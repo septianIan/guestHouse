@@ -31,7 +31,7 @@ class ReservationGroupFormRequest extends FormRequest
             'contactPerson' => 'required',
             'addressPerson' => 'required',
             'estimateArrivale' => 'required',
-            'methodPayment' => 'required'
+            'methodPayment' => 'required',
         ];
 
         if ($this->getMethod() == 'POST') {

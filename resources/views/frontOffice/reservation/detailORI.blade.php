@@ -27,7 +27,6 @@
                      Address : {{ $reservation->address }}<br>
                      Contact Person : {{ $reservation->contactPerson }}<br>
                      Name Person : {{ $reservation->namePerson }}<br>
-                     Media Of Reservation : {{ $reservation->mediaReservation }}
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
@@ -36,43 +35,75 @@
                      Arrivale Date : {{ $reservation->arrivaleDate }}<br>
                      Departure Date : {{ $reservation->departureDate }}<br>
                      Estimate Arrival Check in : {{ $reservation->estimateArrivale }}<br>
+                     Email: info@almasaeedstudio.com
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
                   <b>Payment</b>
                   <address>
                      Method Payment : {{ $reservation->methodPayment }}<br>
-                     Deposit : Rp. {{ number_format($reservation->deposit, 0, ',', '.') }}<br>
+                     Deposit : {{ $reservation->deposit }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Status</b>
+                  <b>Booked Room</b>
                   <address>
-                     {{ $reservation->getStatusReservation() }}
+                     Total Room : {{ $reservation->rooms->count() }}<br>
                   </address>
                </div>
 
                <div class="row mt-3">
                   <h4 class="mx-3">
                      <i class="fa fa-info-circle"></i>
-                     &nbsp;Room Datails
+                     &nbsp;Billing Datails
                   </h4>
                   <div class="col-12 table-responsive">
                      <table class="table table-bordered table-striped">
                         <thead>
                            <tr>
-                              <th>Total Room Reserved</th>
-                              <th>Type Of Room</th>
+                              <th>No</th>
+                              <th>Number Room</th>
+                              <th>Type Room</th>
+                              <th>Stay overnight</th>
+                              <th>Room rate</th>
+                              <th>Total rate per room</th>
                            </tr>
                         </thead>
                         <tbody>
-                        @foreach($reservation->individualReservations as $value)
+                           @foreach($reservation->rooms as $room)
                            <tr>
-                              <td>{{ $value->totalRoomReserved }}</td>
-                              <td>{{ $value->typeOfRoom }}</td>
+                              <td>{{ $loop->iteration }}</td>
+                              <td>{{ $room->numberRoom }}</td>
+                              <td>{{ $room->roomType }}</td>
+                              <td>{{ $difference }} Night</td>
+                              <td>{{ $room->getPriceRp() }}</td>
+                              <td>
+                                 <b>
+                                    Rp. 
+                                    @php
+                                       echo number_format($room->price*=$difference, 0, ',', '.')
+                                    @endphp
+                                 </b>
+                              </td>
                            </tr>
-                        @endforeach
+                           @endforeach
                         </tbody>
+                        <tbody>
+                           <tr style="background:lightblue;">
+                              <td colspan="5" style="font-weight:bold;">Deposit&nbsp;:</td>
+                              <td colspan="5" style="font-weight:bold;">(-) Rp.&nbsp;{{ number_format($reservation->deposit, 0, ',', '.') }}</td>
+                           </tr>
+                        </tbody>
+                        <tfoot>
+                           <tr rowspan="1" style="background:yellow;font-weight:bold;">
+                              <td colspan="5">Total :</td>
+                              <td>Rp. 
+                                 @php
+                                    echo number_format($reservation->total-=$reservation->deposit, 0, ',', '.')
+                                 @endphp
+                              </td>
+                           </tr>
+                        </tfoot>
                      </table>
                   </div>
                </div>

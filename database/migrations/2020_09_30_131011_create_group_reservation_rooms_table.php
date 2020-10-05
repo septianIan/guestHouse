@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMethodpaymentTable extends Migration
+class CreateGroupReservationRoomsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,13 @@ class CreateMethodpaymentTable extends Migration
      */
     public function up()
     {
-        Schema::create('methodpayment', function (Blueprint $table) {
+        Schema::create('group_reservation_rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reservationgroup_id')->constrained()->onDelete('cascade');
-            $table->string('methodPayment')->default(null);
-            $table->string('deposit')->default(0);
-            $table->string('value1')->default(0);
-            $table->string('value2')->default(NULL);
-            $table->string('value3')->default(NULL);
-            $table->string('status')->default(0);
+            $table->string('totalRoomReserved');
+            $table->string('typeOfRoom');
+            $table->string('roomRate')->default(0);
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }
@@ -33,6 +31,6 @@ class CreateMethodpaymentTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('methodpayment');
+        Schema::dropIfExists('group_reservation_rooms');
     }
 }

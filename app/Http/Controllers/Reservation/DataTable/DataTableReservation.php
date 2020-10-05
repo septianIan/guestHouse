@@ -17,13 +17,23 @@ class DataTableReservation extends Controller
      */
     public function __invoke()
     {
-        $reservations = Reservation::where('status', 0)->latest()->get();
+        $reservations = Reservation::whereIn('status', [1,2,3])->latest()->get();
         return datatables()->of($reservations)
         ->addColumn('action', 'frontOffice.template.components.action.DT-action')
         ->addColumn('status', function(Reservation $reservation){
-            return $reservation->getStatusReservation();
+            if ($reservation->getStatusReservation() == 'Confirm') {
+                $data = '<font style="color:blue;font-weight:bold;">'.$reservation->getStatusReservation().'</font>';
+            } elseif ($reservation->getStatusReservation() == 'Tentative') {
+                $data = '<font style="color:red;font-weight:bold;">'.$reservation->getStatusReservation().'</font>';
+            } elseif ($reservation->getStatusReservation() == 'Changed') {
+                $data = '<font style="color:#2ecc71;font-weight:bold;">'.$reservation->getStatusReservation().'</font>';
+            } else {
+
+            }
+            return $data;
         })
         ->addIndexColumn()
+        ->rawColumns(['status', 'action'])
         ->toJson();
     }
 }

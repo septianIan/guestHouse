@@ -15,8 +15,8 @@ class CreateReservationgroupMealTable extends Migration
     {
         Schema::create('reservationgroup_meal', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reservationgroup_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('meal_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('reservationgroup_id')->constrained()->cascadeOnUpdate()->onDelete('cascade');
+            $table->foreignId('meal_id')->constrained()->cascadeOnUpdate()->onDelete('cascade');
             $table->time('atTime');
             $table->timestamps();
         });

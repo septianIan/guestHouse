@@ -35,11 +35,12 @@
 </head>
 <body class="hold-transition login-page bg hero">
    <div class="login-box">
-      <div class="login-logo" style="color:blck;">
-         <strong>Login System Information <i>Guest House</i></strong>
-      </div>
+      
       <!-- /.login-logo -->
       <div class="card">
+      <div class="login-logo mt-3" style="color:blck;">
+         <strong>Login System</strong>
+      </div>
          <div class="card-body login-card-body">
             <p class="login-box-msg">Sign in to start your session</p>
 

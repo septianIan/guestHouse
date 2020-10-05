@@ -18,6 +18,7 @@ class CreateReservationgroupsTable extends Migration
             $table->string('groupName');
             $table->string('arrivaleDate');
             $table->string('departureDate');
+            $table->string('mediaReservation');
             $table->string('namePerson');
             $table->bigInteger('contactPerson');
             $table->string('addressPerson');
@@ -26,8 +27,8 @@ class CreateReservationgroupsTable extends Migration
             $table->string('estimateArrivale');
             $table->string('dateReservation');
             $table->string('status')->default(0);
-            $table->bigInteger('totalRoomPayment');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

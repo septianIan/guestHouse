@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Reservation;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationFormRequest;
+use App\IndividualReservationRoom;
 use App\Reservation;
 use App\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Console\Input\Input;
 
 class ReservationGuestController extends Controller
 {
@@ -41,9 +43,7 @@ class ReservationGuestController extends Controller
      */
     public function store(ReservationFormRequest $request)
     {
-        // ReservationFormRequest
-        $rooms = Room::find($request->rooms);
-        $rooms->toQuery()->update(['status' => 'O']);
+        // $rooms = Room::find($request->rooms);
 
         //code mengambil selisih antara checkin dan checkout
         $checkIn = new Carbon($request->arrivaleDate);
@@ -51,16 +51,23 @@ class ReservationGuestController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < 1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
-        $total = $difference*=$rooms->sum('price');
-
-        //total price
-        // $rooms->sum('price');
-
-        // clear!!!
-        $rooms->toQuery()->update(['status' => 'O']);
-        $data = \array_merge($request->except('_token', 'rooms'), \compact('total'));
+        $data = \array_merge($request->except('_token', 'rooms', 'totalRoomReserved'));
         $reservation = Reservation::create($data);
-        $reservation->rooms()->attach($rooms);
+
+        if (\count($request->rooms) > 0) {
+            foreach ($request->rooms as $room => $v) {
+                $individualReservationDetail = [
+                    'reservation_id' => $reservation->id,
+                    'totalRoomReserved' => $request->totalRoomReserved[$room],
+                    'typeOfRoom' => $request->rooms[$room]
+                ];
+                DB::table('individual_reservation_rooms')->insert($individualReservationDetail);
+            }
+        }
+
+        // di pakai nanti ketika check in
+        // $rooms->toQuery()->update(['code' => 'O']);
+        // $reservation->rooms()->attach($rooms);
         \session()->flash('message', 'Reservation has been added');
         return \redirect()->route('reservation.reservation.index');
     }
@@ -73,15 +80,15 @@ class ReservationGuestController extends Controller
      */
     public function show($id)
     {
-        $reservation = Reservation::with('rooms',)->find($id);
+        $reservation = Reservation::with('rooms')->findOrFail($id);
         //code mengambil selisih antara checkin dan checkout
         $checkIn = new Carbon($reservation->arrivaleDate);
         $checkOut = $reservation->departureDate;
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
-        
-        return view('frontOffice.reservation.detail', \compact('reservation','difference'));
+
+        return view('frontOffice.reservation.detail', \compact('reservation', 'difference'));
     }
 
     /**
@@ -94,8 +101,8 @@ class ReservationGuestController extends Controller
     {
         $reservation = Reservation::find($id);
         $roomReser = DB::table('reservation_room')
-                        ->where('reservation_id', $id)
-                        ->first();
+            ->where('reservation_id', $id)
+            ->first();
         $rooms = Room::all();
         return view('frontOffice.reservation.edit', \compact('reservation', 'rooms', 'roomReser'));
     }
@@ -107,10 +114,21 @@ class ReservationGuestController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ReservationFormRequest $request, Reservation $reservation)
+    public function update(Request $request, Reservation $reservation)
     {
-        $data = $request->except('_token', 'numberRoom');
+        $data = $request->except('_token', 'numberRoom', 'totalRoomReserved', 'rooms');
         $reservation->update($data);
+
+        if (\count($request->rooms) > 0) {
+            foreach ($request->rooms as $room => $v) {
+                $individualReservationDetail = [
+                    'reservation_id' => $reservation->id,
+                    'totalRoomReserved' => $request->totalRoomReserved[$room],
+                    'typeOfRoom' => $request->rooms[$room]
+                ];
+                $data = IndividualReservationRoom::firstOrCreate($individualReservationDetail);
+            }
+        }
 
         \session()->flash('message', 'Reservation has been changed');
         return \redirect()->route('reservation.reservation.index');
@@ -123,43 +141,36 @@ class ReservationGuestController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Reservation $reservation)
-    {   
+    {
         $reservation->rooms()->update(['status' => 'VR']);
         $reservation->delete();
         return \response()->json(['sukses' => true]);
     }
 
-    public function deleteRoom(Request $request, $id, Reservation $reservation)
+    public function cancelGuest()
     {
-        $room = Room::find($request->idRoom);
-        $reservation = Reservation::find($id);
-
-        $checkin = new Carbon($reservation->arrivaleDate);
-        $checkOut = $reservation->departureDate;
-        $selisih = ($checkin->diff($checkOut)->days < -1) ? 'today' : $checkin->diffInDays($checkOut);
-        $total = $reservation->total - ($room->price * $selisih);
-        $room->update(['status' => 'VR']);
-        $reservation->update(['total' => $total]);
-        $room->reservations()->detach($id);
-        return \redirect()->back();
+        return view('frontOffice.reservation.cancelGuestView');
     }
 
-    public function addNewRoom(Request $request, $id)
+    public function detailCancelReservation($id)
     {
-        $rooms = Room::find($request->rooms);
-        $reservation = Reservation::find($id);
-        //mengambil selisih hari. antara checkin dan checkout
+        $reservation = Reservation::onlyTrashed()
+            ->with('rooms')
+            ->where('id', $id)->first();
+        //code mengambil selisih antara checkin dan checkout
         $checkIn = new Carbon($reservation->arrivaleDate);
         $checkOut = $reservation->departureDate;
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
 
-        $total = ($difference * $rooms->sum('price') + $reservation->total);
+        return view('frontOffice.reservation.detail', \compact('reservation', 'difference'));
+    }
 
-        $rooms->toQuery()->update(['status' => 'O']);
-        $reservation->update(['total'=> $total]);
-        $reservation->rooms()->attach($rooms);
+    public function deleteRoomArragement($id)
+    {
+        $individualReservationDetail = IndividualReservationRoom::find($id);
+        $individualReservationDetail->delete();
         return \redirect()->back();
     }
 }

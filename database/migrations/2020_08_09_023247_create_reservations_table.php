@@ -20,15 +20,16 @@ class CreateReservationsTable extends Migration
             $table->string('departureDate');
             $table->string('mediaReservation');
             $table->string('methodPayment');
-            $table->string('deposit');
-            $table->string('contactPerson');
+            $table->bigInteger('numberAccount')->default(0);
+            $table->bigInteger('deposit')->default(0);
+            $table->bigInteger('contactPerson');
             $table->string('namePerson');
             $table->string('address');
             $table->string('estimateArrivale');
             $table->string('specialRequest');
-            $table->string('total');
-            $table->integer('status')->default('0');
+            $table->integer('status')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

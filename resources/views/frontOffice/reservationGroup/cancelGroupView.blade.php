@@ -1,9 +1,10 @@
 @extends('frontOffice.template.ui')
-@section('title', 'Data Group Reservation')
+@section('title', 'Cancel Reservation Group')
 @section('breadcrumb')
    <ol class="breadcrumb float-sm-right">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <li class="breadcrumb-item active">Data Group Reservation</li>
+      <li class="breadcrumb-item"><a href="{{ route('reservation.reservationGroup.index') }}">Data Reservation Group</a></li>
+      <li class="breadcrumb-item active">Data Cancel Reservation Group</li>
    </ol>
 @endsection
 @section('content')
@@ -13,8 +14,7 @@
             <div class="card card-primary">
                <div class="card-header">
                   <h3 class="card-title">
-                     <h3 class="card-title">Data Group Reservation</h3>
-                     <a href="{{ route('reservation.reservationGroup.create') }}" class="float-right"><i class="fa fa-plus"></i> Add Reservation</a>
+                     <h3 class="card-title">Cancel reservation group</h3>
                   </h3>
                </div>
                <div class="card-body">
@@ -28,8 +28,7 @@
                            <td>Group name</td>
                            <td>Arrivale date</td>
                            <td>Departure date</td>
-                           <td>Estimate arrivale</td>
-                           <td>Status</td>
+                           <td>Name person</td>
                            <td>Action</td>
                         </tr>
                      </thead>
@@ -65,53 +64,16 @@
          "serverSide" : true,
          "responsive" : true,
          "autoWidth" : true,
-         ajax: '{{ route('reservation.data.reservationGroups') }}',
+         ajax: '{{ route('reservation.data.cancelReservationGroups') }}',
          columns : [
             {data: 'DT_RowIndex'},
             {data: 'groupName'},
             {data: 'arrivaleDate'},
             {data: 'departureDate'},
-            {data: 'estimateArrivale'},
-            {data: 'status'},
-            {data: 'action'}
+            {data: 'namePerson'},
+            {data: 'detail'}
          ]
       });
-      //sweet alert
-      $('#dataTable').on('click', 'button#delete', function(e){
-         e.preventDefault();
-         var id = $(this).data('id');
-         Swal.fire({
-            title: 'Are you sure you want to delete this data?',
-            text: "Deleted data! means canceled reservation!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel!',
-         }).then((result) => {
-            if (result.value) {
-                  $.ajax({
-                     type: "DELETE",
-                     url: "/reservation/reservationGroup/" +id,
-                     data: {
-                        "id": id,
-                        "_token": "{{ csrf_token() }}"
-                     },
-
-                     //setelah berhasil di hapus
-                     success: function(data){
-                        Swal.fire('Erase Data!', 'Data has been deleted', 'success')
-                        location.reload(true);
-                     }
-                  })
-               }
-            })
-         });
-      //notif
-      $('#notif').fadeTo(2000, 500).slideUp(500, function(){
-            $('#notif').slideUp(500);
-      })
    })
 </script>
 @endpush

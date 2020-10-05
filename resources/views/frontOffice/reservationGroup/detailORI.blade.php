@@ -21,13 +21,13 @@
                </div>
             </div>
             <div class="row invoice-info">
-               <div class="col-sm-4 invoice-col">
+               <div class="col-sm-3 invoice-col">
                   <p>
                      <strong>Group name :&nbsp; <font style="font-style:italic;">{{ $reservationGroup->groupName }}</font></strong>
                      <br>
-                     Contact Person : {{ $reservationGroup->contactPerson }}
-                     <br>                     
                      Name person : {{ $reservationGroup->namePerson }}
+                     <br>                     
+                     Contact Person : {{ $reservationGroup->contactPerson }}
                      <br>
                      Address : {{ $reservationGroup->addressPerson }}
                   </p>
@@ -35,7 +35,7 @@
                <div class="col-sm-3 invoice-col">
                   <b>Date Reservation</b>
                   <p>
-                     Arrivale Date : {{ $reservationGroup->arrivaleDate }}<br>
+                     Arrivale Date : {{ $reservationGroup->arrivaleData }}<br>
                      Departure Date : {{ $reservationGroup->departureDate }}<br>
                      Estimate Arrival Check in : {{ $reservationGroup->estimateArrivale }}<br>
                      Date Reservation : {{ $reservationGroup->dateReservation }}
@@ -45,22 +45,23 @@
                   <b>Method Payment :&nbsp; <font style="font-style:italic;">{{ $reservationGroup->methodPayment->methodPayment }}</font></b>
                   @if($reservationGroup->methodPayment->methodPayment == 'personal')
                      <p>
-                        Cast deposit : {{ number_format($reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
-                        Credit card : {{ $reservationGroup->methodPayment->value1 }}<br>
-                        Number account : {{ $reservationGroup->methodPayment->value2 }}<br>
-                        Other : {{ $reservationGroup->methodPayment->value3 }}<br>
+                        Cast deposit : {{ $reservationGroup->methodPayment->value2 }}<br>
+                        Credit card : {{ $reservationGroup->methodPayment->value3 }}<br>
+                        Other : {{ $reservationGroup->methodPayment->value4 }}<br>
                      </p>
                   @else
                      <p>
-                        Deposit : {{ number_format($reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
-                        Credit card   : {{ $reservationGroup->methodPayment->value1 }}<br>
-                        Travel agent : {{ $reservationGroup->methodPayment->value2 }}<br>
-                        Other : {{ $reservationGroup->methodPayment->value3 }}<br>
+                        Guarantee : {{ $reservationGroup->methodPayment->value2 }}<br>
+                        Voucher : {{ $reservationGroup->methodPayment->value3 }}<br>
+                        Other : {{ $reservationGroup->methodPayment->value4 }}<br>
                      </p>
                   @endif
                </div>
-               <div class="col-sm-2 invoice-col">
-                  
+               <div class="col-sm-3 invoice-col">
+                  <b>Booked Room</b>
+                  <p>
+                     Total Room : {{ count($reservationGroup->rooms) }}<br>
+                  </p>
                </div>
 
                <div class="row mt-3">
@@ -69,28 +70,64 @@
                      &nbsp;Billing Datails
                   </h4>
                   <div class="col-12 table-responsive">
-                     <table class="table table-bordered table-stripped">
+                     <table class="table table-bordered table-avatar">
                         <thead>
+                           <tr>
+                              <th>No</th>
+                              <th>Number room</th>
+                              <th>Type room</th>
+                              <th>Stay overnight</th>
+                              <th>Room rate</th>
+                              <th>Total rate per room</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           @foreach($reservationGroup->rooms as $room)
+                              <tr>
+                                 <td>{{ $loop->iteration }}</td>
+                                 <td>{{ $room->numberRoom }}</td>
+                                 <td>{{ $room->roomType }}</td>
+                                 <td>{{ $difference }} Night</td>
+                                 <td>
+                                    {{ $room->getPriceRp() }} / Night
+                                    
+                                 </td>
+                                 <td>
+                                    Rp.
+                                    @php
+                                       echo number_format($room->price*=$difference, 0, ',', '.')
+                                    @endphp
+                                 </td>
+                              </tr>
+                           @endforeach
+                        </tbody>
+                        <tbody>
+                           <tr rowspan="1" style="background:#FFA07A;font-weight:bold;">
+                              <td colspan="5">Total room payment:</td>
+                              <td>
+                                 {{ $reservationGroup->getTotalRp() }}
+                              </td>
+                           </tr>
+                        </tbody>
+                        <tbody>
                            <tr>
                               <th>No</th>
                               <th>Meal</th>
                               <th colspan="5">At Time</th>
-                              <th colspan="6">Price</th>
                            </tr>
-                        </thead>
+                        </tbody>
                         <tbody>
                            @foreach($reservationGroup->meals as $meal)
                               <tr>
                                  <td>{{ $loop->iteration }}</td>
                                  <td>{{ $meal->type }}</td>
                                  <td colspan="5">{{ $meal->pivot->atTime }}</td>
-                                 <td colspan="5">{{ $meal->price }}</td>
                               </tr>
                            @endforeach
                         </tbody>
                         <tbody>
                            <tr rowspan="1" style="background:#98FB98;font-weight:bold;">
-                              <td colspan="7">Total meal :</td>
+                              <td colspan="5">Total meal :</td>
                               <td>
                                  (+) Rp. {{ number_format($totalMeal, 0, ',', '.') }}
                               </td>
@@ -99,21 +136,27 @@
                         <tbody>
                            <tr rowspan="1">
                               <th>Special request</th>
-                              <td colspan="6">{{ $reservationGroup->specialRequest }}</td>
+                              <td colspan="4">{{ $reservationGroup->specialRequest }}</td>
                               <td style="background:lightblue;font-weight:bold;">(+) Rp. {{ number_format($reservationGroup->costRequest, 0, ',', '.') }}</td>
                            </tr>
                         </tbody>
+                        @if($reservationGroup->methodPayment->methodPayment == 'personal')
                         <tbody>
                            <tr>
-                              <th colspan="7">Deposit&nbsp;:</th>
-                              <th colspan="6" style="background:#FFB6C1;">(-) Rp.&nbsp;{{ number_format($reservationGroup->methodPayment->deposit, 0, ',', '.') }}</th>
+                              <th colspan="5">Deposit&nbsp;:</th>
+                              <th colspan="6" style="background:#FFB6C1;">(-) Rp.&nbsp;{{ number_format($reservationGroup->methodPayment->value2, 0, ',', '.') }}</th>
                            </tr>
                         </tbody>
+                        @endif
                         <tfoot>
                            <tr rowspan="1" style="background:yellow;font-weight:bold;">
-                              <td colspan="7">Total of all :</td>
+                              <td colspan="5">Total of all :</td>
                               <td>
-                                 Rp. {{ number_format($allTotal-=$reservationGroup->methodPayment->deposit, 0, ',', '.') }}
+                                 @if($reservationGroup->methodPayment->methodPayment == 'personal')
+                                    Rp. {{ number_format($allTotal-=$reservationGroup->methodPayment->value2, 0, ',', '.') }}
+                                 @else
+                                    Rp. {{ number_format($allTotal, 0, ',', '.') }}
+                                 @endif
                               </td>
                            </tr>
                         </tfoot>

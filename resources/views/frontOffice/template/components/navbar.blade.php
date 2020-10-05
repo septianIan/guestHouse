@@ -31,6 +31,7 @@
           <a href="{{ route('logout') }}" class="dropdown-item"  onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
             <span class="fa fa-sign-out"></span> {{ __('Sign Out') }}
+            {{ Auth::user()->name }}
           </a>
           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
               @csrf

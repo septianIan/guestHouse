@@ -1,5 +1,5 @@
 <?php 
 
 Route::get('/', function () {
-   return 'reception page';
+   return view('frontOffice.reception.index');
 })->name('reception');

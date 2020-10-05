@@ -25,8 +25,6 @@ class ReservationFormRequest extends FormRequest
     {
         $rules = [
             'guestName' => 'required',
-            'arrivaleDate' => 'required',
-            'departureDate' => 'required',
             'mediaReservation' => 'required',
             'methodPayment' => 'required',
             'contactPerson' => 'required',
@@ -34,10 +32,15 @@ class ReservationFormRequest extends FormRequest
             'address' => 'required',
             'estimateArrivale' => 'required',
             'specialRequest' => 'required',
-            // 'rooms' => 'required'
+            'deposit' => 'required',
+            'numberAccount' => 'required'
         ];
         if ($this->getMethod() == "POST") {
-            $rules += ['rooms' => 'required'];
+            // $rules += ['rooms' => 'required'];
+            $rules += [
+                'arrivaleDate' => 'required', 
+                'departureDate' => 'required'
+            ];
         }
 
         return $rules;

@@ -1,5 +1,6 @@
 <?php
 
+use App\IndividualReservationRoom;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,5 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MasterLaundrySeeder::class);
         $this->call(RoomSeeder::class);
         $this->call(MealSeed::class);
+        $this->call(IndividualReservationSeed::class);
+        $this->call(groupReservationSeed::class);
     }
 }

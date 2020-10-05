@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Reservation;
 
-
+use App\GroupReservationRoom;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationGroupFormRequest;
 use App\Meal;
@@ -45,6 +45,7 @@ class ReservationGroupController extends Controller
      */
     public function store(ReservationGroupFormRequest $request)
     {
+
         $rooms = Room::find($request->rooms);
         $dateReservation = Carbon::now()->isoFormat('D-M-Y');
         
@@ -52,9 +53,6 @@ class ReservationGroupController extends Controller
         $checkOut = $request->departureDate;
         $difference = ($checkIn->diff($checkOut)->days < -1) 
                     ? 'today' :$checkIn->diffInDays($checkOut);
-                    //selisih dari arrivale dan departure di kalikan jumlah sum rooms
-        $totalRoomPayment = $difference*=$rooms->sum('price');
-
         //jika metode pembayarannya personal maka ouput yang di hasilkan value dari creditCard jika tidak value dari voucher
         $noMethodPayment = $request->methodPayment == 'personal' ? $request->creditCard : $request->voucher;
         
@@ -64,33 +62,45 @@ class ReservationGroupController extends Controller
         $specialRequest = \implode(" ", $arrayReq);
 
 
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'namePerson', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'costRequest', 'estimateArrivale'), \compact('totalRoomPayment','dateReservation', 'specialRequest'));
-
-        $rooms->toQuery()->update(['status' => 'O']);
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'namePerson', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'costRequest', 'estimateArrivale'), \compact('dateReservation', 'specialRequest'));
         $groupReservation = ReservationGroup::create($data);
-        $groupReservation->rooms()->attach($rooms);
 
-        //jika meals arragement lebih dari 0
-        if (\count($request->meals) > 0) {
-            //loop request meals
-            foreach($request->meals as $meal=>$v) {
-                $attach = [
-                    'reservationgroup_id' => $groupReservation->id,
-                    'meal_id' => $request->meals[$meal],
-                    'atTime' => $request->timeMeal[$meal],
-                ];
-                DB::table('reservationgroup_meal')->insert($attach);
+        if ($request->has('meals')) {
+            //jika meals arragement lebih dari 0
+            if (\count($request->meals) > 0) {
+                //loop request meals
+                foreach($request->meals as $meal=>$v) {
+                    $attach = [
+                        'reservationgroup_id' => $groupReservation->id,
+                        'meal_id' => $request->meals[$meal],
+                        'atTime' => $request->timeMeal[$meal],
+                    ];
+                    DB::table('reservationgroup_meal')->insert($attach);
+                }
             }
         }
 
+        if (count($request->rooms) > 0) {
+            foreach($request->rooms as $room=>$v) {
+                $roomSelection = [
+                    'reservationgroup_id' => $groupReservation->id,
+                    'totalRoomReserved' => $request->totalRoomReserved[$room],
+                    'typeOfRoom' => $request->rooms[$room]
+                ];
+                DB::table('group_reservation_rooms')->insert($roomSelection );
+            }
+        }
+
+        //VALIDASI Method Payment
         $requestOther = $request->other == '' ? 'nothing' : $request->other;
         if ($request->methodPayment == 'personal') {
             MethodPayment::create([
                 'reservationgroup_id' => $groupReservation->id,
                 'methodPayment' => $request->methodPayment,
-                'value2' => $request->deposit,
-                'value3' => $request->creditCard,
-                'value4' => $requestOther,
+                'deposit' => $request->deposit,
+                'value1' => $request->creditCard,
+                'value2' => $request->numberAccount,
+                'value3' => $requestOther,
                 'status' => 0
             ]);
         } else {
@@ -98,9 +108,10 @@ class ReservationGroupController extends Controller
             MethodPayment::create([
                 'reservationgroup_id' => $groupReservation->id,
                 'methodPayment' => $request->methodPayment,
-                'value2' => $request->guarantee,
-                'value3' => $request->voucher,
-                'value4' => $requestOther,
+                'deposit' => $request->deposit,
+                'value1' => $request->guarantee,
+                'value2' => $request->voucher,
+                'value3' => $requestOther,
                 'status' => 0
             ]);
         }
@@ -123,7 +134,7 @@ class ReservationGroupController extends Controller
             ? 'today'
             : $checkIn->diffInDays($checkOut);
         $totalMeal = $reservationGroup->meals->sum('price');
-        $allTotal = $reservationGroup->totalRoomPayment + $reservationGroup->costRequest + $totalMeal;
+        $allTotal = $reservationGroup->costRequest + $totalMeal;
 
         return \view('frontOffice.reservationGroup.detail', \compact(
             'reservationGroup', 
@@ -157,19 +168,49 @@ class ReservationGroupController extends Controller
      */
     public function update(ReservationGroupFormRequest $request, ReservationGroup $reservationGroup)
     {   
-        $data = $request->except('_token','deposit','creditCard','otherPersonal','guarantee','methodPayment', 'voucher');        
+        $dateReservation = Carbon::now()->isoFormat('D-M-Y');
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'namePerson', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'costRequest', 'estimateArrivale', 'specialRequest', 'status'), \compact('dateReservation'));       
+        // \dd($request->all());
         $reservationGroup->update($data);
 
+        //ROOMS ARRAGEMENT
+        if (count($request->rooms) > 0) {
+            foreach($request->rooms as $room=>$v) {
+                $roomSelection = [
+                    'reservationgroup_id' => $reservationGroup->id,
+                    'totalRoomReserved' => $request->totalRoomReserved[$room],
+                    'typeOfRoom' => $request->rooms[$room]
+                ];
+                GroupReservationRoom::firstOrCreate($roomSelection);
+            }
+        }
+
+        //MEALS ARRAGEMENT
+        if ($request->has('meals')) {
+            //jika meals arragement lebih dari 0
+            if (\count($request->meals) > 0) {
+                //loop request meals
+                foreach($request->meals as $meal=>$v) {
+                    $attach = [
+                        'reservationgroup_id' => $reservationGroup->id,
+                        'meal_id' => $request->meals[$meal],
+                        'atTime' => $request->timeMeal[$meal],
+                    ];
+                    DB::table('reservationgroup_meal')->updateOrInsert($attach);
+                }
+            }
+        }
+        
         $requestOther = $request->other == '' ? 'nothing' : $request->other;
         $methodPayment = MethodPayment::where('reservationgroup_id' ,$reservationGroup->id)->first();
-        
         if ($request->methodPayment == 'personal') {
             $methodPayment->update([
                 'reservationgroup_id' => $reservationGroup->id,
                 'methodPayment' => $request->methodPayment,
-                'value2' => $request->deposit,
-                'value3' => $request->creditCard,
-                'value4' => $requestOther,
+                'deposit' => $request->deposit,
+                'value1' => $request->creditCard,
+                'value2' => $request->numberAccount,
+                'value3' => $requestOther,
                 'status' => 0
             ]);
         } else {
@@ -177,9 +218,10 @@ class ReservationGroupController extends Controller
             $methodPayment->update([
                 'reservationgroup_id' => $reservationGroup->id,
                 'methodPayment' => $request->methodPayment,
-                'value2' => $request->guarantee,
-                'value3' => $request->voucher,
-                'value4' => $requestOther,
+                'deposit' => $request->deposit,
+                'value1' => $request->guarantee,
+                'value2' => $request->voucher,
+                'value3' => $requestOther,
                 'status' => 0
             ]);
         }
@@ -201,56 +243,44 @@ class ReservationGroupController extends Controller
         return \response()->json(['sukses' => true]);
     }
 
-    public function deleteMeal(Request $request ,$id)
+    public function cancelGroup()
     {
-        $meals = Meal::find($request->idMeal);
-        $reservationGroup = ReservationGroup::find($id);
+        return view('frontOffice.reservationGroup.cancelGroupView');
+    }
 
-        $meals->reservationGroups()->detach($reservationGroup);
+    public function deleteMeal($id)
+    {
+        $deleteMeal = DB::table('reservationgroup_meal')->where('id', $id)->delete();
         return \redirect()->back();
     }
 
-    public function addMeal(Request $request)
+    public function detailCancelReservationGroup($id)
     {
-        $meals = Meal::find($request->meals);
-        $reservationGroup = ReservationGroup::find($request->id);
-        $reservationGroup->meals()->attach($meals, ['atTime' => $request->timeMeal]);
-        return \redirect()->back();
-    }
-
-    public function deleteRoom(Request $request, $id)
-    {
-        $rooms = Room::find($request->idRoom);
-        $reservationGroup = ReservationGroup::find($id);
+        $reservationGroup = ReservationGroup::onlyTrashed()
+                            ->with('rooms', 'meals', 'methodPayment')
+                            ->where('id', $id)
+                            ->first();
 
         $checkIn = new Carbon($reservationGroup->arrivaleDate);
         $checkOut = $reservationGroup->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < -1) 
-                    ? 'today' :$checkIn->diffInDays($checkOut);
-        $totalRoomPayment = $reservationGroup->totalRoomPayment - ($rooms->price * $difference);
-        $rooms->update(['status' => 'VR']);
-        $reservationGroup->update(['totalRoomPayment' => $totalRoomPayment]);
-        $rooms->reservationGroups()->detach($reservationGroup);
+        $difference = ($checkIn->diff($checkOut)->days < -1)
+            ? 'today'
+            : $checkIn->diffInDays($checkOut);
+        $totalMeal = $reservationGroup->meals->sum('price');
+        $allTotal = $reservationGroup->totalRoomPayment + $reservationGroup->costRequest + $totalMeal;
 
-        return \redirect()->back();
-        
+        return \view('frontOffice.reservationGroup.detail', \compact(
+            'reservationGroup', 
+            'difference',
+            'totalMeal',
+            'allTotal'
+        ));
     }
 
-    public function addRoom(Request $request)
+    public function deleteRoomArragementGroupReservation($id)
     {
-        $rooms = Room::find($request->rooms);
-        $reservationGroup = ReservationGroup::find($request->id);
-
-        $checkIn = new Carbon($reservationGroup->arrivaleDate);
-        $checkOut = $reservationGroup->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < -1) 
-                    ? 'today' :$checkIn->diffInDays($checkOut);
-        $totalRoomPayment = ($difference * $rooms->sum('price') + $reservationGroup->totalRoomPayment);
-        
-        $rooms->toQuery()->update(['status' => 'O']);
-        $reservationGroup->update(['totalRoomPayment'=> $totalRoomPayment]);
-        $reservationGroup->rooms()->attach($rooms);
+        $groupReservationRoom = GroupReservationRoom::find($id);
+        $groupReservationRoom->delete();
         return \redirect()->back();
-
     }
 }

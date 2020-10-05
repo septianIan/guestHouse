@@ -2,11 +2,15 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReservationGroup extends Model
 {
+    use SoftDeletes;
+
     public $table = 'reservationgroups';
     protected $guarded = [];
 
@@ -17,7 +21,7 @@ class ReservationGroup extends Model
 
     public function meals()
     {
-        return $this->belongsToMany(Meal::class, 'reservationgroup_meal', 'reservationgroup_id', 'meal_id')->withPivot('atTime');
+        return $this->belongsToMany(Meal::class, 'reservationgroup_meal', 'reservationgroup_id', 'meal_id')->withPivot('atTime', 'id');
     }
 
     public function methodPayment()
@@ -28,5 +32,33 @@ class ReservationGroup extends Model
     public function getTotalRp()
     {
         return 'Rp. '. \number_format($this->totalRoomPayment, 0, ',', '.');
+    }
+
+    public function setArrivaleDateAttribute($value)
+    {
+        $this->attributes['arrivaleDate'] = Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+    }
+
+    public function setDepartureDateAttribute($value)
+    {
+        $this->attributes['departureDate'] = Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
+    }
+
+    public function groupReservationRooms()
+    {
+        return $this->hasMany(GroupReservationRoom::class, 'reservationgroup_id');
+    }
+
+    public function getStatusGroupReservation()
+    {
+        if ($this->status == 1) {
+            return 'Confirm';
+        } elseif ($this->status == 2) {
+            return 'Tentative';
+        } elseif ($this->status == 3) {
+            return 'Changed';
+        } else {
+            return \false;
+        }
     }
 }

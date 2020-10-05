@@ -1,36 +1,30 @@
 @extends('frontOffice.template.ui')
-@section('title', 'Individual Reservation')
-
+@section('title', 'Cancel Guest')
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
    <li class="breadcrumb-item"><a href="">Home</a></li>
-   <li class="breadcrumb-item active">Data Individual Reservation</li>
+   <li class="breadcrumb-item"><a href="{{ route('reservation.reservation.index') }}">Data Reservation Guest</a></li>
+   <li class="breadcrumb-item active">Data Cancel Reservation Guest</li>
 </ol>
 @endsection
-
 @section('content')
 <div class="container">
    <div class="row">
       <div class="col-md-12">
          <div class="card card-primary">
             <div class="card-header">
-               <h3 class="card-title">Data Individual Reservation</h3>
-               <a href="{{ route('reservation.reservation.create') }}" class="float-right"><i class="fa fa-plus"></i> Add Reservation</a>
+               <h3 class="card-title">Data Cancel Guest</h3>
             </div>
             <div class="card-body">
-               @if(session('message'))
-                  <div  div id="notif" class="alert alert-info">{{ session('message') }}</div>
-               @endif
-               <table id="dataTable" class="table table-bordered table-striped">
+               <table id="dataTable" class="table table-bordered table-stripped">
                   <thead>
                      <tr>
                         <th>No</th>
-                        <th>Guest Name</th>
+                        <th>Name Guest</th>
                         <th>Arrival</th>
                         <th>Departure</th>
                         <th>Media Reservation</th>
                         <th>Estimate Arrival</th>
-                        <th>Status</th>
                         <th>Action</th>
                      </tr>
                   </thead>
@@ -59,6 +53,7 @@
 
 <!-- Sweet alert -->
 <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+
 <script>
    $(function() {
       //dataTable
@@ -67,7 +62,7 @@
          "serverSide" : true,
          "responsive" : true,
          "autoWidth" : true,
-         ajax: '{{ route('reservation.data.reservations') }}',
+         ajax: '{{ route('reservation.data.cancelReservations') }}',
          columns : [
             {data: 'DT_RowIndex'},
             {data: 'guestName'},
@@ -75,47 +70,14 @@
             {data: 'departureDate'},
             {data: 'mediaReservation'},
             {data: 'estimateArrivale'},
-            {data: 'status'},
-            {data: 'action'}
+            {
+               data: 'detail', 
+               name: 'detail', 
+               orderable: true, 
+               searchable: true
+            },
          ]
       });
-      //sweet alert
-      $('#dataTable').on('click', 'button#delete', function(e){
-         e.preventDefault();
-         var id = $(this).data('id'); //ambil dari data-id
-
-         Swal.fire({
-            title: 'Are you sure you delete this data?',
-            text: "Deleted data! means canceled reservation!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel!',
-         }).then((result) => {
-            if (result.value) {
-               $.ajax({
-                  type: "DELETE",
-                  url: "/reservation/reservation/" +id,
-                  data: {
-                     "id": id,
-                     "_token": "{{ csrf_token() }}"
-                  },
-
-                  //setelah berhasil di hapus
-                  success: function(data){
-                     Swal.fire('Erase Data!', 'Data has been deleted', 'success')
-                     location.reload(true);
-                  }
-               })
-            }
-         })
-      });
-      //notif
-      $('#notif').fadeTo(2000, 500).slideUp(500, function(){
-            $('#notif').slideUp(500);
-      })
-   });
+   })
 </script>
 @endpush
