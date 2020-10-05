@@ -238,7 +238,8 @@ class ReservationGroupController extends Controller
      */
     public function destroy(ReservationGroup $reservationGroup)
     {
-        $reservationGroup->rooms()->update(['status' => 'VR']);
+        // $reservationGroup->rooms()->update(['code' => 'VR']);
+        $reservationGroup->update(['status' => 0]);
         $reservationGroup->delete();
         return \response()->json(['sukses' => true]);
     }
