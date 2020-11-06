@@ -18,6 +18,11 @@ class Room extends Model
         return $this->belongsToMany(ReservationGroup::class, 'reservationgroup_room', 'room_id', 'reservationgroup_id');
     }
 
+    public function registrations()
+    {
+        return $this->belongsToMany(Registration::class);
+    }
+
     public function getRoomTypeAttribute($value)
     {
         return strtoupper($value);

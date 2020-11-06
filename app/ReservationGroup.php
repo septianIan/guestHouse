@@ -51,12 +51,14 @@ class ReservationGroup extends Model
 
     public function getStatusGroupReservation()
     {
-        if ($this->status == 1) {
+        if ($this->status == 'confirm') {
             return 'Confirm';
-        } elseif ($this->status == 2) {
+        } elseif ($this->status == 'tentantive') {
             return 'Tentative';
-        } elseif ($this->status == 3) {
+        } elseif ($this->status == 'Changed') {
             return 'Changed';
+        } elseif($this->status == 'checkIn') {
+            return 'Check In';
         } else {
             return \false;
         }

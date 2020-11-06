@@ -1,0 +1,2 @@
+tabel individual_reservation_room dan group_reservation_room untuk pengaturan kamar
+tabel resevation_room dan reservationGroup_room untuk tabel pivot

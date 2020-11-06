@@ -18,7 +18,7 @@ class CreateIndividualReservationRoomsTable extends Migration
             $table->foreignId('reservation_id')->constrained()->onDelete('cascade');
             $table->string('totalRoomReserved');
             $table->string('typeOfRoom');
-            $table->string('roomRate')->default(0);
+            $table->string('roomRate');
             $table->integer('status')->default(1);
             $table->timestamps();
         });

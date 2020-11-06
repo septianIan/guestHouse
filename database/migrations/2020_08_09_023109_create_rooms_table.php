@@ -18,7 +18,7 @@ class CreateRoomsTable extends Migration
             $table->string('roomType');
             $table->integer('numberRoom');
             $table->integer('price');
-            $table->string('status');
+            $table->string('code');
             $table->timestamps();
         });
     }

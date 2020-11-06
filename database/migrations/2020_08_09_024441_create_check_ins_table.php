@@ -15,13 +15,9 @@ class CreateCheckInsTable extends Migration
     {
         Schema::create('check_ins', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('reservationgroup_id');
-
-            $table->foreign('reservationgroup_id')->references('id')->on('reservationgroups')->onDelete('cascade');
-            $table->foreignId('registration_id')->constrained();
+            $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
             $table->string('date');
-            $table->string('time');
-            $table->string('status');
+            $table->string('status')->default('checkIn');
             $table->timestamps();
         });
     }

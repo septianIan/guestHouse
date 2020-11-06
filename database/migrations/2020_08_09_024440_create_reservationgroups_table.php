@@ -22,11 +22,13 @@ class CreateReservationgroupsTable extends Migration
             $table->string('namePerson');
             $table->bigInteger('contactPerson');
             $table->string('addressPerson');
-            $table->string('specialRequest');
-            $table->bigInteger('costRequest')->default(0);
+            $table->string('specialRequest')->nullable();
+            $table->bigInteger('rateRequest')->nullable();
+            $table->time('atTime')->nullable();
+            $table->string('flightNumber')->nullable();
             $table->string('estimateArrivale');
             $table->string('dateReservation');
-            $table->string('status')->default(0);
+            $table->string('status')->default('confirm');
             $table->timestamps();
             $table->softDeletes();
         });

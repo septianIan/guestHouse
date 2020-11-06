@@ -12,7 +12,6 @@ Route::get('/', function () {
 })->name('dashboard');
 
 Route::resource('reservation', 'ReservationGuestController');
-Route::get('calendar', 'CalendarController@index')->name('calender.index');
 Route::get('cancelGuest', 'ReservationGuestController@cancelGuest')->name('reservation.cancelGuest');
 Route::get('cancelGroup', 'ReservationGroupController@cancelGroup')->name('reservation.cancelGroup');
 
@@ -36,4 +35,9 @@ Route::get('reservationGroup/deteleRoomArragement/{id}', 'ReservationGroupContro
 Route::get('reservationGroup/deleteMealArragementGroupReservation/{id}', 'ReservationGroupController@deleteMeal')->name('deleteMealArragementGroupReservation.room');
 
 
-
+/**
+ * Chart Plan
+ * 
+ */
+Route::get('calendar', 'ChartPlanController@calendar')->name('chartPlan.calendar');
+Route::get('date-between', 'ChartPlanController@betweenDate')->name('chartPlan.dateBetween');

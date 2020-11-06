@@ -15,17 +15,18 @@ class DataTableReservationGroupController extends Controller
      */
     public function __invoke()
     {
-        $reservationGroup = ReservationGroup::whereIn('status', [1,2,3])->latest()->get();
+        $reservationGroup = ReservationGroup::whereIn('status', ['checkIn','confirm','tentative', 'changed'])->latest()->get();
         return \datatables()->of($reservationGroup)
         ->addColumn('action', 'frontOffice.template.components.action.DT-action')
         ->addColumn('status', function(ReservationGroup $reservation){
-            if ($reservation->getStatusGroupReservation() == 'Confirm') {
-                $data = '<font style="color:blue;font-weight:bold;">'.$reservation->getStatusGroupReservation().'</font>';
-            } elseif ($reservation->getStatusGroupReservation() == 'Tentative') {
-                $data = '<font style="color:red;font-weight:bold;">'.$reservation->getStatusGroupReservation().'</font>';
-            } elseif ($reservation->getStatusGroupReservation() == 'Changed') {
-                $data = '<font style="color:#2ecc71;font-weight:bold;">'.$reservation->getStatusGroupReservation().'</font>';
-            } else {
+            if ($reservation->status == 'confirm') {
+                $data = '<font style="color:blue;font-weight:bold;">Confirm</font>';
+            } elseif ($reservation->status == 'tentative') {
+                $data = '<font style="color:red;font-weight:bold;">Tentative</font>';
+            } elseif ($reservation->status == 'changed') {
+                $data = '<font style="color:#2ecc71;font-weight:bold;">Changed</font>';
+            } elseif($reservation->status == 'checkIn') {
+                $data = '<font style="color:green;font-weight:bold;">Check In</font>';
             }
             return $data;
         })

@@ -16,7 +16,7 @@
                <div class="col-12">
                   <h4>
                      <i class="fa fa-info-circle"></i>
-                     &nbsp;Detail Guest Reservation
+                     &nbsp;Detail Individual Reservation
                   </h4>
                </div>
             </div>
@@ -48,33 +48,71 @@
                <div class="col-sm-3 invoice-col">
                   <b>Status</b>
                   <address>
-                     {{ $reservation->getStatusReservation() }}
+                     {{ $reservation->status }}
                   </address>
                </div>
+            </div>
+         </div>
+      </div>
+   </div>
 
-               <div class="row mt-3">
-                  <h4 class="mx-3">
-                     <i class="fa fa-info-circle"></i>
-                     &nbsp;Room Datails
-                  </h4>
-                  <div class="col-12 table-responsive">
-                     <table class="table table-bordered table-striped">
-                        <thead>
-                           <tr>
-                              <th>Total Room Reserved</th>
-                              <th>Type Of Room</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($reservation->individualReservations as $value)
-                           <tr>
-                              <td>{{ $value->totalRoomReserved }}</td>
-                              <td>{{ $value->typeOfRoom }}</td>
-                           </tr>
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="invoice p-3 mb-3">
+            <div class="row mt-3">
+               <h4 class="mx-3">
+                  <i class="fa fa-info-circle"></i>
+                  &nbsp;Room Datails
+               </h4>
+               <div class="col-12 table-responsive">
+                  <table class="table table-bordered table-striped">
+                     <thead>
+                        <tr>
+                           <th>Total Room Reserved</th>
+                           <th>Type Of Room</th>
+                           <th>Room rate</th>
+                           <th>Stay</th>
+                           <th>Total rate</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        @foreach($reservation->individualReservationRooms as $value)
+                        <tr>
+                           <td>{{ $value->totalRoomReserved }}</td>
+                           <td>{{ $value->typeOfRoom }}</td>
+                           <td>Rp. {{ number_format($value->roomRate, 0 ,',', '.') }}</td>
+                           <td>{{ $difference }} Night</td>
+                           <td>
+                              Rp.
+                              @php
+                              $totalPerRoom = $value->roomRate * $value->totalRoomReserved * $difference;
+                              echo number_format($totalPerRoom, 0, ',', '.')
+                              @endphp
+                           </td>
+                        </tr>
                         @endforeach
-                        </tbody>
-                     </table>
-                  </div>
+                     </tbody>
+                     <tbody>
+                        <tr rowspan="1" style="background:#3498db;font-weight:bold;">
+                           <td colspan="4"></td>
+                           <td>
+                              Rp. {{ number_format($total, 0, ',', '.') }}
+                           </td>
+                        </tr>
+                     </tbody>
+                     <tbody>
+                        <tr rowspan="1" style="background:#dbc3c7;font-weight:bold;">
+                           <td colspan="4">Deposit</td>
+                           <td>Rp. {{ number_format($reservation->deposit, 0, ',', '.') }} (-)</td>
+                        </tr>
+                     </tbody>
+                     <tbody>
+                        <tr rowspan="1" style="background:yellow;font-weight:bold;">
+                           <td colspan="4">Total</td>
+                           <td>Rp. {{ number_format($total-=$reservation->deposit, 0, ',', '.') }}</td>
+                        </tr>
+                     </tbody>
+                  </table>
                </div>
             </div>
          </div>

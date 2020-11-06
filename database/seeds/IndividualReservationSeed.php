@@ -29,7 +29,7 @@ class IndividualReservationSeed extends Seeder
                 'address' => 'Jl monginsidi no 25 bojoneogoro',
                 'estimateArrivale' => '09:00',
                 'specialRequest' => 'no req',
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -47,7 +47,7 @@ class IndividualReservationSeed extends Seeder
                 'address' => 'Ds bendo kec kapas bojonegoro',
                 'estimateArrivale' => '07:00',
                 'specialRequest' => 'no req',
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -65,7 +65,7 @@ class IndividualReservationSeed extends Seeder
                 'address' => 'Ds semanding kapas bojonegoro',
                 'estimateArrivale' => '08:00',
                 'specialRequest' => 'no req',
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -77,6 +77,7 @@ class IndividualReservationSeed extends Seeder
                 'reservation_id' => 1,
                 'totalRoomReserved' => 1,
                 'typeOfRoom' => 'standart',
+                'roomRate' => 100000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -84,6 +85,7 @@ class IndividualReservationSeed extends Seeder
                 'reservation_id' => 2,
                 'totalRoomReserved' => 1,
                 'typeOfRoom' => 'superior',
+                'roomRate' => 300000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -91,6 +93,7 @@ class IndividualReservationSeed extends Seeder
                 'reservation_id' => 2,
                 'totalRoomReserved' => 1,
                 'typeOfRoom' => 'standart',
+                'roomRate' => 100000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -98,6 +101,16 @@ class IndividualReservationSeed extends Seeder
                 'reservation_id' => 3,
                 'totalRoomReserved' => 3,
                 'typeOfRoom' => 'deluxe',
+                'roomRate' => 200000,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ],
+
+            [
+                'reservation_id' => 3,
+                'totalRoomReserved' => 1,
+                'typeOfRoom' => 'extraBad',
+                'roomRate' => 50000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

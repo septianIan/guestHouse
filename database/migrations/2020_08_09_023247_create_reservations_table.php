@@ -27,7 +27,7 @@ class CreateReservationsTable extends Migration
             $table->string('address');
             $table->string('estimateArrivale');
             $table->string('specialRequest');
-            $table->integer('status')->default(1);
+            $table->string('status')->default('confirm');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -54,6 +54,7 @@
                <div class="card-header">
                   <h3 class="card-title">Step 2 | Room arragement</h3>
                   <a href="#" class="addRoom ml-2"><i class="fa fa-plus px-1"></i>Add Room Arragement</a>
+                  <a href="#" class="addExtraBad ml-2"><i class="fa fa-plus px-1"></i>Add Extra bad</a>
                   <div class="card-tools">
                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
                      </button>
@@ -64,10 +65,11 @@
                   <table class="table table-bordered table-striped">
                      <thead>
                         <tr>
-                           <th>Media Information</th>
-                           <th>Total Room Reserved</th>
-                           <th>Type of Room</th>
-                           <th>Action</th>
+                           <td>Media Of Reservation</td>
+                           <td>Total Room Reserved</td>
+                           <td>Type Of Room</td>
+                           <td>Room rate</td>
+                           <td>Action</td>
                         </tr>
                      </thead>
                      <tbody>
@@ -81,19 +83,41 @@
                               </select>
                            </td>
                            <td>
-                              <input type="number" name="totalRoomReserved[]" class="form-control" required>
+                              <input type="number" name="totalRoomReserved[]" class="form-control" value="" required>
                            </td>
                            <td>
-                              <select name="rooms[]" id="" class="form-control" required>
+                              <select name="rooms[]" class="form-control" required>
                                  <option value=""></option>
                                  <option value="standart">STANDARD</option>
                                  <option value="superior">SUPERIOR</option>
                                  <option value="deluxe">DELUXE</option>
                               </select>
                            </td>
+                           <td>
+                              <input type="number" name="roomRate[]" class="form-control" required>
+                           </td>
                            <td></td>
                         </tr>
                      </tbody>
+                     <tfoot class="rowExtraBad">
+                        <tr style="background:lightblue;">
+                           <td></td>
+                           <td>
+                              <input type="number" id="form1" name="totalRoomReserved[]" class="form-control" value="" required>
+                           </td>
+                           <td>
+                              <select name="rooms[]" id="form2" class="form-control" required>
+                                 <option value="extraBad">Extra Bad</option>
+                              </select>
+                           </td>
+                           <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+                           <td colspan="2">
+                              <center>
+                                 <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
+                              </center>
+                           </td>
+                        </tr>
+                     </tfoot>
                   </table>
                </div>
             </div>
@@ -110,7 +134,7 @@
                </div>
                <div class="card-body">
                   <div class="row">
-                     <div class="col-sm-5">
+                     <div class="col-sm-6">
                         <label for="">Personal account</label>
                         <select name="methodPayment" class="form-control @error('methodPayment') is-invalid @enderror" id="">
                            <option value=""></option>
@@ -123,17 +147,17 @@
                         {{ $message }}
                      </div>
                      @enderror
-                  </div>
-                  <div class="row">
                      <div class="col-sm-6">
                         <label for="">Deposit</label>
-                        <input type="text" class="form-control @error('deposit') is-invalid @enderror" name="deposit" placeholder="Deposit..." value="{{ old('deposit') }}" autocomplete="off">
-                        @error('deposit')
+                        <input type="text" class="form-control is-invalid" name="deposit" placeholder="Deposit..." value="{{ old('deposit') }}" autocomplete="off">
                         <div class="invalid-feedback">
-                           {{ $message }}
+                           Deposit is not blank
                         </div>
-                        @enderror
-
+                     </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                     <div class="col-sm-6">
                         <label for="">Credit card</label>
                         <select name="creditCard" class="form-control @error('creditCard') is-invalid @enderror" placeholder="Credit Crard">
                            <option value=""></option>
@@ -164,13 +188,6 @@
                      </div>
                      {{-- via commpany account --}}
                      <div class="col-sm-6">
-                        <label for="">Deposit</label>
-                        <input type="text" class="form-control @error('deposit') is-invalid @enderror" name="deposit" placeholder="Deposit..." value="{{ old('deposit') }}" autocomplete="off">
-                        @error('deposit')
-                        <div class="invalid-feedback">
-                           {{ $message }}
-                        </div>
-                        @enderror
                         <label for="">Guarantee letter</label>
                         <input type="text" class="form-control @error('guarantee') is-invalid @enderror" placeholder="Guarantee letter..." name="guarantee" value="{{ old('guarantee') }}">
                         @error('guarantee')
@@ -258,8 +275,12 @@
                   </div>
                   <div class="row">
                      <div class="col-sm-6">
-                        <label for="">Cost</label>
-                        <input type="number" name="costRequest" class="form-control" value="{{ old('priceRequest') }}">
+                        <label for="">Rate</label>
+                        <input type="number" name="rateRequest" class="form-control" value="{{ old('rateRequest') }}">
+                     </div>
+                     <div class="col-sm-6">
+                        <label for="">Flight number / Other</label>
+                        <input type="text" name="flightNumber" class="form-control" value="{{ old('flightNumber') }}">
                      </div>
                   </div>
                </div>
@@ -280,7 +301,23 @@
                </div>
                <div class="card-body">
                   <div class="row addMeals">
-                     
+                     <div class="col-sm-4" id="1">
+                        <label for="">Meals</label>
+                        <select name="meals[]" class="form-control">
+                           <option value=""></option>
+                           @foreach($meals as $meal)
+                           <option value="{{ $meal->id }}">{{ $meal->type }}</option>
+                           @endforeach
+                        </select>
+                     </div>
+                     <div class="col-sm-4" id="2">
+                        <label for="">Time</label>
+                        <input type="time" name="timeMeal[]" class="form-control">
+                     </div>
+                     <div class="col-sm-4" id="3">
+                        <label for="">Action</label><br>
+                        <a href="#" class="btn btn-danger removeMealsArragement" style="display:inline"><i class="fa fa-times"></i></a>
+                     </div>
                   </div>
                </div>
             </div>
@@ -307,21 +344,21 @@
                      <label for="">Status Reservation ?</label>
                      <div class="form-group">
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio1" value="1" name="status" checked>
+                           <input class="custom-control-input" type="radio" id="customRadio1" value="confirm" name="status" checked>
                            <label for="customRadio1" class="custom-control-label">Confirm</label>
                         </div>
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio2" value="2" name="status">
+                           <input class="custom-control-input" type="radio" id="customRadio2" value="tentative" name="status">
                            <label for="customRadio2" class="custom-control-label">tentative</label>
                         </div>
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio3" value="3" name="status">
+                           <input class="custom-control-input" type="radio" id="customRadio3" value="changed" name="status">
                            <label for="customRadio3" class="custom-control-label">Changed</label>
                         </div>
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
-                     
+
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>
@@ -340,8 +377,7 @@
 
 @push('scripts')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js">
-</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
 <script>
    $(function() {
@@ -354,11 +390,15 @@
       addRow();
    });
 
-   $('.addRoom').on('click', function(){
+   $('.addRoom').on('click', function() {
       addRoom();
    });
 
-   function addRoom(){
+   $('.addExtraBad').on('click', function() {
+      addExtraBad();
+   });
+
+   function addRoom() {
       let trAddRoom = `
          <tr>
             <td></td>
@@ -366,12 +406,15 @@
                <input type="number" name="totalRoomReserved[]" class="form-control" required>
             </td>
             <td>
-               <select name="rooms[]" id="" class="form-control" required>
+               <select name="rooms[]" class="form-control" required>
                   <option value=""></option>
                   <option value="standart">STANDARD</option>
                   <option value="superior">SUPERIOR</option>
                   <option value="deluxe">DELUXE</option>
                </select>
+            </td>
+            <td>
+               <input type="number" name="roomRate[]" class="form-control" required>
             </td>
             <td><a href="#" class="btn btn-danger remove"><i class="fa fa-times"></i></a></td>
          </tr>
@@ -383,7 +426,7 @@
       let row = `
          <div class="col-sm-4" id="1">
             <label for="">Meals</label>
-            <select name="meals[]" class="form-control" id="" required>
+            <select name="meals[]" class="form-control" required>
                <option value=""></option>
                @foreach($meals as $meal)
                   <option value="{{ $meal->id }}">{{ $meal->type }}</option>
@@ -402,6 +445,29 @@
       $('.addMeals').append(row);
    };
 
+   function addExtraBad() {
+      let tr = `
+         <tr style="background:lightblue;">
+            <td></td>
+            <td>
+               <input type="number" id="form1" name="totalRoomReserved[]" class="form-control" value="" required>
+            </td>
+            <td>
+               <select name="rooms[]" id="form2" class="form-control" required>
+                  <option value="extraBad">Extra Bad</option>
+               </select>
+            </td>
+            <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+            <td colspan="2">
+               <center>
+                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
+               </center>
+            </td>
+         </tr>
+      `;
+      $('.rowExtraBad').append(tr);
+   }
+
    $('.remove').live('click', function() {
       let last = $('tbody.tr').length;
       if (last > 0) {
@@ -409,6 +475,11 @@
       } else {
          $(this).parent().parent().remove();
       }
+   });
+
+   $('.removeExtraBad').live('click', function() {
+      var removeExtraBad = $('tfoot tr');
+      removeExtraBad.remove();
    });
 
    $('.removeMealsArragement').live('click', function() {
@@ -432,26 +503,26 @@
          </div>
          <div class="modal-body">
             <div class="row">
-               @foreach($rooms as $room) 
-                  <div class="col-mb-3 col-sm-2 col-12">
-                     @if($room->status == 'VR')
-                        <div class="info-box bg-info">
-                           <span class="info-box-icon"><i class="fa fa-check-square"></i></span>
-                           <div class="info-box-content">
-                              <span class="info-box-text">{{ $room->roomType }}</span>
-                              <span class="info-box-number">{{ $room->numberRoom }}</span>
-                           </div>
-                        </div>
-                     @elseif($room->status == 'O')
-                        <div class="info-box bg-danger">
-                           <span class="info-box-icon"><i class="fa fa-times"></i></span>
-                           <div class="info-box-content">
-                              <span class="info-box-text">{{ $room->roomType }}</span>
-                              <span class="info-box-number">{{ $room->numberRoom }} </span>
-                           </div>
-                        </div>
-                     @endif
+               @foreach($rooms as $room)
+               <div class="col-mb-3 col-sm-2 col-12">
+                  @if($room->status == 'VR')
+                  <div class="info-box bg-info">
+                     <span class="info-box-icon"><i class="fa fa-check-square"></i></span>
+                     <div class="info-box-content">
+                        <span class="info-box-text">{{ $room->roomType }}</span>
+                        <span class="info-box-number">{{ $room->numberRoom }}</span>
+                     </div>
                   </div>
+                  @elseif($room->status == 'O')
+                  <div class="info-box bg-danger">
+                     <span class="info-box-icon"><i class="fa fa-times"></i></span>
+                     <div class="info-box-content">
+                        <span class="info-box-text">{{ $room->roomType }}</span>
+                        <span class="info-box-number">{{ $room->numberRoom }} </span>
+                     </div>
+                  </div>
+                  @endif
+               </div>
                @endforeach
             </div>
          </div>

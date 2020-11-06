@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt(12345),
         ]);
 
-        $reservation->assignRole('reservation');
+        $reservation->assignRole('frontOffice');
 
         $reception = User::create([
             'name' => 'Reception',
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt(12345),
         ]);
 
-        $reception->assignRole('reception');
+        $reception->assignRole('frontOffice');
 
         $cashier = User::create([
             'name' => 'Cashier',
@@ -34,6 +34,14 @@ class UserSeeder extends Seeder
             'password' => bcrypt(12345),
         ]);
 
-        $cashier->assignRole('cashier');
+        $cashier->assignRole('frontOffice');
+
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@gh.test',
+            'password' => bcrypt(12345)
+        ]);
+
+        $admin->assignRole('admin');
     }
 }

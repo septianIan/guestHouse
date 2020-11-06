@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class LaundrySeeder extends Seeder
+class ExtraBadSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,6 +11,6 @@ class LaundrySeeder extends Seeder
      */
     public function run()
     {
-        
+        //
     }
 }

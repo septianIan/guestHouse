@@ -27,10 +27,11 @@ class groupReservationSeed extends Seeder
                 'contactPerson' => '082515462332',
                 'addressPerson' => 'jl soekarno hatta no 12 surabaya',
                 'specialRequest' => 'no req',
-                'costRequest' => 0,
+                'rateRequest' => 0,
+                'flightNumber' => 'null',
                 'estimateArrivale' => '08:00',
                 'dateReservation' => $date,
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -45,10 +46,11 @@ class groupReservationSeed extends Seeder
                 'contactPerson' => '0812632648237',
                 'addressPerson' => 'ds ngumpak dalem kec.dander kab. bojonegoro',
                 'specialRequest' => 'jemput di terminal 12:00',
-                'costRequest' => 80000,
+                'rateRequest' => 80000,
+                'flightNumber' => '090909',
                 'estimateArrivale' => '12:30',
                 'dateReservation' => $date,
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -63,10 +65,11 @@ class groupReservationSeed extends Seeder
                 'contactPerson' => '083627587542',
                 'addressPerson' => 'ds pujon kidol , malang',
                 'specialRequest' => 'no req',
-                'costRequest' => 0,
+                'rateRequest' => 0,
+                'flightNumber' => 'null',
                 'estimateArrivale' => '08:00',
                 'dateReservation' => $date,
-                'status' => 1,
+                'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
                 'deleted_at' => null
@@ -78,6 +81,7 @@ class groupReservationSeed extends Seeder
                 'reservationgroup_id' => 1,
                 'totalRoomReserved' => 10,
                 'typeOfRoom' => 'standart',
+                'roomRate' => 100000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -86,6 +90,7 @@ class groupReservationSeed extends Seeder
                 'reservationgroup_id' => 1,
                 'totalRoomReserved' => 10,
                 'typeOfRoom' => 'superior',
+                'roomRate' => 300000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -94,6 +99,7 @@ class groupReservationSeed extends Seeder
                 'reservationgroup_id' => 2,
                 'totalRoomReserved' => 5,
                 'typeOfRoom' => 'standart',
+                'roomRate' => 100000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -102,6 +108,7 @@ class groupReservationSeed extends Seeder
                 'reservationgroup_id' => 2,
                 'totalRoomReserved' => 6,
                 'typeOfRoom' => 'superior',
+                'roomRate' => 300000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
@@ -110,6 +117,7 @@ class groupReservationSeed extends Seeder
                 'reservationgroup_id' => 3,
                 'totalRoomReserved' => 15,
                 'typeOfRoom' => 'standart',
+                'roomRate' => 100000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

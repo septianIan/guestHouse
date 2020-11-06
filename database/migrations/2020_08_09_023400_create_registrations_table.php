@@ -15,18 +15,23 @@ class CreateRegistrationsTable extends Migration
     {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('national');
+            $table->string('firstName');
+            $table->string('lastName');
+            $table->string('nationality');
             $table->string('passport');
             $table->string('occupation');
             $table->string('dateBirth');
-            $table->string('address');
+            $table->string('homeAddress', 191);
             $table->string('company');
-            $table->string('arrivaleDate');
-            $table->string('dapatureDate');
             $table->string('purpose');
-            $table->string('commingFrom');
-            $table->string('termPayment');
+            $table->string('arrivaleDate');
+            $table->string('departureDate');
+            $table->string('comingFrom');
+            $table->string('nextDestination');
+            $table->string('termOfPayment');
+            $table->string('numberAccount');
+            // $table->string('expDate')->default(0);
+            $table->string('status')->default('confirm');
             $table->timestamps();
         });
     }

@@ -18,12 +18,12 @@ class DataTableCancelGuestReservation extends Controller
     {
         $reservation = Reservation::onlyTrashed()->where('status', 0)->latest()->get();
         return \datatables()->of($reservation)
-                ->addColumn('detail', function($reservation){
-                    $btn = '<a href="reservation/detailCancelReservation/'.$reservation->id.'" class="btn btn-warning"><i class="fa fa-eye"></i></a>';
-                    return $btn;
-                })
-                ->addIndexColumn()
-                ->rawColumns(['detail'])
-                ->make(true);
+            ->addColumn('detail', function ($reservation) {
+                $btn = '<a href="reservation/detailCancelReservation/' . $reservation->id . '" class="btn btn-warning"><i class="fa fa-eye"></i></a>';
+                return $btn;
+            })
+            ->addIndexColumn()
+            ->rawColumns(['detail'])
+            ->make(true);
     }
 }

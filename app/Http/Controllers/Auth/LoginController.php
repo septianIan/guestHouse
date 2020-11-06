@@ -41,12 +41,10 @@ class LoginController extends Controller
 
     public function redirectTo()
     {
-        if (auth()->user()->hasRole('reservation')) {
+        if (auth()->user()->hasRole('frontOffice')) {
             return '/reservation';
-        } elseif (auth()->user()->hasRole('reception')) {
-            return '/reception';
-        } elseif (auth()->user()->hasRole('cashier')) {
-            return '/cashier';
+        } elseif (auth()->user()->hasRole('admin')) {
+            return '/admin';
         } else {
             return $this->redirectTo;
         }

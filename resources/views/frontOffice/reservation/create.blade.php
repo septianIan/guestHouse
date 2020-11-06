@@ -2,7 +2,7 @@
 @section('title', 'Create Individual Reservation')
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
-   <li class="breadcrumb-item"><a href="/">Home</a></li>
+   <li class="breadcrumb-item"><a href="/{{ request()->segment(1) }}">Home</a></li>
    <li class="breadcrumb-item"><a href="{{ route('reservation.reservation.index') }}">Data Reservation</a></li>
    <li class="breadcrumb-item active">Create Individual Reservation</li>
 </ol>
@@ -53,6 +53,7 @@
                <div class="card-header">
                   <h3 class="card-title">Rooms Arragement</h3>
                   <a href="#" class="addRow ml-2"><i class="fa fa-plus px-1"></i>Add Room Arragement</a>
+                  <a href="#" class="addExtraBad ml-2"><i class="fa fa-plus px-1"></i>Add Extra bad</a>
                </div>
                <div class="card-body">
                   <table class="table table-bordered table-striped">
@@ -61,12 +62,56 @@
                            <td>Media Of Reservation</td>
                            <td>Total Room Reserved</td>
                            <td>Type Of Room</td>
+                           <td>Room rate</td>
                            <td>Action</td>
                         </tr>
                      </thead>
                      <tbody>
-
+                        <tr>
+                           <td>
+                              <select name="mediaReservation" id="" class="form-control" required>
+                                 <option value="{{ old('mediaReservation') }}">{{ old('mediaReservation') }}</option>
+                                 <option value=""></option>
+                                 <option value="telephone">Telephone</option>
+                                 <option value="fax">Fax</option>
+                              </select>
+                           </td>
+                           <td>
+                              <input type="number" name="totalRoomReserved[]" class="form-control" required>
+                           </td>
+                           <td>
+                              <select name="rooms[]" class="form-control" required>
+                                 <option value=""></option>
+                                 <option value="standart">STANDARD</option>
+                                 <option value="superior">SUPERIOR</option>
+                                 <option value="deluxe">DELUXE</option>
+                              </select>
+                           </td>
+                           <td>
+                              <input type="number" name="roomRate[]" class="form-control" required>
+                           </td>
+                           <td></td>
+                        </tr>
                      </tbody>
+                     <tfoot class="rowExtraBad">
+                        <td></td>
+                        <tr style="background:lightblue;">
+                           <td>
+                              <input type="number" id="form1" name="totalRoomReserved[]" class="form-control" value="" required>
+                           </td>
+                           <td>
+                              <select name="rooms[]" id="form2" class="form-control" required>
+                                 <option value="extraBad">Extra Bad</option>
+                              </select>
+                           </td>
+                           <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+                           <td colspan="2">
+                              <center>
+                                 <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
+                              </center>
+                           </td>
+                        </tr>
+                     </tfoot>
                   </table>
                </div>
             </div>
@@ -199,15 +244,15 @@
                      <label for="">Status Reservation ?</label>
                      <div class="form-group">
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio1" value="1" name="status" checked>
+                           <input class="custom-control-input" type="radio" id="customRadio1" value="confirm" name="status" checked>
                            <label for="customRadio1" class="custom-control-label">Confirm</label>
                         </div>
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio2" value="2" name="status">
+                           <input class="custom-control-input" type="radio" id="customRadio2" value="tentative" name="status">
                            <label for="customRadio2" class="custom-control-label">tentative</label>
                         </div>
                         <div class="custom-control custom-radio">
-                           <input class="custom-control-input" type="radio" id="customRadio3" value="3" name="status">
+                           <input class="custom-control-input" type="radio" id="customRadio3" value="changed" name="status">
                            <label for="customRadio3" class="custom-control-label">Changed</label>
                         </div>
                      </div>
@@ -246,25 +291,21 @@
 
    function addRow() {
       let tr = `
-               <tr>
-            <td>
-               <select name="mediaReservation" id="" class="form-control" required>
-                  <option value="{{ old('mediaReservation') }}">{{ old('mediaReservation') }}</option>
-                  <option value=""></option>
-                  <option value="telephone">Telephone</option>
-                  <option value="fax">Fax</option>
-               </select>
-            </td>
+         <tr>
+            <td></td>
             <td>
                <input type="number" name="totalRoomReserved[]" class="form-control" required>
             </td>
             <td>
-               <select name="rooms[]" id="" class="form-control" required>
+               <select name="rooms[]" class="form-control" required>
                   <option value=""></option>
                   <option value="standart">STANDARD</option>
                   <option value="superior">SUPERIOR</option>
                   <option value="deluxe">DELUXE</option>
                </select>
+            </td>
+            <td>
+               <input type="number" name="roomRate[]" class="form-control" required>
             </td>
             <td><a href="#" class="btn btn-danger remove"><i class="fa fa-times"></i></a></td>
          </tr>
@@ -272,9 +313,42 @@
       $('tbody').append(tr);
    };
 
+   $('.addExtraBad').on('click', function(){
+      addExtraBad();
+   })
+
+   $('.removeExtraBad').live('click', function() {
+      var removeExtraBad = $('tfoot tr');
+      removeExtraBad.remove();
+   });
+
+   function addExtraBad(){
+      let tr = `
+         <tr style="background:lightblue;">
+            <td></td>
+            <td>
+               <input type="number" id="form1" name="totalRoomReserved[]" class="form-control" value="" required>
+            </td>
+            <td>
+               <select name="rooms[]" id="form2" class="form-control" required>
+                  <option value="extraBad">Extra Bad</option>
+               </select>
+            </td>
+            <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+            <td colspan="2">
+               <center>
+                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
+               </center>
+            </td>
+         </tr>
+      `;
+      $('.rowExtraBad').append(tr);
+   }
+
    $('.remove').live('click', function() {
-      var last = $('tbody tr').length;
-      if (last == 1) {
+      var last = $('tbody').length;
+      console.log(last);
+      if (last < '15') {
          alert("you can not remove last row");
       } else {
          $(this).parent().parent().remove();

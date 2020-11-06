@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReservationRoomTable extends Migration
+class CreateExtraBadsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateReservationRoomTable extends Migration
      */
     public function up()
     {
-        Schema::create('reservation_room', function (Blueprint $table) {
+        Schema::create('extra_bads', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('reservation_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
+            $table->string('amount');
+            $table->string('extraBad');
+            $table->string('rate');
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ class CreateReservationRoomTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reservation_room');
+        Schema::dropIfExists('extra_bads');
     }
 }

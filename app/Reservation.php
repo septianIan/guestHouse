@@ -12,24 +12,6 @@ class Reservation extends Model
     
     protected $guarded = [];
 
-    public function rooms()
-    {
-        return $this->belongsToMany(Room::class)->withTimestamps();
-    }
-
-    public function getStatusReservation()
-    {
-        if ($this->status == 1) {
-            return 'Confirm';
-        } elseif ($this->status == 2) {
-            return 'Tentative';
-        } elseif ($this->status == 3) {
-            return 'Changed';
-        } else {
-            return \false;
-        }
-    }
-
     public function getTotalRp()
     {
         return 'Rp. '. \number_format($this->total, 0, ',', '.');
@@ -45,7 +27,10 @@ class Reservation extends Model
         $this->attributes['departureDate'] = Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
     }
 
-    public function individualReservations()
+    // public function getArrivaleDate()
+    // {}
+
+    public function individualReservationRooms()
     {
         return $this->hasMany(IndividualReservationRoom::class);
     }

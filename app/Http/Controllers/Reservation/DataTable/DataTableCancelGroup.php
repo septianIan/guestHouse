@@ -17,13 +17,13 @@ class DataTableCancelGroup extends Controller
     {
         $reservationGroup = ReservationGroup::onlyTrashed()->latest()->get();
         return \datatables()->of($reservationGroup)
-                            ->addColumn('detail', function($reservationGroup){
-                                $btn = '<a href="reservation/detailCancelReservationGroup/'.$reservationGroup->id.'" class="btn btn-warning"><i class="fa fa-eye"></i></a>';
-                                return $btn;
-                            })
-                            ->addIndexColumn()
-                            ->rawColumns(['detail'])
-                            ->rawColumns(['detail'])
-                            ->make(true);
+            ->addColumn('detail', function ($reservationGroup) {
+                $btn = '<a href="reservation/detailCancelReservationGroup/' . $reservationGroup->id . '" class="btn btn-warning"><i class="fa fa-eye"></i></a>';
+                return $btn;
+            })
+            ->addIndexColumn()
+            ->rawColumns(['detail'])
+            ->rawColumns(['detail'])
+            ->make(true);
     }
 }

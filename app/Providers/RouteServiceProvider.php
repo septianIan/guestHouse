@@ -51,6 +51,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapReceptionRoutes();
 
         $this->mapCashierRoutes();
+
+        $this->mapAdminRoutes();
     }
 
     /**
@@ -69,7 +71,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapReservationRoutes()
     {
-        Route::middleware('web', 'auth', 'role:reservation')
+        Route::middleware('web', 'auth', 'role:frontOffice')
             ->namespace($this->namespace . '\Reservation')
             ->prefix('reservation')
             ->name('reservation.')
@@ -78,7 +80,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapReceptionRoutes()
     {
-        Route::middleware('web', 'auth', 'role:reception')
+        Route::middleware('web', 'auth', 'role:frontOffice')
             ->namespace($this->namespace . '\Reception')
             ->prefix('reception')
             ->name('reception.')
@@ -87,11 +89,20 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapCashierRoutes()
     {
-        Route::middleware('web', 'auth', 'role:cashier')
+        Route::middleware('web', 'auth', 'role:frontOffice')
             ->namespace($this->namespace . '\Cashier')
             ->prefix('cashier')
             ->name('cashier.')
             ->group(base_path('routes/cashier.php'));
+    }
+
+    protected function mapAdminRoutes()
+    {
+        Route::middleware('web', 'auth', 'role:admin')
+            ->namespace($this->namespace .'\Admin')
+            ->prefix('admin')
+            ->name('admin.')
+            ->group(\base_path('routes/admin.php'));
     }
 
     /**
