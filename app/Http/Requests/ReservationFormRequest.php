@@ -28,7 +28,6 @@ class ReservationFormRequest extends FormRequest
             'mediaReservation' => 'required',
             'methodPayment' => 'required',
             'contactPerson' => 'required',
-            'namePerson' => 'required',
             'address' => 'required',
             'estimateArrivale' => 'required',
             'specialRequest' => 'required',

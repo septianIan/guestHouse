@@ -208,7 +208,10 @@
                               <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                                  <option value=""></option>
                                  @foreach($rooms as $room)
-                                 <option value="{{ $room->id }}">{{ $room->numberRoom }} || {{ $room->code }}</option>
+                                 <option value="{{ $room->id }}" 
+                                    @if($room->code == 'O')
+                                       disabled
+                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
                                  @endforeach
                               </select>
                               @error('rooms[]')

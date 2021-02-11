@@ -14,7 +14,7 @@
       <div class="col-md-12">
          <div class="card card-primary">
             <div class="card-header">
-               <h3 class="card-title">Data Registration guest</h3>
+               <h3 class="card-title">Data Registration Guest</h3>
                <a href="{{ route('reception.registration.create') }}" class="float-right"><i class="fa fa-plus"></i> Add Registration</a>
             </div>
             <div class="card-body">
@@ -24,13 +24,13 @@
                <table id="dataTable" class="table table-bordered table-striped">
                   <thead>
                      <tr>
-                        <td>No</td>
-                        <td>Guest Name</td>
-                        <td>Arrivale</td>
-                        <td>Departure</td>
-                        <td>Coming from</td>
-                        <td>status</td>
-                        <td>Action</td>
+                        <th>No</th>
+                        <th>Guest Name</th>
+                        <th>Arrivale</th>
+                        <th>Departure</th>
+                        <th>Coming from</th>
+                        <th>status</th>
+                        <th>Action</th>
                      </tr>
                   </thead>
                </table>

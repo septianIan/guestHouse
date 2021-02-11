@@ -24,13 +24,13 @@
                   <table id="dataTable" class="table table-bordered table-striped">
                      <thead>
                         <tr>
-                           <td>No</td>
-                           <td>Group name</td>
-                           <td>Arrivale date</td>
-                           <td>Departure date</td>
-                           <td>Estimate arrivale</td>
-                           <td>Status</td>
-                           <td>Action</td>
+                           <th>No</th>
+                           <th>Group name</th>
+                           <th>Arrivale date</th>
+                           <th>Departure date</th>
+                           <th>Estimate arrivale</th>
+                           <th>Status</th>
+                           <th>Action</th>
                         </tr>
                      </thead>
                   </table>

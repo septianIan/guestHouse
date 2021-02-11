@@ -19,17 +19,22 @@ class CreateReservationsTable extends Migration
             $table->string('arrivaleDate');
             $table->string('departureDate');
             $table->string('mediaReservation');
-            $table->string('methodPayment');
+            $table->string('methodPayment')->nullable();
             $table->bigInteger('numberAccount')->default(0);
             $table->bigInteger('deposit')->default(0);
-            $table->bigInteger('contactPerson');
-            $table->string('namePerson');
+            $table->string('contactPerson');
             $table->string('address');
             $table->string('estimateArrivale');
             $table->string('specialRequest');
+            /**
+             * Status confirm = tamu sudah reservasi sudah membayar deposit
+             * Status tentative = tamu reservasi tapi masih belum pasti check in    namun sudah deposit
+             * Status = Changed tamu ganti jumlah kamar atau identitas
+             * Status = CheckIn tamu reservasi sudah registrasi dan sudah check in
+             */
             $table->string('status')->default('confirm');
             $table->timestamps();
-            $table->softDeletes();
+            // $table->softDeletes();
         });
     }
 

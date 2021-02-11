@@ -10,18 +10,18 @@
       </a>
       <ul class="nav nav-treeview">
          <li class="nav-item">
-            <a href="{{ route('reservation.chartPlan.calendar') }}" class="nav-link">
+            <a href="{{ route('chartPlan.dateBetween') }}" class="nav-link">
                <i class="far fa-circle nav-icon"></i>
                <p>
-                  Calendar
+                  Between Date
                </p>
             </a>
          </li>
          <li class="nav-item">
-            <a href="{{ route('reservation.chartPlan.dateBetween') }}" class="nav-link">
+            <a href="{{ route('chartPlan.reservationPlan') }}" class="nav-link">
                <i class="far fa-circle nav-icon"></i>
                <p>
-                  Between Date
+                  Reservation Plan
                </p>
             </a>
          </li>

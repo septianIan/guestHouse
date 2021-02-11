@@ -37,7 +37,6 @@
                      Arrivale Date : {{ $guestReservation->reservation->arrivaleDate }}<br>
                      Departure Date : {{ $guestReservation->reservation->departureDate }}<br>
                      Estimate Arrival Check in : {{ $guestReservation->reservation->estimateArrivale }}<br>
-                     Email: info@almasaeedstudio.com
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
@@ -48,11 +47,13 @@
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Booked Room</b>
+                  <b>Order room by reservation</b>
                   <address>
                      @foreach($guestReservation->reservation->individualReservationRooms as $value)
-                     Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
-                     <b>{{ $value->typeOfRoom }}</b>
+                     <address>
+                        Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
+                        <b>{{ $value->typeOfRoom }}</b>
+                     </address>
                      @endforeach
                      Stay : {{ $difference }} night
                   </address>
@@ -286,22 +287,22 @@
                                     </td>
                                  </tr>
                               </tbody>
-                              @if(isset($guestReservation))
-                              <tbody>
-                                 <tr rowspan="1" style="background:#dbc3c7;font-weight:bold;">
-                                    <td colspan="6">Deposit :</td>
-                                    <td>
-                                       (-) Rp. {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }}
-                                    </td>
-                                 </tr>
-                              </tbody>
-                              @endif
                               @if(!empty($registration->extraBad))
                               <tbody>
                                  <tr rowspan="1" style="background:#2ecc71;font-weight:bold;">
                                     <td colspan="6">Extrabad :</td>
                                     <td>
-                                       Rp. {{ number_format($registration->extraBad->rate, 0, ',', '.') }} (-)
+                                       Rp. {{ number_format($registration->extraBad->rate * $difference, 0, ',', '.') }} (+)
+                                    </td>
+                                 </tr>
+                              </tbody>
+                              @endif
+                              @if(isset($guestReservation))
+                              <tbody>
+                                 <tr rowspan="1" style="background:#dbc3c7;font-weight:bold;">
+                                    <td colspan="6">Deposit :</td>
+                                    <td>
+                                       Rp. {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }} (-)
                                     </td>
                                  </tr>
                               </tbody>
@@ -312,15 +313,32 @@
                                     <td>
                                        Rp.
                                        @if(isset($guestReservation))
-                                       @php
-                                       $total = ($registration->rooms()->sum('roomRate') * $difference) - $guestReservation->reservation->deposit;
-                                       echo number_format($total, 0, ',', '.')
-                                       @endphp
+                                          {{-- jika dari reservation --}}
+                                          @if(!empty($registration->extraBad))
+                                             @php
+                                                $total = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad->rate * $difference) - $guestReservation->reservation->deposit;
+                                                echo number_format($total, 0, ',', '.')
+                                             @endphp
+                                          @else
+                                             @php
+                                                $total = ($registration->rooms()->sum('roomRate') * $difference) - $guestReservation->reservation->deposit;
+                                                echo number_format($total, 0, ',', '.')
+                                             @endphp
+                                          @endif
+                                          
                                        @else
-                                       @php
-                                       $total = $registration->rooms()->sum('roomRate') * $difference;
-                                       echo number_format($total, 0, ',', '.')
-                                       @endphp
+                                       {{-- jika datang langsung --}}
+                                          @if(!empty($registration->extraBad))
+                                             @php
+                                                $total = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad->rate * $difference);
+                                                echo number_format($total, 0, ',', '.')
+                                             @endphp
+                                          @else
+                                             @php
+                                                $total = $registration->rooms()->sum('roomRate') * $difference;
+                                                echo number_format($total, 0, ',', '.')
+                                             @endphp
+                                          @endif
                                        @endif
                                     </td>
                                  </tr>
@@ -341,7 +359,14 @@
                <div class="card-body">
                   <div class="col-sm-6 mt-3">
                      <button class="btn btn-success" type="submit">Edit</button>
-                     <a href="#" class="btn btn-primary checkIn" data-id="{{ $registration->id }}">Check In</a>
+                     <a href="#" class="btn btn-primary checkIn" data-id="{{ $registration->id }}">
+                        @if($registration->status == 'checkIn')
+                           <i class="fa fa-check" aria-hidden="true"></i> Guest has chacked in
+                        @else
+                           Check In
+                        @endif
+                     </a>
+                     <b></b>
                   </div>
                </div>
             </div>
@@ -378,7 +403,10 @@
                                  <option value="{{ $roomArragement->id }}">{{ $roomArragement->numberRoom }}</option>
                                  <option value=""></option>
                                  @foreach($rooms as $room)
-                                 <option value="{{ $room->id }}">{{ $room->numberRoom }} || {{ $room->code }}</option>
+                                    <option value="{{ $room->id }}" 
+                                    @if($room->code == 'O')
+                                       disabled
+                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
                                  @endforeach
                               </select>
                            </td>
@@ -470,11 +498,16 @@
                      <tr>
                         <form action="{{ route('reception.registration.addRoom') }}" method="post">
                            @csrf
+                           <input type="hidden" name="idRegistration" value="{{ $registration->id }}">
+
                            <td>
                               <select name="rooms" id="rooms" class="form-control @error('rooms[]') is-invalid @enderror">
                                  <option value=""></option>
                                  @foreach($rooms as $room)
-                                 <option value="{{ $room->id }}">{{ $room->numberRoom }} || {{ $room->code }}</option>
+                                 <option value="{{ $room->id }}" 
+                                    @if($room->code == 'O')
+                                       disabled
+                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
                                  @endforeach
                               </select>
                               @error('rooms[]')
@@ -483,7 +516,6 @@
                               </div>
                               @enderror
                            </td>
-                           <td>
                            <td>
                               <input type="text" class="form-control @error('totalPax') is-invalid @enderror" id="totalPax" name="totalPax">
                               @error('totalPax')
@@ -508,7 +540,6 @@
                               </select>
                            </td>
                            <td>
-                              <input type="hidden" value="{{ $registration->id }}" name="idRegistration">
                               <button class="btn btn-primary" type="submit" id="btnSave"><i class="fa fa-bookmark"></i></button>
                            </td>
                         </form>
@@ -541,7 +572,6 @@
 <script>
    $('.checkIn').live('click', function() {
       var id = $(this).data('id'); //ambil dari data-id
-         
       Swal.fire({
          title: 'Would you like to keep a check in?',
          showDenyButton: true,
@@ -557,7 +587,6 @@
                   "id": id
                },
 
-               //setelah berhasil di hapus
                success: function(data) {
                   if (data.success === true) {
                      Swal.fire('Info! ', data.message, 'info')
@@ -615,7 +644,7 @@
       }
    });
 
-   function showDiv(select) {
+   /*function showDiv(select) {
       let date = `<input type="date" name="expDate" class="form-control" id="remove">`;
       let removeDate = document.getElementById('remove');
       if (select.value == "creditCard") {
@@ -623,7 +652,7 @@
       } else {
          removeDate.remove();
       }
-   };
+   };*/
 
 </script>
 @endpush

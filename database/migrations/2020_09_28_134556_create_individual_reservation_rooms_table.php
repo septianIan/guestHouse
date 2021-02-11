@@ -19,7 +19,13 @@ class CreateIndividualReservationRoomsTable extends Migration
             $table->string('totalRoomReserved');
             $table->string('typeOfRoom');
             $table->string('roomRate');
+            $table->string('discount')->nullable();
             $table->integer('status')->default(1);
+            /**
+             * Status = 0 tamu sudah checkOut atau sudah selesai
+             * Status = 1 tamu bookong
+             * Status = 2 tamu sudah checkIn
+             */
             $table->timestamps();
         });
     }

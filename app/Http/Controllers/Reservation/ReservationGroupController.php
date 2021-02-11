@@ -53,7 +53,7 @@ class ReservationGroupController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today' : $checkIn->diffInDays($checkOut);
         
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'namePerson', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale', 'status'), \compact('dateReservation', 'specialRequest'));
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale', 'status'), \compact('dateReservation', 'specialRequest'));
         $groupReservation = ReservationGroup::create($data);
 
         if ($request->has('meals')) {
@@ -177,7 +177,7 @@ class ReservationGroupController extends Controller
     public function update(ReservationGroupFormRequest $request, ReservationGroup $reservationGroup)
     {
         $dateReservation = Carbon::now()->isoFormat('D-M-Y');
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'namePerson', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'estimateArrivale', 'specialRequest', 'status'), \compact('dateReservation'));
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'estimateArrivale', 'specialRequest', 'status'), \compact('dateReservation'));
         // \dd($request->all());
         $reservationGroup->update($data);
 

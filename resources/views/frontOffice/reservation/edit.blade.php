@@ -53,8 +53,7 @@
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Rooms Arragement</h3>
-                  <a href="#" class="addRow ml-2"><i class="fa fa-plus px-1"></i>Add Room Arragement</a>
-                  <a href="#" class="addExtraBad ml-2"><i class="fa fa-plus px-1"></i>Add Extra bad</a>
+                  <a href="#" class="addExtraBad ml-2 btn btn-warning btn-xs"><i class="fa fa-plus px-1"></i>Add Extra bad</a>
                </div>
                <div class="card-body">
                   <table class="table table-bordered table-striped">
@@ -64,6 +63,7 @@
                            <td>Total Room Reserved</td>
                            <td>Type Of Room</td>
                            <td>Room rate</td>
+                           <td>Discount</td>
                            <td>Action</td>
                         </tr>
                      </thead>
@@ -84,23 +84,63 @@
                               </select>
                            </td>
                            <td>
-                              <input type="number" name="totalRoomReserved[]" class="form-control" value="{{ $value->totalRoomReserved }}" required>
+                              <input type="number" id="totalRoomReserved{{ $value->typeOfRoom }}" name="totalRoomReserved[]" class="form-control" value="{{ $value->totalRoomReserved }}" required>
+
+                              <input type="hidden" name="" id="totalRoomReserved{{ $value->typeOfRoom }}DefaultHidden" value="{{ $value->totalRoomReserved }}">
                            </td>
                            <td>
-                              <select name="rooms[]" id="" class="form-control" required>
+                              <select name="rooms[]" id="typeRoom" class="form-control" required>
                                  <option value="{{ $value->typeOfRoom }}">{{ $value->typeOfRoom }}</option>
-                                 <option value="standart">STANDARD</option>
-                                 <option value="superior">SUPERIOR</option>
-                                 <option value="deluxe">DELUXE</option>
                               </select>
                            </td>
-                           <td><input type="number" class="form-control" name="roomRate[]" value="{{ $value->roomRate }}"></td>
+                           <td><input type="number" class="form-control" id="roomRate" name="roomRate[]" value="{{ $value->roomRate }}"></td>
+                           <td>
+                              <input type="number" name="discount[]" style="width:100px;" class="form-control" value="{{ $value->discount }}" id="">%
+                           </td>
                            <td>
                               <a href="#" class="btn btn-danger removeData" data-id="{{ $value->id }}"><i class="fa fa-trash"></i></a>
                            </td>
                         </tr>
                         @endforeach
                      </tbody>
+                     <tbody style="background:#2ecc71;">
+                        <input type="hidden" name="idRooms">
+                        <tr>
+                           <td>
+                              <select name="mediaReservation" id="" class="form-control" required>
+                                 <option value="{{ $reservation->mediaReservation }}">{{ $reservation->mediaReservation }}</option>
+                                 <option value=""></option>
+                                 <option value="telephone">Telephone</option>
+                                 <option value="fax">Fax</option>
+                              </select>
+                           </td>
+                           <td>
+                              <input type="number" id="NewTotalRoomReserved" name="totalRoomReserved[]" class="form-control" value="" required>
+                           </td>
+                           <td>
+                              <select name="rooms[]" id="NewTypeRoom" class="form-control" required>
+                                 <option value=""></option>
+                                 <option value="standart">STANDART</option>
+                                 <option value="superior">SUPERIOR</option>
+                                 <option value="deluxe">DELUXE</option>
+                              </select>
+                           </td>
+                           <td>
+                              <input type="number" class="form-control" id="newRoomRate" name="roomRate[]" value="">
+                           </td>
+                           <td rowspan="2">
+                              <input type="number" name="discount[]" style="width:100px;" class="form-control" value="" id="">%
+                           </td>
+                        </tr>
+                     </tbody>
+                     <thead>
+                        <tr style="background:lightblue;">
+                           <td>Total Room Reserved</td>
+                           <td>Type Of Room</td>
+                           <td>Room rate</td>
+                           <td colspan="2">Action</td>
+                        </tr>
+                     </thead>
                      <tfoot class="rowExtraBad">
                         @if(empty($extraBad))
                         <tr style="background:lightblue;">
@@ -183,13 +223,6 @@
                   <label for="">Contact Person</label>
                   <input type="number" name="contactPerson" class="form-control @error('contactPerson') is-invalid @enderror" placeholder="Contact Person..." autocomplete="off" value="{{ $reservation->contactPerson }}">
                   @error('contactPerson')
-                  <div class="invalid-feedback">
-                     {{ $message }}
-                  </div>
-                  @enderror
-                  <label for="">Name Person</label>
-                  <input type="text" name="namePerson" class="form-control @error('namePerson') is-invalid @enderror" placeholder="Name Person..." autocomplete="off" value="{{ $reservation->namePerson }}">
-                  @error('namePerson')
                   <div class="invalid-feedback">
                      {{ $message }}
                   </div>
@@ -297,42 +330,9 @@
       })
    });
 
-   $('.addRow').on('click', function() {
-      addRow();
-   });
-
    $('.addExtraBad').on('click', function(){
       addExtraBad();
    });
-
-   function addRow() {
-      let tr = `
-            <tr>
-               <td>
-                  <select name="mediaReservation" id="" class="form-control" required>
-                     <option value="{{ $reservation->mediaReservation }}">{{ $reservation->mediaReservation }}</option>
-                     <option value=""></option>
-                     <option value="telephone">Telephone</option>
-                     <option value="fax">Fax</option>
-                  </select>
-               </td>
-               <td>
-                  <input type="number" name="totalRoomReserved[]" class="form-control" required>
-               </td>
-               <td>
-                  <select name="rooms[]" id="" class="form-control" required>
-                     <option value=""></option>
-                     <option value="standart">STANDARD</option>
-                     <option value="superior">SUPERIOR</option>
-                     <option value="deluxe">DELUXE</option>
-                  </select>
-               </td>
-               <td><input type="number" class="form-control" name="roomRate[]"></td>
-               <td><a href="#" class="btn btn-danger remove"><i class="fa fa-times"></i></a></td>
-            </tr>
-      `;
-      $('.rowRooms').append(tr);
-   };
 
    function addExtraBad(){
       let tr = `
@@ -355,15 +355,6 @@
       `;
       $('.rowExtraBad').append(tr);
    }
-
-   $('.remove').live('click', function() {
-      var last = $('tbody tr').length;
-      if (last == 1) {
-         alert("you can not remove last row");
-      } else {
-         $(this).parent().parent().remove();
-      }
-   });
 
    $('.removeExtraBad').live('click', function() {
       var removeExtraBad = $('tfoot tr');
@@ -392,5 +383,148 @@
       }
    });
 
+   $(document).ready(function(){
+      //STANDART
+      $('#totalRoomReservedStandart').change(function(){
+         let totalRoomReservedStandart = $(this).val();
+         let totalRoomReservedStandartDefaultHidden = $('#totalRoomReservedStandartDefaultHidden').val();
+         let typeRoom = $("#typeRoom option:selected").val();
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reservation.checkAvailableRoomStandart.totalRoomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "totalRoomReserved": totalRoomReservedStandart,
+               "typeRoom": typeRoom 
+            },
+            beforeSend: function(){
+               $("#totalRoomReservedStandart").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  alert(data.message);
+                  $('#totalRoomReservedStandart').val(totalRoomReservedStandartDefaultHidden);
+                  $("#totalRoomReservedStandart").removeClass('is-valid');
+                  $("#totalRoomReservedStandart").addClass('is-invalid');
+                  $("#totalRoomReservedStandart").css("background","#FFF");
+               }else if(data.success === false) {
+                  alert(data.message);
+                  $("#totalRoomReservedStandart").css("background","#FFF");
+                  $("#totalRoomReservedStandart").removeClass('is-invalid');
+                  $("#totalRoomReservedStandart").addClass('is-valid');
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {}
+         });
+      });
+
+      //SUPERIOR
+      $('#totalRoomReservedSuperior').change(function(){
+         let totalRoomReservedSuperior = $(this).val();
+         let totalRoomReservedSuperiorDefaultHidden = $('#totalRoomReservedSuperiorDefaultHidden').val();
+         let typeRoom = $("#typeRoom option:selected").val();
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reservation.checkAvailableRoomSuperior.totalRoomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "totalRoomReserved": totalRoomReservedSuperior,
+               "typeRoom": typeRoom 
+            },
+            beforeSend: function(){
+               $("#totalRoomReservedSuperior").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  alert(data.message);
+                  $('#totalRoomReservedSuperior').val(totalRoomReservedSuperiorDefaultHidden);
+                  $("#totalRoomReservedSuperior").removeClass('is-valid');
+                  $("#totalRoomReservedSuperior").addClass('is-invalid');
+                  $("#totalRoomReservedSuperior").css("background","#FFF");
+               }else if(data.success === false) {
+                  alert(data.message);
+                  $("#totalRoomReservedSuperior").css("background","#FFF");
+                  $("#totalRoomReservedSuperior").removeClass('is-invalid');
+                  $("#totalRoomReservedSuperior").addClass('is-valid');
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {}
+         });
+      });
+
+      //DELUXE
+      $('#totalRoomReservedDeluxe').change(function(){
+         let totalRoomReservedDeluxe = $(this).val();
+         let totalRoomReservedDeluxeDefaultHidden = $('#totalRoomReservedDeluxeDefaultHidden').val();
+         let typeRoom = $("#typeRoom option:selected").val();
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reservation.checkAvailableRoomDeluxe.totalRoomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "totalRoomReserved": totalRoomReservedDeluxe,
+               "typeRoom": typeRoom 
+            },
+            beforeSend: function(){
+               $("#totalRoomReservedDeluxe").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  alert(data.message);
+                  $('#totalRoomReservedDeluxe').val(totalRoomReservedDeluxeDefaultHidden);
+                  $("#totalRoomReservedDeluxe").removeClass('is-valid');
+                  $("#totalRoomReservedDeluxe").addClass('is-invalid');
+                  $("#totalRoomReservedDeluxe").css("background","#FFF");
+               }else if(data.success === false) {
+                  alert(data.message);
+                  $("#totalRoomReservedDeluxe").css("background","#FFF");
+                  $("#totalRoomReservedDeluxe").removeClass('is-invalid');
+                  $("#totalRoomReservedDeluxe").addClass('is-valid');
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {}
+         });
+      });
+
+      //TAMBAH KAMAR BARU
+      $('#NewTotalRoomReserved').change(function(){
+         let NewTotalRoomReserved = $(this).val();
+         let typeRoom = $('#NewTypeRoom option:selected').val();
+
+         console.log(typeRoom);
+
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reservation.checkAvailableRoom.totalRoomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "totalRoomReserved": NewTotalRoomReserved,
+               "typeRoom": typeRoom
+            },
+            beforeSend: function(){
+               $('#NewTotalRoomReserved').css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  alert(data.message);
+                  $('#NewTotalRoomReserved').val('');
+                  $("#NewTotalRoomReserved").removeClass('is-valid');
+                  $("#NewTotalRoomReserved").addClass('is-invalid');
+                  $("#NewTotalRoomReserved").css("background","#FFF");
+               }else if(data.success === false) {
+                  alert(data.message);
+                  $("#NewTotalRoomReserved").css("background","#FFF");
+                  $("#NewTotalRoomReserved").removeClass('is-invalid');
+                  $("#NewTotalRoomReserved").addClass('is-valid');
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown){}
+         });
+      });
+   });
 </script>
 @endpush

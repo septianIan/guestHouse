@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
-    use SoftDeletes;
+    //use SoftDeletes;
     
     protected $guarded = [];
 
@@ -27,11 +27,14 @@ class Reservation extends Model
         $this->attributes['departureDate'] = Carbon::createFromFormat('Y-m-d', $value)->format('Y-m-d');
     }
 
-    // public function getArrivaleDate()
-    // {}
-
     public function individualReservationRooms()
     {
         return $this->hasMany(IndividualReservationRoom::class);
+    }
+
+    public function delete()
+    {
+        $this->individualReservationRooms()->delete();
+        parent::delete();
     }
 }

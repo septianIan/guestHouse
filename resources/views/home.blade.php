@@ -14,7 +14,7 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    {{ __('You are logged in!') }} <b><a href="{{ route('reservation.dashboard') }}">Enter to Application!!!</a></b>
                 </div>
             </div>
         </div>

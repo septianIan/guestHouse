@@ -24,11 +24,9 @@ Route::post('/registration/addExtraBad', 'RegistrationController@addExtraBad')->
  * Individual Check In
  */
 Route::get('/data/individualCheckIn', 'CheckInController@index')->name('checkIn.individualCheckIn');
+Route::get('data/reservation', 'CheckInController@dataTableIndividualReservation')->name('data.IndividualReservations');
 Route::get('/checkIn/{id}', 'CheckInController@checkIn')->name('checkIn.checkInStore');
-/**
- * Individual Data table
- */
-Route::get('data/reservation', 'CheckInController@dataTableIndividualReservation')->name('data.reservations');
+
 Route::get('detailIndividualCheckIn/{id}', 'CheckInController@detailIndividualReservation')->name('data.detailReservation');
 //BATAS
 
@@ -37,4 +35,6 @@ Route::get('detailIndividualCheckIn/{id}', 'CheckInController@detailIndividualRe
 /**
  * Group Check In
  */
-Route::get('/groupCheckIn', 'CheckInController@index')->name('checkIn.groupCheckIn');
+Route::get('/groupCheckIn', 'CheckInController@indexGroup')->name('checkIn.groupCheckIn');
+Route::get('/data/groupReservation', 'CheckInController@dataTableGroupReservation')->name('data.groupReservations');
+Route::get('/detailGroupCheckIn/{id}', 'CheckInController@detailGroupReservation');

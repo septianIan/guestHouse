@@ -25,14 +25,13 @@ class IndividualReservationSeed extends Seeder
                 'numberAccount' => '65273471438',
                 'deposit' => '100000',
                 'contactPerson' => '087535252643',
-                'namePerson' => 'adi swantoro',
                 'address' => 'Jl monginsidi no 25 bojoneogoro',
                 'estimateArrivale' => '09:00',
                 'specialRequest' => 'no req',
                 'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
-                'deleted_at' => null
+                //'deleted_at' => null
             ],    
             [
                 'guestName' => 'andik ikwanni sowa maulidan',
@@ -43,14 +42,13 @@ class IndividualReservationSeed extends Seeder
                 'numberAccount' => 0,
                 'deposit' => '200000',
                 'contactPerson' => '081862426234',
-                'namePerson' => 'anjayani putri',
                 'address' => 'Ds bendo kec kapas bojonegoro',
                 'estimateArrivale' => '07:00',
                 'specialRequest' => 'no req',
                 'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
-                'deleted_at' => null
+                //'deleted_at' => null
             ],
             [
                 'guestName' => 'ajeng ayu nindia safira',
@@ -61,14 +59,13 @@ class IndividualReservationSeed extends Seeder
                 'numberAccount' => 0,
                 'deposit' => '100000',
                 'contactPerson' => '081935123947',
-                'namePerson' => 'yono',
                 'address' => 'Ds semanding kapas bojonegoro',
                 'estimateArrivale' => '08:00',
                 'specialRequest' => 'no req',
                 'status' => 'confirm',
                 'created_at' => $date,
                 'updated_at' => $date,
-                'deleted_at' => null
+                //'deleted_at' => null
             ]
         ];
 

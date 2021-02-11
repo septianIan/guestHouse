@@ -71,8 +71,6 @@
                            <th>Total Room Reserved</th>
                            <th>Type Of Room</th>
                            <th>Room rate</th>
-                           <th>Stay</th>
-                           <th>Total rate</th>
                         </tr>
                      </thead>
                      <tbody>
@@ -80,37 +78,9 @@
                         <tr>
                            <td>{{ $value->totalRoomReserved }}</td>
                            <td>{{ $value->typeOfRoom }}</td>
-                           <td>Rp. {{ number_format($value->roomRate, 0 ,',', '.') }}</td>
-                           <td>{{ $difference }} Night</td>
-                           <td>
-                              Rp.
-                              @php
-                              $totalPerRoom = $value->roomRate * $value->totalRoomReserved * $difference;
-                              echo number_format($totalPerRoom, 0, ',', '.')
-                              @endphp
-                           </td>
+                           <td>Rp. {{ number_format($value->roomRate, 0, ',', '.') }}</td>
                         </tr>
                         @endforeach
-                     </tbody>
-                     <tbody>
-                        <tr rowspan="1" style="background:#3498db;font-weight:bold;">
-                           <td colspan="4"></td>
-                           <td>
-                              Rp. {{ number_format($total, 0, ',', '.') }}
-                           </td>
-                        </tr>
-                     </tbody>
-                     <tbody>
-                        <tr rowspan="1" style="background:#dbc3c7;font-weight:bold;">
-                           <td colspan="4">Deposit</td>
-                           <td>Rp. {{ number_format($reservation->deposit, 0, ',', '.') }} (-)</td>
-                        </tr>
-                     </tbody>
-                     <tbody>
-                        <tr rowspan="1" style="background:yellow;font-weight:bold;">
-                           <td colspan="4">Total</td>
-                           <td>Rp. {{ number_format($total-=$reservation->deposit, 0, ',', '.') }}</td>
-                        </tr>
                      </tbody>
                   </table>
                </div>

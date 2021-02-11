@@ -6,6 +6,7 @@ use App\ExtraBad;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationFormRequest;
 use App\Registration;
+use App\Reservation;
 use App\ReservationCheckInDetail;
 use App\Room;
 use Carbon\Carbon;
@@ -43,7 +44,7 @@ class RegistrationController extends Controller
      */
     public function store(RegistrationFormRequest $request)
     {   
-        $data = \array_merge($request->except('_token', 'roomNo', 'totalPax', 'roomRate', 'typeOfRegistration', 'walkInOrReservation', 'rooms', 'idReservation', 'amount', 'extraBad', 'rate'));
+        $data = \array_merge($request->except('_token', 'roomNo', 'totalPax', 'roomRate', 'typeOfRegistration', 'walkInOrReservation', 'rooms', 'idReservation', 'amount', 'extraBad', 'rate', 'idRooms'));
         $registration = Registration::create($data);
 
         $registration_id = $registration->id;
@@ -69,6 +70,7 @@ class RegistrationController extends Controller
             }
         }
 
+        // condition registration by reservation
         if ($request->has('idReservation')) {
             ReservationCheckInDetail::create([
                 'reservation_id' => $request->idReservation,
@@ -89,6 +91,7 @@ class RegistrationController extends Controller
     public function show($id)
     {
         $registration = Registration::findOrFail($id);
+        $guestReservation = ReservationCheckInDetail::where('registration_id', $id)->first();
         $checkIn = new Carbon($registration->arrivaleDate);
         $checkOut = $registration->departureDate;
         $difference = ($checkIn->diff($checkOut)->days < -1)
@@ -99,7 +102,8 @@ class RegistrationController extends Controller
         return \view('frontOffice.reception.detail', \compact(
             'registration',
             'difference',
-            'grandTotal'
+            'grandTotal',
+            'guestReservation'
         ));
     }
 
@@ -111,7 +115,7 @@ class RegistrationController extends Controller
      */
     public function edit($registration)
     {   
-        $guestReservation = ReservationCheckInDetail::where('registration_id',$registration)->first();
+        $guestReservation = ReservationCheckInDetail::where('registration_id', $registration)->first();
         $registration = Registration::findOrFail($registration);
         $rooms = Room::get();
         $checkIn = new Carbon($registration->arrivaleDate);
@@ -119,6 +123,7 @@ class RegistrationController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
+
         return \view('frontOffice.reception.edit', \compact(
             'registration', 'rooms', 'difference', 'guestReservation'
         ));
@@ -156,9 +161,6 @@ class RegistrationController extends Controller
             $success = true;
             $message = 'Guest has checked in, data cannot be deleted';
         } else {
-            // $pivot = DB::table('registration_room')->where('registration_id', $id)->get();
-            // $rooms = Room::find($pivot->pluck('room_id')->toArray());
-            // $rooms->toQuery()->update(['code' => 'VR']);
             $check->rooms()->update(['code' => 'VR']);
             $check->delete();
             $success = false;

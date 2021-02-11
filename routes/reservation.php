@@ -30,14 +30,21 @@ Route::get('reservation/detailCancelReservation/{id}', 'ReservationGuestControll
 Route::resource('reservationGroup', 'ReservationGroupController');
 Route::get('data/reservationGroup', 'DataTable\DataTableReservationGroupController')->name('data.reservationGroups');
 Route::get('data/cancelReservationGroup', 'DataTable\DataTableCancelGroup')->name('data.cancelReservationGroups');
-Route::get('reservation/detailCancelReservationGroup/{id}', 'ReservationGroupController@detailCancelReservationGroup');
+Route::get('reservation/detailCancelReservationGroup/{id}','ReservationGroupController@detailCancelReservationGroup');
 Route::get('reservationGroup/deteleRoomArragement/{id}', 'ReservationGroupController@deleteRoomArragementGroupReservation')->name('deteleRoomArragement.room');
 Route::get('reservationGroup/deleteMealArragementGroupReservation/{id}', 'ReservationGroupController@deleteMeal')->name('deleteMealArragementGroupReservation.room');
 
 
 /**
- * Chart Plan
- * 
+ * Request jquery
  */
-Route::get('calendar', 'ChartPlanController@calendar')->name('chartPlan.calendar');
-Route::get('date-between', 'ChartPlanController@betweenDate')->name('chartPlan.dateBetween');
+Route::post('roomRate', 'ReservationGuestController@searchRoomRate')->name('search.roomRate');
+
+Route::post('checkAvailableRoom/standart', 'ReservationGuestController@checkRoomStandart')->name('checkAvailableRoomStandart.totalRoomReserved');
+
+Route::post('checkAvailableRoom/superior', 'ReservationGuestController@checkRoomSuperior')->name('checkAvailableRoomSuperior.totalRoomReserved');
+
+Route::post('checkAvailableRoom/deluxe', 'ReservationGuestController@checkRoomDeluxe')->name('checkAvailableRoomDeluxe.totalRoomReserved');
+
+//Tambah kamar baru
+Route::post('checkAvailableRoom', 'ReservationGuestController@checkAvailableRoom')->name('checkAvailableRoom.totalRoomReserved');

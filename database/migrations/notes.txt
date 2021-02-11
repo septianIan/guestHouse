@@ -1,2 +1,5 @@
 tabel individual_reservation_room dan group_reservation_room untuk pengaturan kamar
 tabel resevation_room dan reservationGroup_room untuk tabel pivot
+
+tabel individual_reservation_room
+- kolom status artinya tamu reservasi dalam keadaan aktif

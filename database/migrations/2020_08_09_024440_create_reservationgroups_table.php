@@ -19,7 +19,6 @@ class CreateReservationgroupsTable extends Migration
             $table->string('arrivaleDate');
             $table->string('departureDate');
             $table->string('mediaReservation');
-            $table->string('namePerson');
             $table->bigInteger('contactPerson');
             $table->string('addressPerson');
             $table->string('specialRequest')->nullable();

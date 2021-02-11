@@ -1,10 +1,10 @@
 @extends('frontOffice.template.ui')
-@section('title', 'Detail Reservation')
+@section('title', 'Detail Group Reservation')
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
    <li class="breadcrumb-item"><a href="/">Home</a></li>
-   <li class="breadcrumb-item"><a href="{{ route('reservation.reservation.index') }}">Data Reservation</a></li>
-   <li class="breadcrumb-item active">Detail Reservation</li>
+   <li class="breadcrumb-item"><a href="{{ route('reservation.reservation.index') }}">Data Group Reservation</a></li>
+   <li class="breadcrumb-item active">Detail Group Reservation</li>
 </ol>
 @endsection
 @section('content')
@@ -16,39 +16,41 @@
                <div class="col-12">
                   <h4>
                      <i class="fa fa-info-circle"></i>
-                     &nbsp;Detail Guest Reservation
+                     &nbsp;Detail Group Reservation
                   </h4>
                </div>
             </div>
             <div class="row invoice-info">
                <div class="col-sm-3 invoice-col">
                   <address>
-                     <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $reservation->guestName }} </font></strong><br>
-                     Address : {{ $reservation->address }}<br>
-                     Contact Person : {{ $reservation->contactPerson }}<br>
-                     Name Person : {{ $reservation->namePerson }}<br>
+                     <strong>Group Name :&nbsp;<font style="font-style:italic;">{{ $groupReservation->groupName }} </font></strong><br>
+                     Address : {{ $groupReservation->addressPerson }}<br>
+                     Contact Person : {{ $groupReservation->contactPerson }}<br>
+                     Name Person : {{ $groupReservation->namePerson }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Date Reservation</b>
+                  <b>Date Reservarion</b>
                   <address>
-                     Arrivale Date : {{ $reservation->arrivaleDate }}<br>
-                     Departure Date : {{ $reservation->departureDate }}<br>
-                     Estimate Arrival Check in : {{ $reservation->estimateArrivale }}<br>
+                     Arrivale Date : {{ $groupReservation->arrivaleDate }}<br>
+                     Departure Date : {{ $groupReservation->departureDate }}<br>
+                     Estimate Arrival Check in : {{ $groupReservation->estimateArrivale }}<br>
                      Email: info@almasaeedstudio.com
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
                   <b>Payment</b>
                   <address>
-                     Method Payment : {{ $reservation->methodPayment }}<br>
-                     Deposit : {{ number_format($reservation->deposit, 0, ',', '.') }}<br>
+                     Method Payment : {{ $groupReservation->methodPayment->methodPayment }}<br>
+                     Guarentee latter : {{ $groupReservation->methodPayment->value1 }} <br>
+                     No : {{ $groupReservation->methodPayment->value2 }} <br>
+                     Deposit : {{ number_format($groupReservation->methodPayment->deposit, 0, ',', '.') }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Order room by reservation</b>
+                  <b>Booked Room</b>
                   <address>
-                     @foreach($reservation->individualReservationRooms as $value)
+                     @foreach($groupReservation->groupReservationRooms as $value)
                      Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
                      <p>{{ $value->typeOfRoom }}</p>
                      @endforeach
@@ -65,7 +67,7 @@
          <form action="{{ route('reception.registration.store') }}" method="post">
             @csrf
 
-            <input type="hidden" name="idReservation" value="{{ $reservation->id }}">
+            <input type="hidden" name="idReservation" value="{{ $groupReservation->id }}">
 
             <div class="card card-primary">
                <div class="card-header">
@@ -129,7 +131,7 @@
                      </div>
                   </div>
                   <label for="">Home address</label>
-                  <textarea name="homeAddress" id="" cols="15" class="form-control @error('homeAddress') is-invalid @enderror" rows="3">{{ $reservation->address }}</textarea>
+                  <textarea name="homeAddress" id="" cols="15" class="form-control @error('homeAddress') is-invalid @enderror" rows="3">{{ $groupReservation->address }}</textarea>
                   @error('homeAddress')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -158,7 +160,7 @@
                         @enderror
 
                         <label for="">Arrivale date</label>
-                        <input type="date" class="form-control @error('arrivaleDate') is-invalid @enderror" name="arrivaleDate" placeholder="Arrivale date..." value="{{ $reservation->arrivaleDate }}" autocomplete="off">
+                        <input type="date" class="form-control @error('arrivaleDate') is-invalid @enderror" name="arrivaleDate" placeholder="Arrivale date..." value="{{ $groupReservation->arrivaleDate }}" autocomplete="off">
                         @error('arrivaleDate')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -166,7 +168,7 @@
                         @enderror
 
                         <label for="">Departure date</label>
-                        <input type="date" class="form-control @error('departureDate') is-invalid @enderror" name="departureDate" value="{{ $reservation->departureDate }}" autocomplete="off">
+                        <input type="date" class="form-control @error('departureDate') is-invalid @enderror" name="departureDate" value="{{ $groupReservation->departureDate }}" autocomplete="off">
                         @error('departureDate')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -214,12 +216,7 @@
                   <div class="row">
                      <div class="col-sm-5">
                         <select name="termOfPayment" class="form-control" id="test" onchange="showDiv(this)">
-                           <option value="{{ $reservation->methodPayment }}">{{ $reservation->methodPayment }}</option>
-                           <option value="cash">Cash/Travel cheque</option>
-                           <option value="creditCard">Credit card</option>
-                           <option value="debit">Debit card</option>
-                           <option value="companyAccount">Company account</option>
-                           <option value="travelAccount">Travel account</option>
+                           <option value="{{ $groupReservation->methodPayment->methodPayment }}"></option>
                         </select>
                      </div>
                      <div class="col-sm-4">
@@ -235,13 +232,13 @@
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Rooms Arragement</h3>
-                  <a href="#" class="addRow ml-2 btn btn-primary btn-xs"><i class="fa fa-plus px-1"></i>Room Arragement</a>
-                  <a href="#" class="addExtraBad ml-2 btn btn-warning btn-xs"><i class="fa fa-plus px-1"></i>Extra bad</a>
+                  <a href="#" class="addRow ml-2"><i class="fa fa-plus px-1"></i>Add Room Arragement</a>
                </div>
                <div class="card-body">
                   <table class="table table-bordered table-striped">
                      <thead>
                         <tr>
+                           <td>#</td>
                            <td>Type room</td>
                            <td>Room no</td>
                            <td>Total pax</td>
@@ -252,64 +249,20 @@
                         </tr>
                      </thead>
                      <tbody>
-                        @foreach($individialReservationRoomWhereNotExtraBad as $value)
+                        @php $no = 1; @endphp
+                        @foreach($groupReservation->groupReservationRooms as $value)
                         @for($i = 0; $i < $value->totalRoomReserved; $i++)
-                        
-                        <input type="hidden" name="idRooms[]" value="{{ $value->id }}">
-
                            <tr>
+                              <td>{{ $no++ }}</td>
                               <td>{{ $value->typeOfRoom }}</td>
                               <td>
                                  <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                                     <option value=""></option>
                                     @foreach($rooms as $room)
-
-                                       @if($room->code == 'O')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:blue;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VR')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:green;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VC')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:#FFA500;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VD')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:red;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-                                          
-                                       @endif
-
+                                    <option value="{{ $room->id }}" 
+                                    @if($room->code == 'O')
+                                       disabled
+                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
                                     @endforeach
                                  </select>
                                  @error('rooms[]')
@@ -326,7 +279,7 @@
                                  </div>
                                  @enderror
                               </td>
-                              <td><input type="number" class="form-control" value="{{ $value->roomRate }}" name="roomRate[]"></td>
+                              <td><input type="number" class="form-control" name="roomRate[]"></td>
                               <td>
                                  <select name="typeOfRegistration[]" id="" class="form-control">
                                     <option value=""></option>
@@ -340,12 +293,11 @@
                                  </select>
                               </td>
                               <td><a href="#" class="btn btn-danger remove"><i class="fa fa-times"></i></a></td>
-                              </td>
                            </tr>
                         @endfor
                         @endforeach
                      </tbody>
-                     <tfoot class="rowExtraBad">
+                     <tfoot>
                         @if(!empty($extraBad))
                            <tr style="background:lightblue;">
                               <td colspan="2"></td>
@@ -452,55 +404,14 @@
                <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                   <option value=""></option>
                   @foreach($rooms as $room)
-
-                     @if($room->code == 'O')
-                        <option value="{{ $room->id }}" 
-                        @if($room->code == 'O')
-                           disabled
-                        @elseif($room->code == 'VD')
-                           disabled
-                        @endif
-                        style="color:blue;font-weight:bold;">
-                     
-                        {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                     @elseif($room->code == 'VR')
-                        <option value="{{ $room->id }}" 
-                        @if($room->code == 'O')
-                           disabled
-                        @elseif($room->code == 'VD')
-                           disabled
-                        @endif
-                        style="color:green;font-weight:bold;">
-                     
-                        {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                     @elseif($room->code == 'VC')
-                        <option value="{{ $room->id }}" 
-                        @if($room->code == 'O')
-                           disabled
-                        @elseif($room->code == 'VD')
-                           disabled
-                        @endif
-                        style="color:#FFA500;font-weight:bold;">
-                     
-                        {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                     @elseif($room->code == 'VD')
-                        <option value="{{ $room->id }}" 
-                        @if($room->code == 'O')
-                           disabled
-                        @elseif($room->code == 'VD')
-                           disabled
-                        @endif
-                        style="color:red;font-weight:bold;">
-                     
-                        {{ $room->numberRoom }} | {{ $room->code }}</option>
-                        
-                     @endif
-
+                  <option value="{{ $room->id }}">{{ $room->numberRoom }} || {{ $room->code }}</option>
                   @endforeach
                </select>
+               @error('rooms[]')
+               <div class="invalid-feedback">
+                  {{ $message }}
+               </div>
+               @enderror
             </td>
             <td>
                <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]">
@@ -550,34 +461,6 @@
          removeDate.remove();
       }
    };
-
-   $('.addExtraBad').on('click', function() {
-      let tr = `
-         <tr style="background:lightblue;">
-            <td colspan="2"></td>
-            <td>
-               <input type="number" id="form1" name="amount" class="form-control" value="" required>
-            </td>
-            <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
-            <td>
-               <select name="extraBad" id="form2" class="form-control" required>
-                  <option value="extraBad">Extra Bad</option>
-               </select>
-            </td>
-            <td colspan="2">
-               <center>
-                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
-               </center>
-            </td>
-         </tr>
-      `;
-      $('.rowExtraBad').append(tr);
-   });
-
-   $('.removeExtraBad').live('click', function() {
-      var removeExtraBad = $('tfoot tr');
-      removeExtraBad.remove();
-   });
 
 </script>
 @endpush

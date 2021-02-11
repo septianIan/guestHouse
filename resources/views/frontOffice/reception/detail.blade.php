@@ -42,7 +42,7 @@
                   </div>
                   <div class="col-sm-3 invoice-col">
                      <p>
-                        Coming from : {{ $registration->comingFrom }}
+                        Coming from : {{ $registration->comingFrom }} <br>
                         Next destination : {{ $registration->nextDestination }}<br>
                         Term of payment : {{ $registration->termOfPayment }}<br>
                         Number account : {{ $registration->numberAccount }}<br>
@@ -53,6 +53,61 @@
             </div>
          </div>
       </div>
+
+      {{-- Detial Reservation guest --}}
+      @if(isset($guestReservation))
+      <div class="row">
+         <div class="col-lg-12">
+            <div class="invoice p-3 mb-3">
+               <div class="row">
+                  <div class="col-12">
+                     <h4>
+                        <i class="fa fa-info-circle"></i>
+                        &nbsp;Detail Guest Reservation
+                     </h4>
+                  </div>
+               </div>
+               <div class="row invoice-info">
+                  <div class="col-sm-3 invoice-col">
+                     <address>
+                        <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $guestReservation->reservation->guestName }} </font></strong><br>
+                        Address : {{ $guestReservation->reservation->address }}<br>
+                        Contact Person : {{ $guestReservation->reservation->contactPerson }}<br>
+                        Name Person : {{ $guestReservation->reservation->namePerson }}<br>
+                     </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Date Reservation : </b>{{ $guestReservation->reservation->created_at }}
+                     <address>
+                        Arrivale Date : {{ $guestReservation->reservation->arrivaleDate }}<br>
+                        Departure Date : {{ $guestReservation->reservation->departureDate }}<br>
+                        Estimate Arrival Check in : {{ $guestReservation->reservation->estimateArrivale }}<br>
+                     </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Payment</b>
+                     <address>
+                        Method Payment : {{ $guestReservation->reservation->methodPayment }}<br>
+                        Deposit : {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }}<br>
+                     </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Order room by reservation</b>
+                     <address>
+                        @foreach($guestReservation->reservation->individualReservationRooms as $value)
+                        <address>
+                           Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
+                           <b>{{ $value->typeOfRoom }}</b>
+                        </address>
+                        @endforeach
+                        Stay : {{ $difference }} night
+                     </address>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      @endif
 
       <div class="row">
          <div class="col-lg-12">
@@ -81,24 +136,88 @@
                         </thead>
                         <tbody>
                            @foreach($registration->rooms as $room)
-                              <tr>
-                                 <td>{{ $room->numberRoom }}</td>
-                                 <td>{{ $room->pivot->totalPax }}</td>
-                                 <td>{{ $room->pivot->typeOfRegistration }}</td>
-                                 <td>{{ $room->pivot->walkInOrReservation }}</td>
-                                 <td>Rp. {{ number_format($room->pivot->roomRate, 0, ',', '.') }}</td>
-                                 <td>{{ $difference }} Night</td>
-                                 <td>
-                                    Rp. {{ number_format($room->pivot->roomRate*=$difference, 0, ',', '.') }}
-                                 </td>
-                              </tr>
+                           <tr>
+                              <td>{{ $room->numberRoom }}</td>
+                              <td>{{ $room->pivot->totalPax }}</td>
+                              <td>{{ $room->pivot->typeOfRegistration }}</td>
+                              <td>{{ $room->pivot->walkInOrReservation }}</td>
+                              <td>Rp. {{ number_format($room->pivot->roomRate, 0, ',', '.') }}</td>
+                              <td>{{ $difference }} Night</td>
+                              <td>
+                                 Rp.
+                                 @php
+                                 $roomRate = $room->pivot->roomRate * $difference;
+                                 echo number_format($roomRate, 0, ',', '.')
+                                 @endphp
+                              </td>
+                           </tr>
                            @endforeach
                         </tbody>
+                        <tbody>
+                           <tr rowspan="1" style="background:#3498db;font-weight:bold;">
+                              <td colspan="6"></td>
+                              <td>
+                                 Rp.
+                                 @php
+                                 $total = $registration->rooms()->sum('roomRate') * $difference;
+                                 echo number_format($total, 0, ',', '.')
+                                 @endphp
+                              </td>
+                           </tr>
+                        </tbody>
+                        @if(!empty($registration->extraBad))
+                        <tbody>
+                           <tr rowspan="1" style="background:#2ecc71;font-weight:bold;">
+                              <td colspan="6">Extrabad :</td>
+                              <td>
+                                 Rp. {{ number_format($registration->extraBad->rate * $difference, 0, ',', '.') }} (+)
+                              </td>
+                           </tr>
+                        </tbody>
+                        @endif
+                        @if(isset($guestReservation))
+                        <tbody>
+                           <tr rowspan="1" style="background:#dbc3c7;font-weight:bold;">
+                              <td colspan="6">Deposit :</td>
+                              <td>
+                                 Rp. {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }} (-)
+                              </td>
+                           </tr>
+                        </tbody>
+                        @endif
                         <tfoot>
                            <tr rowspan="1" style="background:yellow;font-weight:bold;">
-                           <td colspan="6"></td>
+                              <td colspan="6">Total :</td>
                               <td>
-                                 Rp. {{ number_format($grandTotal, 0, ',', '.') }}
+                                 Rp.
+                                 @if(isset($guestReservation))
+                                    {{-- jika dari reservation --}}
+                                    @if(!empty($registration->extraBad))
+                                       @php
+                                          $total = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad->rate * $difference) - $guestReservation->reservation->deposit;
+                                          echo number_format($total, 0, ',', '.')
+                                       @endphp
+                                    @else
+                                       @php
+                                          $total = ($registration->rooms()->sum('roomRate') * $difference) - $guestReservation->reservation->deposit;
+                                          echo number_format($total, 0, ',', '.')
+                                       @endphp
+                                    @endif
+                                    
+                                 @else
+                                 {{-- jika datang langsung --}}
+                                    @if(!empty($registration->extraBad))
+                                       @php
+                                          $total = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad->rate * $difference);
+                                          echo number_format($total, 0, ',', '.')
+                                       @endphp
+                                    @else
+                                       @php
+                                          $total = $registration->rooms()->sum('roomRate') * $difference;
+                                          echo number_format($total, 0, ',', '.')
+                                       @endphp
+                                    @endif
+                                 @endif
                               </td>
                            </tr>
                         </tfoot>

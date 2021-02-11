@@ -63,7 +63,7 @@
          "serverSide" : true,
          "responsive" : true,
          "autoWidth" : true,
-         ajax: '{{ route('reception.data.reservations') }}',
+         ajax: '{{ route('reception.data.IndividualReservations') }}',
          columns : [
             {data: 'DT_RowIndex'},
             {data: 'guestName'},

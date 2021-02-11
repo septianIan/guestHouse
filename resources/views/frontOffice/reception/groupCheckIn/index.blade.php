@@ -23,12 +23,13 @@
                <table id="dataTable" class="table table-bordered table-striped">
                   <thead>
                      <tr>
-                        <td>No</td>
-                        <td>Guest Name</td>
-                        <td>Arrivale</td>
-                        <td>Departure</td>
-                        <td>Coming from</td>
-                        <td>Action</td>
+                        <th>No</th>
+                        <th>Group name</th>
+                        <th>Name person</th>
+                        <th>Arrivale</th>
+                        <th>Departure</th>
+                        <th>Coming from</th>
+                        <th>Action</th>
                      </tr>
                   </thead>
                </table>
@@ -57,6 +58,23 @@
 <!-- Sweet alert -->
 <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script>
-
+   $(function() {
+      $('#dataTable').DataTable({
+         "processing" : true,
+         "serverSide" : true,
+         "responsive" : true,
+         "autoWidth" : true,
+         ajax: '{{ route('reception.data.groupReservations') }}',
+         columns : [
+            {data: 'DT_RowIndex'},
+            {data: 'groupName'},
+            {data: 'namePerson'},
+            {data: 'arrivaleDate'},
+            {data: 'departureDate'},
+            {data: 'estimateArrivale'},
+            {data: 'action'}
+         ]
+      });
+   });
 </script>
 @endpush
