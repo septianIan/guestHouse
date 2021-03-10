@@ -13,7 +13,7 @@
       <div class="col-md-12">
          <form action="{{ route('reservation.reservation.store') }}" method="post">
             @csrf
-
+            {{-- Guest name --}}
             <div class="card card-primary">
                <div class="card-header">
                   <h3 class="card-title">Create Individual Reservation</h3>
@@ -32,7 +32,7 @@
                   @enderror
 
                   <label for="">Arrivale Date</label>
-                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror" autocomplete="off" value="{{ old('arrivaleDate') }}">
+                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror" autocomplete="off" value="{{ old('arrivaleDate') }}" required>
                   @error('arrivaleDate')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -40,7 +40,7 @@
                   @enderror
 
                   <label for="">Departure Date</label>
-                  <input type="date" name="departureDate" class="form-control @error('departureDate') is-invalid @enderror" placeholder="Departure Date..." autocomplete="off" value="{{ old('departureDate') }}">
+                  <input type="date" name="departureDate" class="form-control @error('departureDate') is-invalid @enderror" placeholder="Departure Date..." autocomplete="off" value="{{ old('departureDate') }}" required>
                   @error('departureDate')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -48,7 +48,7 @@
                   @enderror
                </div>
             </div>
-
+            {{-- Room Arragement --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Rooms Arragement</h3>
@@ -63,14 +63,13 @@
                            <td>Total Room Reserved</td>
                            <td>Type Of Room</td>
                            <td>Room rate</td>
-                           <td>Discount</td>
                         </tr>
                      </thead>
                      <tbody>
                      {{-- Standart --}}
                         <tr>
                            <td rowspan="3">
-                              <select name="mediaReservation" id="" class="form-control">
+                              <select name="mediaReservation" id="" class="form-control" required>
                                  <option value="{{ old('mediaReservation') }}">{{ old('mediaReservation') }}</option>
                                  <option value=""></option>
                                  <option value="telephone">Telephone</option>
@@ -88,9 +87,6 @@
                            <td>
                               <input type="number" name="roomRate[]" class="form-control" value="{{ $roomRateStandart->price }}">
                            </td>
-                           <td>
-                              <input type="number" name="discount[]" style="width:100px;" class="form-control" id="">%
-                           </td>
                         </tr>
                         {{-- Superior --}}
                         <tr>
@@ -105,9 +101,6 @@
                            <td>
                               <input type="number" name="roomRate[]" class="form-control" value="{{ $roomRateSuperior->price }}">
                            </td>
-                           <td>
-                              <input type="number" name="discount[]" style="width:100px;" class="form-control" id="">%
-                           </td>
                         </tr>
                         {{-- Deluxe --}}
                         <tr>
@@ -121,9 +114,6 @@
                            </td>
                            <td>
                               <input type="number" name="roomRate[]" class="form-control" value="{{ $roomRateDeluxe->price }}">
-                           </td>
-                           <td>
-                              <input type="number" name="discount[]" style="width:100px;" class="form-control" id="">%
                            </td>
                         </tr>
                      </tbody>
@@ -161,7 +151,7 @@
                   </table>
                </div>
             </div>
-
+            {{-- Method payment --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Method Payment</h3>
@@ -172,7 +162,7 @@
                </div>
                <div class="card-body">
                   <label for="">Deposit</label>
-                  <input type="number" class="form-control @error('deposit') is-invalid @enderror" name="deposit" placeholder="Deposit..." value="{{ old('deposit') }}" autocomplete="off">
+                  <input type="number" class="form-control @error('deposit') is-invalid @enderror" name="deposit" placeholder="Deposit..." value="{{ old('deposit') }}" autocomplete="off" required>
                   @error('deposit')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -181,7 +171,7 @@
                   <div class="row">
                      <div class="col-sm-6">
                         <label for="">Method Payment</label>
-                        <select name="methodPayment" id="" class="form-control @error('methodPayment') is-invalid @enderror">
+                        <select name="methodPayment" id="" class="form-control @error('methodPayment') is-invalid @enderror" required>
                            <option value="{{ old('methodPayment') }}">{{ old('methodPayment') }}</option>
                            <option value=""></option>
                            <option value="cash">Cash</option>
@@ -197,7 +187,7 @@
                      </div>
                      <div class="col-sm-6">
                         <label for="">Number</label>
-                        <input type="number" class="form-control @error('numberAccount') is-invalid @enderror" name="numberAccount" placeholder="Number Account..." value="{{ old('numberAccount') }}" autocomplete="off">
+                        <input type="number" class="form-control @error('numberAccount') is-invalid @enderror" name="numberAccount" placeholder="Number Account..." value="{{ old('numberAccount') }}" autocomplete="off" required>
                         @error('numberAccount')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -207,7 +197,7 @@
                   </div>
                </div>
             </div>
-
+            {{-- Another contact --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Another Contact</h3>
@@ -218,14 +208,14 @@
                </div>
                <div class="card-body">
                   <label for="">Contact Person</label>
-                  <input type="text" name="contactPerson" class="form-control @error('contactPerson') is-invalid @enderror" placeholder="Contact Person..." autocomplete="off" value="{{ old('contactPerson') }}">
+                  <input type="text" name="contactPerson" class="form-control @error('contactPerson') is-invalid @enderror" placeholder="Contact Person..." autocomplete="off" value="{{ old('contactPerson') }}" required>
                   @error('contactPerson')
                   <div class="invalid-feedback">
                      {{ $message }}
                   </div>
                   @enderror
                   <label for="">Address/Phone</label>
-                  <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" placeholder="Address..." autocomplete="off" value="{{ old('address') }}">
+                  <input type="text" name="address" class="form-control @error('address') is-invalid @enderror" placeholder="Address..." autocomplete="off" value="{{ old('address') }}" required>
                   @error('address')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -233,7 +223,7 @@
                   @enderror
                </div>
             </div>
-
+            {{-- Estimate arrivale --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Estimate Arrivale</h3>
@@ -244,7 +234,7 @@
                </div>
                <div class="card-body">
                   <label for="">Estimate Arrival</label>
-                  <input type="time" name="estimateArrivale" class="form-control @error('estimateArrivale') is-invalid @enderror" placeholder="Estimate Arrival..." autocomplete="off" value="{{ old('estimateArrivale') }}">
+                  <input type="time" name="estimateArrivale" class="form-control @error('estimateArrivale') is-invalid @enderror" placeholder="Estimate Arrival..." autocomplete="off" value="{{ old('estimateArrivale') }}" required>
                   @error('estimateArrivale')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -252,7 +242,7 @@
                   @enderror
                </div>
             </div>
-
+            {{-- Spec req --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Request</h3>
@@ -271,7 +261,7 @@
                   @enderror
                </div>
             </div>
-
+            {{-- Submit --}}
             <div class="card card-success">
                <div class="card-header">
                   <h3 class="card-title">

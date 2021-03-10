@@ -27,11 +27,11 @@ class ReservationGroupFormRequest extends FormRequest
             'groupName' => 'required',
             'arrivaleDate' => 'required',
             'departureDate' => 'required',
-            'namePerson' => 'required',
             'contactPerson' => 'required',
             'addressPerson' => 'required',
             'estimateArrivale' => 'required',
             'methodPayment' => 'required',
+            'mediaReservation' => 'required'
         ];
 
         if ($this->getMethod() == 'POST') {

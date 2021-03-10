@@ -34,4 +34,14 @@ class Registration extends Model
     {
         return $this->hasOne(ExtraBad::class);
     }
+
+    public function telephoneBills()
+    {
+        return $this->hasMany(TelephoneVoucher::class);
+    }
+
+    public function miscellaneousBills()
+    {
+        return $this->hasMany(MiscellaneousVoucher::class);
+    }
 }

@@ -25,6 +25,14 @@
                </p>
             </a>
          </li>
+         <li class="nav-item">
+            <a href="{{ route('chartPlan.todayArrivalList') }}" class="nav-link">
+               <i class="far fa-circle nav-icon"></i>
+               <p>
+                  Today Arrival List
+               </p>
+            </a>
+         </li>
       </ul>
    </li>
 

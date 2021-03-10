@@ -29,6 +29,11 @@ class ReservationGroup extends Model
         return $this->hasOne(MethodPayment::class, 'reservationgroup_id', 'id');
     }
 
+    public function groupCheckInDetail()
+    {
+        return $this->hasOne(ReservationGroupCheckInDetail::class);
+    }
+
     public function getTotalRp()
     {
         return 'Rp. '. \number_format($this->totalRoomPayment, 0, ',', '.');

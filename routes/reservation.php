@@ -38,13 +38,13 @@ Route::get('reservationGroup/deleteMealArragementGroupReservation/{id}', 'Reserv
 /**
  * Request jquery
  */
-Route::post('roomRate', 'ReservationGuestController@searchRoomRate')->name('search.roomRate');
+Route::post('roomRate', 'CheckRoomAvailableController@searchRoomRate')->name('search.roomRate');
 
-Route::post('checkAvailableRoom/standart', 'ReservationGuestController@checkRoomStandart')->name('checkAvailableRoomStandart.totalRoomReserved');
+Route::post('checkAvailableRoom/standart', 'CheckRoomAvailableController@checkRoomStandart')->name('checkAvailableRoomStandart.totalRoomReserved');
 
-Route::post('checkAvailableRoom/superior', 'ReservationGuestController@checkRoomSuperior')->name('checkAvailableRoomSuperior.totalRoomReserved');
+Route::post('checkAvailableRoom/superior', 'CheckRoomAvailableController@checkRoomSuperior')->name('checkAvailableRoomSuperior.totalRoomReserved');
 
-Route::post('checkAvailableRoom/deluxe', 'ReservationGuestController@checkRoomDeluxe')->name('checkAvailableRoomDeluxe.totalRoomReserved');
+Route::post('checkAvailableRoom/deluxe', 'CheckRoomAvailableController@checkRoomDeluxe')->name('checkAvailableRoomDeluxe.totalRoomReserved');
 
 //Tambah kamar baru
-Route::post('checkAvailableRoom', 'ReservationGuestController@checkAvailableRoom')->name('checkAvailableRoom.totalRoomReserved');
+Route::post('checkAvailableRoom', 'CheckRoomAvailableController@checkAvailableRoom')->name('checkAvailableRoom.totalRoomReserved');

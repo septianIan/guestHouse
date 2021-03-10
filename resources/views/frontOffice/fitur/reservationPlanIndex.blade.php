@@ -39,9 +39,9 @@
                                  @elseif($room->code == 'VR')
                                     style="background:#008000;color:white;"
                                  @elseif($room->code == 'VD')
-                                    style="background:#FFA500;color:white;"
-                                 @elseif($room->code == 'VC')
                                     style="background:#FF0000;color:white;"
+                                 @elseif($room->code == 'VC')
+                                    style="background:#FFA500;color:white;"
                                  @endif>
                                     <div class="card-header">
                                        <h3 class="card-title">
@@ -93,8 +93,8 @@
                                              <td>{{ count($roomStandartO) }}</td>
                                              <td>{{ count($roomStandartVD) }}</td>
                                              <td>{{ count($roomStandartVC) }}</td>
-                                             <td>{{ $bookingStandart }}</td>
-                                             <td>{{ count($roomStandartVR) - $bookingStandart }}</td>
+                                             <td>{{ $totalBookingRoomReservedStandart }}</td>
+                                             <td>{{ count($roomStandartVR) - $totalBookingRoomReservedStandart }}</td>
                                           </tr>
                                        </tbody>
                                     </table>
@@ -129,8 +129,8 @@
                                              <td>{{ count($roomSuperiorO) }}</td>
                                              <td>{{ count($roomSuperiorVD) }}</td>
                                              <td>{{ count($roomSuperiorVC) }}</td>
-                                             <td>{{ $bookingSuperior }}</td>
-                                             <td>{{ count($roomSuperiorVR) - $bookingSuperior }}</td>
+                                             <td>{{ $totalRoomReservedSuperior }}</td>
+                                             <td>{{ count($roomSuperiorVR) - $totalRoomReservedSuperior }}</td>
                                           </tr>
                                        </tbody>
                                     </table>
@@ -165,8 +165,8 @@
                                              <td>{{ count($roomDeluxeO) }}</td>
                                              <td>{{ count($roomDeluxeVD) }}</td>
                                              <td>{{ count($roomDeluxeVC) }}</td>
-                                             <td>{{ $bookingDeluxe }}</td>
-                                             <td>{{ count($roomDeluxeVR) - $bookingDeluxe }}</td>
+                                             <td>{{ $totalRoomReservedDeluxe }}</td>
+                                             <td>{{ count($roomDeluxeVR) - $totalRoomReservedDeluxe }}</td>
                                           </tr>
                                        </tbody>
                                     </table>

@@ -30,7 +30,6 @@ class ReservationFormRequest extends FormRequest
             'contactPerson' => 'required',
             'address' => 'required',
             'estimateArrivale' => 'required',
-            'specialRequest' => 'required',
             'deposit' => 'required',
             'numberAccount' => 'required'
         ];

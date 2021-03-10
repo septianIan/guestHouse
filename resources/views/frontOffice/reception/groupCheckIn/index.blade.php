@@ -68,7 +68,7 @@
          columns : [
             {data: 'DT_RowIndex'},
             {data: 'groupName'},
-            {data: 'namePerson'},
+            {data: 'contactPerson'},
             {data: 'arrivaleDate'},
             {data: 'departureDate'},
             {data: 'estimateArrivale'},

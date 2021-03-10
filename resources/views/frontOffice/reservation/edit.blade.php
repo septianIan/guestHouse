@@ -63,7 +63,6 @@
                            <td>Total Room Reserved</td>
                            <td>Type Of Room</td>
                            <td>Room rate</td>
-                           <td>Discount</td>
                            <td>Action</td>
                         </tr>
                      </thead>
@@ -86,6 +85,7 @@
                            <td>
                               <input type="number" id="totalRoomReserved{{ $value->typeOfRoom }}" name="totalRoomReserved[]" class="form-control" value="{{ $value->totalRoomReserved }}" required>
 
+                              {{-- Jumlah default room reserved --}}
                               <input type="hidden" name="" id="totalRoomReserved{{ $value->typeOfRoom }}DefaultHidden" value="{{ $value->totalRoomReserved }}">
                            </td>
                            <td>
@@ -94,9 +94,6 @@
                               </select>
                            </td>
                            <td><input type="number" class="form-control" id="roomRate" name="roomRate[]" value="{{ $value->roomRate }}"></td>
-                           <td>
-                              <input type="number" name="discount[]" style="width:100px;" class="form-control" value="{{ $value->discount }}" id="">%
-                           </td>
                            <td>
                               <a href="#" class="btn btn-danger removeData" data-id="{{ $value->id }}"><i class="fa fa-trash"></i></a>
                            </td>
@@ -107,7 +104,7 @@
                         <input type="hidden" name="idRooms">
                         <tr>
                            <td>
-                              <select name="mediaReservation" id="" class="form-control" required>
+                              <select name="mediaReservation" id="" class="form-control">
                                  <option value="{{ $reservation->mediaReservation }}">{{ $reservation->mediaReservation }}</option>
                                  <option value=""></option>
                                  <option value="telephone">Telephone</option>
@@ -115,10 +112,10 @@
                               </select>
                            </td>
                            <td>
-                              <input type="number" id="NewTotalRoomReserved" name="totalRoomReserved[]" class="form-control" value="" required>
+                              <input type="number" id="NewTotalRoomReserved" name="totalRoomReserved[]" class="form-control" value="">
                            </td>
                            <td>
-                              <select name="rooms[]" id="NewTypeRoom" class="form-control" required>
+                              <select name="rooms[]" id="NewTypeRoom" class="form-control">
                                  <option value=""></option>
                                  <option value="standart">STANDART</option>
                                  <option value="superior">SUPERIOR</option>
@@ -127,9 +124,6 @@
                            </td>
                            <td>
                               <input type="number" class="form-control" id="newRoomRate" name="roomRate[]" value="">
-                           </td>
-                           <td rowspan="2">
-                              <input type="number" name="discount[]" style="width:100px;" class="form-control" value="" id="">%
                            </td>
                         </tr>
                      </tbody>
@@ -153,6 +147,9 @@
                               </select>
                            </td>
                            <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+                           
+                              <input type="hidden" name="discount[]" style="width:100px;" class="form-control" value="" id="">
+                        
                            <td colspan="2">
                               <center>
                                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
@@ -221,7 +218,7 @@
                </div>
                <div class="card-body">
                   <label for="">Contact Person</label>
-                  <input type="number" name="contactPerson" class="form-control @error('contactPerson') is-invalid @enderror" placeholder="Contact Person..." autocomplete="off" value="{{ $reservation->contactPerson }}">
+                  <input type="text" name="contactPerson" class="form-control @error('contactPerson') is-invalid @enderror" placeholder="Contact Person..." autocomplete="off" value="{{ $reservation->contactPerson }}">
                   @error('contactPerson')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -385,108 +382,140 @@
 
    $(document).ready(function(){
       //STANDART
-      $('#totalRoomReservedStandart').change(function(){
+      $('#totalRoomReservedstandart').change(function(){
          let totalRoomReservedStandart = $(this).val();
-         let totalRoomReservedStandartDefaultHidden = $('#totalRoomReservedStandartDefaultHidden').val();
+         let totalRoomReservedStandartDefaultHidden = $('#totalRoomReservedstandartDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
-         $.ajax({
-            type: "POST",
-            url: "{{ route('reservation.checkAvailableRoomStandart.totalRoomReserved') }}",
-            data: {
-               "_token": "{{ csrf_token() }}",
-               "totalRoomReserved": totalRoomReservedStandart,
-               "typeRoom": typeRoom 
-            },
-            beforeSend: function(){
-               $("#totalRoomReservedStandart").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
-            },
-            dataType: 'json',
-            success: function(data){
-               if(data.success === true){
-                  alert(data.message);
-                  $('#totalRoomReservedStandart').val(totalRoomReservedStandartDefaultHidden);
-                  $("#totalRoomReservedStandart").removeClass('is-valid');
-                  $("#totalRoomReservedStandart").addClass('is-invalid');
-                  $("#totalRoomReservedStandart").css("background","#FFF");
-               }else if(data.success === false) {
-                  alert(data.message);
-                  $("#totalRoomReservedStandart").css("background","#FFF");
-                  $("#totalRoomReservedStandart").removeClass('is-invalid');
-                  $("#totalRoomReservedStandart").addClass('is-valid');
-               }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {}
-         });
+         // jika jumlah kamar yang di pesan kurang dari kamar default
+         if(totalRoomReservedStandart < totalRoomReservedStandartDefaultHidden){
+            //jika jumlah kamar yang dipesan kurang dari nool
+            if(totalRoomReservedStandart <= 0){
+               alert('The total rooms booked cannot be below zero');
+               $('#totalRoomReservedstandart').val(totalRoomReservedStandartDefaultHidden);
+               return;
+            }
+            alert('Reduce the number of rooms booked');
+            return;
+         } else {
+            $.ajax({
+               type: "POST",
+               url: "{{ route('reservation.checkAvailableRoomStandart.totalRoomReserved') }}",
+               data: {
+                  "_token": "{{ csrf_token() }}",
+                  "totalRoomReserved": totalRoomReservedStandart,
+                  "typeRoom": typeRoom 
+               },
+               beforeSend: function(){
+                  $("#totalRoomReservedstandart").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+               },
+               dataType: 'json',
+               success: function(data){
+                  if(data.success === true){
+                     alert(data.message);
+                     $('#totalRoomReservedstandart').val(totalRoomReservedStandartDefaultHidden);
+                     $("#totalRoomReservedstandart").removeClass('is-valid');
+                     $("#totalRoomReservedstandart").addClass('is-invalid');
+                     $("#totalRoomReservedstandart").css("background","#FFF");
+                  }else if(data.success === false) {
+                     alert(data.message);
+                     $("#totalRoomReservedstandart").css("background","#FFF");
+                     $("#totalRoomReservedstandart").removeClass('is-invalid');
+                     $("#totalRoomReservedstandart").addClass('is-valid');
+                  }
+               },
+               error: function(jqXHR, textStatus, errorThrown) {}
+            });
+         }
       });
 
       //SUPERIOR
-      $('#totalRoomReservedSuperior').change(function(){
+      $('#totalRoomReservedsuperior').change(function(){
          let totalRoomReservedSuperior = $(this).val();
-         let totalRoomReservedSuperiorDefaultHidden = $('#totalRoomReservedSuperiorDefaultHidden').val();
+         let totalRoomReservedsuperiorDefaultHidden = $('#totalRoomReservedsuperiorDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
-         $.ajax({
-            type: "POST",
-            url: "{{ route('reservation.checkAvailableRoomSuperior.totalRoomReserved') }}",
-            data: {
-               "_token": "{{ csrf_token() }}",
-               "totalRoomReserved": totalRoomReservedSuperior,
-               "typeRoom": typeRoom 
-            },
-            beforeSend: function(){
-               $("#totalRoomReservedSuperior").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
-            },
-            dataType: 'json',
-            success: function(data){
-               if(data.success === true){
-                  alert(data.message);
-                  $('#totalRoomReservedSuperior').val(totalRoomReservedSuperiorDefaultHidden);
-                  $("#totalRoomReservedSuperior").removeClass('is-valid');
-                  $("#totalRoomReservedSuperior").addClass('is-invalid');
-                  $("#totalRoomReservedSuperior").css("background","#FFF");
-               }else if(data.success === false) {
-                  alert(data.message);
-                  $("#totalRoomReservedSuperior").css("background","#FFF");
-                  $("#totalRoomReservedSuperior").removeClass('is-invalid');
-                  $("#totalRoomReservedSuperior").addClass('is-valid');
-               }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {}
-         });
+         if(totalRoomReservedSuperior < totalRoomReservedsuperiorDefaultHidden){
+            if(totalRoomReservedSuperior <= 0){
+               alert('The total rooms booked cannot be below zero');
+               $('#totalRoomReservedsuperior').val(totalRoomReservedsuperiorDefaultHidden);
+               return;
+            }
+            alert('Reduce the number of rooms booked');
+            return;
+         } else {
+            $.ajax({
+               type: "POST",
+               url: "{{ route('reservation.checkAvailableRoomSuperior.totalRoomReserved') }}",
+               data: {
+                  "_token": "{{ csrf_token() }}",
+                  "totalRoomReserved": totalRoomReservedSuperior,
+                  "typeRoom": typeRoom 
+               },
+               beforeSend: function(){
+                  $("#totalRoomReservedSuperior").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+               },
+               dataType: 'json',
+               success: function(data){
+                  if(data.success === true){
+                     alert(data.message);
+                     $('#totalRoomReservedsuperior').val(totalRoomReservedsuperiorDefaultHidden);
+                     $("#totalRoomReservedsuperior").removeClass('is-valid');
+                     $("#totalRoomReservedsuperior").addClass('is-invalid');
+                     $("#totalRoomReservedsuperior").css("background","#FFF");
+                  }else if(data.success === false) {
+                     alert(data.message);
+                     $("#totalRoomReservedsuperior").css("background","#FFF");
+                     $("#totalRoomReservedsuperior").removeClass('is-invalid');
+                     $("#totalRoomReservedsuperior").addClass('is-valid');
+                  }
+               },
+               error: function(jqXHR, textStatus, errorThrown) {}
+            });
+         }
       });
 
       //DELUXE
-      $('#totalRoomReservedDeluxe').change(function(){
+      $('#totalRoomReserveddeluxe').change(function(){
          let totalRoomReservedDeluxe = $(this).val();
-         let totalRoomReservedDeluxeDefaultHidden = $('#totalRoomReservedDeluxeDefaultHidden').val();
+         let totalRoomReservedDeluxeDefaultHidden = $('#totalRoomReserveddeluxeDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
-         $.ajax({
-            type: "POST",
-            url: "{{ route('reservation.checkAvailableRoomDeluxe.totalRoomReserved') }}",
-            data: {
-               "_token": "{{ csrf_token() }}",
-               "totalRoomReserved": totalRoomReservedDeluxe,
-               "typeRoom": typeRoom 
-            },
-            beforeSend: function(){
-               $("#totalRoomReservedDeluxe").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
-            },
-            dataType: 'json',
-            success: function(data){
-               if(data.success === true){
-                  alert(data.message);
-                  $('#totalRoomReservedDeluxe').val(totalRoomReservedDeluxeDefaultHidden);
-                  $("#totalRoomReservedDeluxe").removeClass('is-valid');
-                  $("#totalRoomReservedDeluxe").addClass('is-invalid');
-                  $("#totalRoomReservedDeluxe").css("background","#FFF");
-               }else if(data.success === false) {
-                  alert(data.message);
-                  $("#totalRoomReservedDeluxe").css("background","#FFF");
-                  $("#totalRoomReservedDeluxe").removeClass('is-invalid');
-                  $("#totalRoomReservedDeluxe").addClass('is-valid');
-               }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {}
-         });
+         if(totalRoomReservedDeluxe < totalRoomReservedDeluxeDefaultHidden){
+            if(totalRoomReservedDeluxe <= 0){
+               alert('The total rooms booked cannot be below zero');
+               $('#totalRoomReserveddeluxe').val(totalRoomReservedDeluxeDefaultHidden);
+               return;
+            }
+            alert('Reduce the number of rooms booked');
+            return;
+         } else {
+            $.ajax({
+               type: "POST",
+               url: "{{ route('reservation.checkAvailableRoomDeluxe.totalRoomReserved') }}",
+               data: {
+                  "_token": "{{ csrf_token() }}",
+                  "totalRoomReserved": totalRoomReservedDeluxe,
+                  "typeRoom": typeRoom 
+               },
+               beforeSend: function(){
+                  $("#totalRoomReserveddeluxe").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
+               },
+               dataType: 'json',
+               success: function(data){
+                  if(data.success === true){
+                     alert(data.message);
+                     $('#totalRoomReserveddeluxe').val(totalRoomReservedDeluxeDefaultHidden);
+                     $("#totalRoomReserveddeluxe").removeClass('is-valid');
+                     $("#totalRoomReserveddeluxe").addClass('is-invalid');
+                     $("#totalRoomReserveddeluxe").css("background","#FFF");
+                  }else if(data.success === false) {
+                     alert(data.message);
+                     $("#totalRoomReserveddeluxe").css("background","#FFF");
+                     $("#totalRoomReserveddeluxe").removeClass('is-invalid');
+                     $("#totalRoomReserveddeluxe").addClass('is-valid');
+                  }
+               },
+               error: function(jqXHR, textStatus, errorThrown) {}
+            });
+         }
       });
 
       //TAMBAH KAMAR BARU

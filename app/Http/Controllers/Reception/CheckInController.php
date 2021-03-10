@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Reception;
 use App\CheckIn;
 use App\Http\Controllers\Controller;
 use App\IndividualReservationRoom;
+use App\Meal;
 use App\Registration;
 use App\Reservation;
 use App\ReservationCheckInDetail;
 use App\ReservationGroup;
+use App\ReservationGroupCheckInDetail;
 use App\Room;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -66,17 +68,32 @@ class CheckInController extends Controller
             $success = true;
             $message = 'Guest has checked in';
         } else {
-            // $regis = Registration::find($id);
-            // $regis->update(['status' => 'checkIn']);
+            $regis = Registration::find($id);
+            $regis->update(['status' => 'checkIn']);
 
+
+            /**
+             * jika checkIn tamu By reservation
+             */
+            //cek reservation individual
             $reservation = ReservationCheckInDetail::where('registration_id', $id)->first();
+            // cek group individual
+            $groupReservation = ReservationGroupCheckInDetail::where('registration_id', $id)->first();
+
             if ($reservation != '') {
                 $reservation->reservation->update(['status' => 'checkIn']);
+                //update status individual_reservation_rooms
+                DB::table('individual_reservation_rooms')->whereIn('reservation_id', [$reservation->reservation_id])
+                ->update(['status' => 2]);
+            } elseif ($groupReservation != ''){
+                $groupReservation->reservationGroup->update(['status' => 'checkIn']);
+                DB::table('group_reservation_rooms')->whereIn(
+                    'reservationgroup_id', [$groupReservation->reservationgroup_id]
+                )->update(['status' => 2]);
+            } else {
+                $success = false;
+                $message = 'Error! reservation individual or group not found!!!';
             }
-
-            //update status individual_reservation_rooms
-            $individualReservationRooms = DB::table('individual_reservation_rooms')->whereIn('reservation_id', [$reservation->reservation_id])
-            ->update(['status' => 2]);
 
             CheckIn::create([
                 'registration_id' => $id,
@@ -128,7 +145,8 @@ class CheckInController extends Controller
         return \view('frontOffice.reception.groupCheckIn.detailGroupReservation', [
             'groupReservation' => $reservationGroup,
             'difference' => $difference,
-            'rooms' => $rooms
+            'rooms' => $rooms,
+            'meals' => Meal::get()
         ]);
     }
 }

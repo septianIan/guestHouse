@@ -15,93 +15,93 @@ class RoomSeeder extends Seeder
         $rooms = [
             [
                 'roomType' => 'standart',
-                'numberRoom' => '01',
+                'numberRoom' => '101',
                 'price' => '200000',
                 'code' => 'O'
             ],
             [
                 'roomType' => 'standart',
-                'numberRoom' => '02',
+                'numberRoom' => '102',
                 'price' => '200000',
                 'code' => 'O'
             ],
             [
                 'roomType' => 'standart',
-                'numberRoom' => '03',
+                'numberRoom' => '103',
                 'price' => '200000',
                 'code' => 'O'
             ],
             [
                 'roomType' => 'standart',
-                'numberRoom' => '04',
+                'numberRoom' => '104',
                 'price' => '200000',
                 'code' => 'VR'
             ],  
             [
                 'roomType' => 'standart',
-                'numberRoom' => '05',
+                'numberRoom' => '105',
                 'price' => '200000',
                 'code' => 'VR'
             ],
             //Superior
             [
                 'roomType' => 'superior',
-                'numberRoom' => '06',
+                'numberRoom' => '106',
                 'price' => '300000',
                 'code' => 'VR'
             ],
             [
                 'roomType' => 'superior',
-                'numberRoom' => '07',
+                'numberRoom' => '107',
                 'price' => '300000',
                 'code' => 'VR'
             ],
             [
                 'roomType' => 'superior',
-                'numberRoom' => '08',
+                'numberRoom' => '108',
                 'price' => '300000',
                 'code' => 'VC'
             ],
             [
                 'roomType' => 'superior',
-                'numberRoom' => '09',
+                'numberRoom' => '109',
                 'price' => '300000',
                 'code' => 'VR'
             ],
             [
                 'roomType' => 'superior',
-                'numberRoom' => '10',
+                'numberRoom' => '110',
                 'price' => '300000',
                 'code' => 'VC'
             ],
             //Deluxe
             [
                 'roomType' => 'deluxe',
-                'numberRoom' => '11',
+                'numberRoom' => '111',
                 'price' => '400000',
                 'code' => 'VR'
             ],
             [
                 'roomType' => 'deluxe',
-                'numberRoom' => '12',
+                'numberRoom' => '112',
                 'price' => '400000',
                 'code' => 'VD'
             ],
             [
                 'roomType' => 'deluxe',
-                'numberRoom' => '13',
+                'numberRoom' => '113',
                 'price' => '400000',
                 'code' => 'VR'
             ],
             [
                 'roomType' => 'deluxe',
-                'numberRoom' => '14',
+                'numberRoom' => '114',
                 'price' => '400000',
                 'code' => 'VD'
             ],
             [
                 'roomType' => 'deluxe',
-                'numberRoom' => '15',
+                'numberRoom' => '115',
                 'price' => '400000',
                 'code' => 'VR'
             ],

@@ -34,7 +34,10 @@ class ReservationGroupController extends Controller
     {
         $rooms = Room::get();
         $meals = Meal::get();
-        return \view('frontOffice.reservationGroup.create', \compact('rooms', 'meals'));
+        $roomRateStandart = Room::where('roomType', 'standart')->first();
+        $roomRateSuperior = Room::where('roomType', 'superior')->first();
+        $roomRateDeluxe = Room::where('roomType', 'deluxe')->first();
+        return \view('frontOffice.reservationGroup.create', \compact('rooms', 'roomRateStandart', 'roomRateSuperior', 'roomRateDeluxe', 'meals'));
     }
 
     /**
@@ -53,9 +56,10 @@ class ReservationGroupController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today' : $checkIn->diffInDays($checkOut);
         
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale', 'status'), \compact('dateReservation', 'specialRequest'));
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale', 'status'), \compact('dateReservation'));
         $groupReservation = ReservationGroup::create($data);
 
+        //jika ada makanan yang dipesan
         if ($request->has('meals')) {
             //jika meals arragement lebih dari 0
             if (\count($request->meals) > 0) {
@@ -71,15 +75,20 @@ class ReservationGroupController extends Controller
             }
         }
 
+        //menyimpan pengaturan room reservasi
         if (count($request->rooms) > 0) {
             foreach ($request->rooms as $room => $v) {
-                $roomSelection = [
-                    'reservationgroup_id' => $groupReservation->id,
-                    'totalRoomReserved' => $request->totalRoomReserved[$room],
-                    'typeOfRoom' => $request->rooms[$room],
-                    'roomRate' => $request->roomRate[$room]
-                ];
-                DB::table('group_reservation_rooms')->insert($roomSelection);
+                //jika request room ada dan request totalRoomReserved ada, maka true
+                if ($request->rooms[$room] != '' && $request->totalRoomReserved[$room] != '') {
+                    $roomSelection = [
+                        'reservationgroup_id' => $groupReservation->id,
+                        'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'typeOfRoom' => $request->rooms[$room],
+                        'roomRate' => $request->roomRate[$room],
+                        'discount' => $request->discount[$room]
+                    ];
+                    DB::table('group_reservation_rooms')->insert($roomSelection);
+                }
             }
         }
 
@@ -125,20 +134,8 @@ class ReservationGroupController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
-        
-        $groupReservationRoom = DB::table('group_reservation_rooms')
-                                ->where('reservationgroup_id', $reservationGroup->id)
-                                ->get();
-
-        $total = 0;
-        foreach($groupReservationRoom as $value){
-            $total += $value->roomRate * $value->totalRoomReserved * $difference;
-        }
-
         return \view('frontOffice.reservationGroup.detail', \compact(
-            'reservationGroup',
-            'difference',
-            'total'
+            'reservationGroup'
         ));
     }
 
@@ -181,42 +178,24 @@ class ReservationGroupController extends Controller
         // \dd($request->all());
         $reservationGroup->update($data);
 
-        //ROOMS ARRAGEMENT
-        for ($i = 0; $i < \count($request->idRooms); $i++) {
-            DB::table('group_reservation_rooms')->where('id', $request->idRooms[$i])
-                ->update([
-                    'reservationgroup_id' => $reservationGroup->id,
-                    'totalRoomReserved' => $request->totalRoomReserved[$i],
-                    'typeOfRoom' => $request->rooms[$i],
-                    'roomRate' => $request->roomRate[$i]
-                ]);
-        }
-        //jika ada tambahan room
+        //ROOM ARRAGEMENT
         if (\count($request->rooms) > \count($reservationGroup->groupReservationRooms)) {
-            if (count($request->rooms) > 0) {
-                foreach ($request->rooms as $room => $v) {
+            foreach ($request->rooms as $room => $v) {
+                if ($request->rooms[$room] != '') {
                     $arrRoomArragement = [
                         'reservationgroup_id' => $reservationGroup->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room]
                     ];
-                    GroupReservationRoom::updateOrCreate($arrRoomArragement, [
-                        'reservationgroup_id' => $reservationGroup->id
-                    ]);
+                    GroupReservationRoom::updateOrCreate([
+                        ['reservationgroup_id' => $reservationGroup->id],
+                        ['typeOfRoom' => $request->rooms[$room]]
+                    ],$arrRoomArragement);
                 }
             }
         }
 
-        //MEALS ARRAGEMENT
-        for ($i = 0; $i < \count($request->idMeals); $i++) {
-            DB::table('reservationgroup_meal')->where('id', $request->idMeals[$i])
-                ->update([
-                    'reservationgroup_id' => $reservationGroup->id,
-                    'meal_id' => $request->meals[$i],
-                    'atTime' => $request->timeMeal[$i],
-                ]);
-        }
         if ($request->has('meals')) {
             //jika ada tambahan meals/ meals req > meals sekarang
             if (\count($request->meals) > \count($reservationGroup->meals)) {
@@ -227,7 +206,10 @@ class ReservationGroupController extends Controller
                         'meal_id' => $request->meals[$meal],
                         'atTime' => $request->timeMeal[$meal],
                     ];
-                    DB::table('reservationgroup_meal')->updateOrInsert($arrMealsArragement, ['reservationgroup_id' => $reservationGroup->id]);
+                    DB::table('reservationgroup_meal')->updateOrInsert([
+                        'reservationgroup_id' => $reservationGroup->id,
+                        'meal_id' => $request->meals[$meal]
+                    ],$arrMealsArragement);
                 }
             }
         }
@@ -269,10 +251,21 @@ class ReservationGroupController extends Controller
      */
     public function destroy(ReservationGroup $reservationGroup)
     {
-        // $reservationGroup->rooms()->update(['code' => 'VR']);
-        $reservationGroup->update(['status' => 0]);
-        $reservationGroup->delete();
-        return \response()->json(['sukses' => true]);
+        if ($reservationGroup->status == 'checkIn') {
+            $success = true;
+            $message = 'Guest has chacked in, data cannot be deleted';
+        } else {
+            $reservationGroup->update(['status' => 0]);
+            $reservationGroup->delete();
+
+            $success = false;
+            $message = 'Data has been deleted';
+        }
+
+        return \response()->json([
+            'success' => $success,
+            'message' => $message
+        ]);
     }
 
     public function cancelGroup()

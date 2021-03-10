@@ -101,8 +101,16 @@
 
                      //setelah berhasil di hapus
                      success: function(data){
-                        Swal.fire('Erase Data!', 'Data has been deleted', 'success')
-                        location.reload(true);
+                        if(data.success === true){
+                           Swal.fire({
+                           icon: 'error',
+                           title: 'Oops...',
+                           text: data.message
+                           })
+                        } else {
+                           Swal.fire('Erase Data!', data.message, 'success')
+                           location.reload(true);
+                        }
                      }
                   })
                }

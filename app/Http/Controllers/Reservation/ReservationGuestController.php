@@ -45,7 +45,7 @@ class ReservationGuestController extends Controller
      * @return \Illuminate\Http\Response
      */ 
     //ReservationFormRequest
-    public function store(Request $request)
+    public function store(ReservationFormRequest $request)
     {
         //code mengambil selisih antara checkin dan checkout
         $checkIn = new Carbon($request->arrivaleDate);
@@ -60,13 +60,12 @@ class ReservationGuestController extends Controller
         if (\count($request->rooms) > 0) {
             foreach ($request->rooms as $room => $v) {
                 //jika req room ada dan req totalRoomReserved ada, maka true
-                if ($request->rooms[$room] != '' && $request->totalRoomReserved[$room]  != '') {
+                if ($request->totalRoomReserved[$room]  != ''&& $request->rooms[$room] != '') {
                     $individualReservationDetail = [
                         'reservation_id' => $reservation->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room],
-                        'discount' => $request->discount[$room]
                     ];
                     DB::table('individual_reservation_rooms')->insert($individualReservationDetail);
                 }
@@ -120,39 +119,31 @@ class ReservationGuestController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Reservation $reservation)
+    public function update(ReservationFormRequest $request, Reservation $reservation)
     {
         // \dd($request->all());
         $data = $request->except('_token', 'numberRoom', 'totalRoomReserved', 'rooms', 'idRooms', 'roomRate', 'discount');
         $reservation->update($data);
 
-        //ROOM ARRAGEMENT
-        for ($i = 0; $i < \count(array($request->idRooms)); $i++) {
-            DB::table('individual_reservation_rooms')->where('id', $request->idRooms[$i])
-                ->update([
-                    'reservation_id' => $reservation->id,
-                    'totalRoomReserved' => $request->totalRoomReserved[$i],
-                    'typeOfRoom' => $request->rooms[$i],
-                    'roomRate' => $request->roomRate[$i],
-                    'discount' => $request->discount[$i]
-                ]);
-        }
         //jika ada tambahan kamar
         // jika request room lebih besar dari pada data kamar sebelumnya, maka ada tambahan kamar
         if (\count($request->rooms) > \count($reservation->individualReservationRooms)) {
             foreach ($request->rooms as $room => $v) {
-                $individualReservationDetail = [
-                    'reservation_id' => $reservation->id,
-                    'totalRoomReserved' => $request->totalRoomReserved[$room],
-                    'typeOfRoom' => $request->rooms[$room],
-                    'roomRate' => $request->roomRate[$room],
-                    'discount' => $request->discount[$room]
-                ];
-                IndividualReservationRoom::updateOrCreate($individualReservationDetail, [
-                    'reservation_id' => $reservation->id
-                ]);
+                if ($request->rooms[$room] != '') {
+                    $individualReservationDetail = [
+                        'reservation_id' => $reservation->id,
+                        'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'typeOfRoom' => $request->rooms[$room],
+                        'roomRate' => $request->roomRate[$room],
+                    ];
+                    IndividualReservationRoom::updateOrCreate([
+                        'reservation_id' => $reservation->id,
+                        'typeOfRoom' => $request->rooms[$room]
+                    ],$individualReservationDetail);
+                }
             }
         }
+
         \session()->flash('message', 'Reservation has been changed');
         return \redirect()->route('reservation.reservation.index');
     }
@@ -207,171 +198,5 @@ class ReservationGuestController extends Controller
         $individualReservationDetail = IndividualReservationRoom::find($id);
         $individualReservationDetail->delete();
         return \redirect()->back();
-    }
-
-    /**
-     * Jquery
-     */
-
-    public function searchRoomRate(Request $request)
-    {
-        $roomRate = DB::table('rooms')->where('roomType', $request->typeRoom)->first();
-        return \response()->json([
-            // 'success' => $success,
-            // 'message' => $message,
-            'room' => $roomRate,
-        ]);
-    }
-
-    public function checkRoomStandart(Request $request)
-    {
-        $totalRoomReservedStandart = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'standart'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $roomStandartVR = Room::where([
-            ['roomType', '=', 'standart'],
-            ['code' ,'=', 'VR']
-        ])->get();
-
-        if ($request->totalRoomReserved > \count($roomStandartVR) - $totalRoomReservedStandart) {
-            $success = true;
-            $message = 'The room STANDART booked exceeds the available rooms';
-        } else {
-            $success = \false;
-            $message = $request->totalRoomReserved.' Rooms standart available';
-        }
-
-        return \response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-    }
-
-    public function checkRoomSuperior(Request $request)
-    {
-        $roomSuperiorVR = Room::where([
-            ['roomType', '=', 'superior'],
-            ['code', '=', 'VR']
-        ])->get();
-        $totalRoomReservedSuperior = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'superior'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        if ($request->totalRoomReserved > \count($roomSuperiorVR) - $totalRoomReservedSuperior) {
-            $success = true;
-            $message = 'The room SUPERIOR booked exceeds the available rooms';
-        } else {
-            $success = \false;
-            $message = $request->totalRoomReserved.' Rooms superior available';
-        }
-
-        return \response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-    }
-
-    public function checkRoomDeluxe(Request $request)
-    {
-        $totalRoomReservedDeluxe = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'deluxe'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $roomDeluxeVR = Room::where([
-            ['roomType', '=', 'deluxe'],
-            ['code', '=', 'VR']
-        ])->get();
-
-        if ($request->totalRoomReserved > count($roomDeluxeVR) - $totalRoomReservedDeluxe) {
-            $success = true;
-            $message = 'The room DELUXE booked exceeds the available rooms';
-        } else {
-            $success = \false;
-            $message = $request->totalRoomReserved.' Rooms deluxe available';
-        }
-
-        return \response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
-    }
-
-    public function checkAvailableRoom(Request $request)
-    {
-        //STANDART
-        $totalRoomReservedStandart = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'standart'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $roomStandartVR = Room::where([
-            ['roomType', '=', 'standart'],
-            ['code' ,'=', 'VR']
-        ])->get();
-
-        //SUPERIOR
-        $roomSuperiorVR = Room::where([
-            ['roomType', '=', 'superior'],
-            ['code', '=', 'VR']
-        ])->get();
-        $totalRoomReservedSuperior = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'superior'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        //DELUXE
-        $totalRoomReservedDeluxe = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'deluxe'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $roomDeluxeVR = Room::where([
-            ['roomType', '=', 'deluxe'],
-            ['code', '=', 'VR']
-        ])->get();
-
-        if($request->typeRoom == 'standart'){
-
-            if ($request->totalRoomReserved > \count($roomStandartVR) - $totalRoomReservedStandart) {
-                $success = true;
-                $message = 'The room STANDART booked exceeds the available rooms';
-            } else {
-                $success = \false;
-                $message = $request->totalRoomReserved.' Rooms standart available';
-            }
-        } elseif($request->typeRoom == 'superior'){
-
-            if ($request->totalRoomReserved > \count($roomSuperiorVR) - $totalRoomReservedSuperior) {
-                $success = true;
-                $message = 'The room SUPERIOR booked exceeds the available rooms';
-            } else {
-                $success = \false;
-                $message = $request->totalRoomReserved.' Rooms superior available';
-            }
-
-        } elseif($request->typeRoom == 'deluxe'){
-            
-            if ($request->totalRoomReserved > count($roomDeluxeVR) - $totalRoomReservedDeluxe) {
-                $success = true;
-                $message = 'The room DELUXE booked exceeds the available rooms';
-            } else {
-                $success = \false;
-                $message = $request->totalRoomReserved.' Rooms deluxe available';
-            }
-
-        } else {
-            $success = \false;
-            $message = 'Total room reserved or type room is not blank';
-        }
-
-
-        return \response()->json([
-            'success' => $success,
-            'message' => $message,
-        ]);
     }
 }

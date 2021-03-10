@@ -32,4 +32,9 @@ class Room extends Model
     {
         return 'Rp. ' . \number_format($this->price, 0, ',', '.');
     }
+
+    public function telephoneBills()
+    {
+        return $this->hasMany(TelephoneVoucher::class);
+    }
 }

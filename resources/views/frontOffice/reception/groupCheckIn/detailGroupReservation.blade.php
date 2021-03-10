@@ -35,7 +35,6 @@
                      Arrivale Date : {{ $groupReservation->arrivaleDate }}<br>
                      Departure Date : {{ $groupReservation->departureDate }}<br>
                      Estimate Arrival Check in : {{ $groupReservation->estimateArrivale }}<br>
-                     Email: info@almasaeedstudio.com
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
@@ -66,8 +65,8 @@
       <div class="col-md-12">
          <form action="{{ route('reception.registration.store') }}" method="post">
             @csrf
-
-            <input type="hidden" name="idReservation" value="{{ $groupReservation->id }}">
+            
+            <input type="hidden" name="idGroupReservation" value="{{ $groupReservation->id }}">
 
             <div class="card card-primary">
                <div class="card-header">
@@ -131,7 +130,7 @@
                      </div>
                   </div>
                   <label for="">Home address</label>
-                  <textarea name="homeAddress" id="" cols="15" class="form-control @error('homeAddress') is-invalid @enderror" rows="3">{{ $groupReservation->address }}</textarea>
+                  <textarea name="homeAddress" id="" cols="15" class="form-control @error('homeAddress') is-invalid @enderror" rows="3">{{ $groupReservation->addressPerson }}</textarea>
                   @error('homeAddress')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -203,7 +202,7 @@
                   </div>
                </div>
             </div>
-
+            {{-- Term of payemnt --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Term of payment</h3>
@@ -215,8 +214,13 @@
                <div class="card-body">
                   <div class="row">
                      <div class="col-sm-5">
-                        <select name="termOfPayment" class="form-control" id="test" onchange="showDiv(this)">
-                           <option value="{{ $groupReservation->methodPayment->methodPayment }}"></option>
+                        <select name="termOfPayment" class="form-control">
+                           <option value=""></option>
+                           <option value="cash">Cash/Travel cheque</option>
+                           <option value="creditCard">Credit card</option>
+                           <option value="debit">Debit card</option>
+                           <option value="companyAccount">Company account</option>
+                           <option value="travelAccount">Travel account</option>
                         </select>
                      </div>
                      <div class="col-sm-4">
@@ -228,11 +232,13 @@
                   </div>
                </div>
             </div>
-
+            
+            {{-- Rooms arragement --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Rooms Arragement</h3>
-                  <a href="#" class="addRow ml-2"><i class="fa fa-plus px-1"></i>Add Room Arragement</a>
+                  <a href="#" class="addRow ml-2 btn btn-primary btn-xs"><i class="fa fa-plus px-1"></i>Room Arragement</a>
+                  <a href="#" class="addExtraBad ml-2 btn btn-warning btn-xs"><i class="fa fa-plus px-1"></i>Extra bad</a>
                </div>
                <div class="card-body">
                   <table class="table table-bordered table-striped">
@@ -259,10 +265,53 @@
                                  <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                                     <option value=""></option>
                                     @foreach($rooms as $room)
-                                    <option value="{{ $room->id }}" 
-                                    @if($room->code == 'O')
-                                       disabled
-                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
+
+                                       @if($room->code == 'O')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:blue;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VR')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:green;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VC')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:#FFA500;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VD')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:red;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                          
+                                       @endif
+
                                     @endforeach
                                  </select>
                                  @error('rooms[]')
@@ -282,6 +331,7 @@
                               <td><input type="number" class="form-control" name="roomRate[]"></td>
                               <td>
                                  <select name="typeOfRegistration[]" id="" class="form-control">
+                                    <option value="group">Group</option>
                                     <option value=""></option>
                                     <option value="individual">Individual</option>
                                     <option value="group">Group</option>
@@ -297,7 +347,7 @@
                         @endfor
                         @endforeach
                      </tbody>
-                     <tfoot>
+                     <tfoot class="rowExtraBad">
                         @if(!empty($extraBad))
                            <tr style="background:lightblue;">
                               <td colspan="2"></td>
@@ -319,6 +369,73 @@
                         @endif
                      </tfoot>
                   </table>
+               </div>
+            </div>
+
+            {{-- Meals arragement --}}
+            <div class="col-md-12">
+               <div class="card card-outline card-primary">
+                  <div class="card-header">
+                     <h3 class="card-title">
+                     Step 6 | Meal arragement
+                     </h3>
+                     <a href="#" class="px-1 ml-2 btn btn-warning btn-xs addMeal"><i class="fa fa-plus px-1"></i>Meal arragement</a>
+                     <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                        </button>
+                     </div>
+                  </div>
+                  <div class="card-body">
+                     {{-- PROBLEM!!!!! --}}
+                     @if(count($groupReservation->meals) == null)
+                        <div class="row addMeals">
+                           <div class="col-sm-4" id="1">
+                              <label for="">Meals</label>
+                              <select name="meals[]" class="form-control" id="">
+                                 <option value=""></option>
+                                 @foreach($meals as $meal)
+                                    <option value="{{ $meal->id }}">{{ $meal->type }}</option>
+                                 @endforeach
+                              </select>
+                           </div>
+                           <div class="col-sm-4" id="2">
+                              <label for="">Time</label>
+                              <input type="time" name="timeMeal[]" class="form-control">
+                           </div>
+                           <div class="col-sm-4" id="3">
+                              <label for="">Action</label><br>
+                              <a href="#" class="btn btn-danger removeMealsArragement" style="display:inline"><i class="fa fa-times"></i></a>
+                           </div>
+                        </div>
+                     @else
+                        @foreach($groupReservation->meals as $mealArragement)
+                        <div class="row">
+                           <div class="col-sm-4" id="">
+                              <label for="">Meals</label>
+                              <select name="meals[]" class="form-control" id="" disabled>
+                                 <option value="{{ $mealArragement->id }}">{{ $mealArragement->type }}</option>
+                                 <option value=""></option>
+                                 @foreach($meals as $meal)
+                                 <option value="{{ $meal->id }}">{{ $meal->type }}</option>
+                                 @endforeach
+                              </select>
+                           </div>
+                           <div class="col-sm-4" id="">
+                              <label for="">Time</label>
+                              <input type="time" name="timeMeal[]" value="{{ $mealArragement->pivot->atTime }}" class="form-control" disabled>
+                           </div>
+                           <div class="col-sm-4" id="">
+                              <label for="">Action</label><br>
+
+                              <a href="#" class="btn btn-danger deleteMealArragement" data-id="{{ $mealArragement->pivot->id }}" style="display:inline"><i class="fa fa-trash"></i></a>
+                           </div>
+                        </div>
+                        @endforeach
+                        <div class="row addMeals">
+                           
+                        </div>
+                     @endif
+                  </div>
                </div>
             </div>
 
@@ -357,40 +474,6 @@
 <!-- Sweet alert -->
 <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script>
-   function getItems() {
-      var items = new Array();
-      var itemRoom = document.getElementsByClassName("roomRate");
-      var stay = document.getElementsByClassName("stay");
-      var totalPerMalam = 0;
-      var total = 0;
-      var roomRate = "";
-
-      for (var i = 0; i < itemRoom.length; i++) {
-         roomRate = "roomRate" + (i);
-         total = total + parseInt(document.getElementById(roomRate).value);
-      }
-
-      if (!isNaN(total)) {
-         document.getElementById('totalRoomRate').innerHTML = "Rp. " + total;
-
-      }
-
-      if (isNaN(total)) {
-         document.getElementById('totalRoomRate').innerHTML = "0";
-      }
-
-      //TOTAL PER MALAM
-      for (let x = 0; x < 2; x++) {
-         stay = "stay" + (x);
-         totalPerMalam = total + parseInt(document.getElementById(stay).value);
-      }
-
-
-      if (!isNaN(totalPerMalam)) {
-         document.getElementById('totalPerMalam').innerHTML = "Rp. " + totalPerMalam;
-         return totalPerMalam;
-      }
-   }
 
    $('.addRow').on('click', function() {
       addRow();
@@ -398,13 +481,60 @@
 
    function addRow() {
       let tr = `
-         <tr>
+         <tr style="background:#ccc;">
+            <td></td>
             <td></td>
             <td>
                <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                   <option value=""></option>
                   @foreach($rooms as $room)
-                  <option value="{{ $room->id }}">{{ $room->numberRoom }} || {{ $room->code }}</option>
+
+                     @if($room->code == 'O')
+                        <option value="{{ $room->id }}" 
+                        @if($room->code == 'O')
+                           disabled
+                        @elseif($room->code == 'VD')
+                           disabled
+                        @endif
+                        style="color:blue;font-weight:bold;">
+                     
+                        {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                     @elseif($room->code == 'VR')
+                        <option value="{{ $room->id }}" 
+                        @if($room->code == 'O')
+                           disabled
+                        @elseif($room->code == 'VD')
+                           disabled
+                        @endif
+                        style="color:green;font-weight:bold;">
+                     
+                        {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                     @elseif($room->code == 'VC')
+                        <option value="{{ $room->id }}" 
+                        @if($room->code == 'O')
+                           disabled
+                        @elseif($room->code == 'VD')
+                           disabled
+                        @endif
+                        style="color:#FFA500;font-weight:bold;">
+                     
+                        {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                     @elseif($room->code == 'VD')
+                        <option value="{{ $room->id }}" 
+                        @if($room->code == 'O')
+                           disabled
+                        @elseif($room->code == 'VD')
+                           disabled
+                        @endif
+                        style="color:red;font-weight:bold;">
+                     
+                        {{ $room->numberRoom }} | {{ $room->code }}</option>
+                        
+                     @endif
+
                   @endforeach
                </select>
                @error('rooms[]')
@@ -451,16 +581,86 @@
       }
    });
 
-   function showDiv(select) {
-      let date1 = `<input type="date" name="expDate" class="form-control" id="remove">`;
-      let date2 = `<input type="date" name="expDate" class="form-control" id="remove">`;
-      let removeDate = document.getElementById('remove');
-      if (select.value == "creditCard" || select.value == 'debit') {
-         $('.expDate').append(date1);
-      } else {
-         removeDate.remove();
-      }
+
+   $('.addExtraBad').on('click', function() {
+      let tr = `
+         <tr style="background:lightblue;">
+            <td colspan="2"></td>
+            <td>
+               <input type="number" id="form1" name="amount" class="form-control" value="" required>
+            </td>
+            <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
+            <td>
+               <select name="extraBad" id="form2" class="form-control" required>
+                  <option value="extraBad">Extra Bad</option>
+               </select>
+            </td>
+            <td colspan="2">
+               <center>
+                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
+               </center>
+            </td>
+         </tr>
+      `;
+      $('.rowExtraBad').append(tr);
+   });
+
+   $('.removeExtraBad').live('click', function() {
+      var removeExtraBad = $('tfoot tr');
+      removeExtraBad.remove();
+   });
+
+   $('.addMeal').on('click', function() {
+      addMeal();
+   })
+   function addMeal() {
+      let row = `
+         <div class="col-sm-4" id="1">
+            <label for="">Meals</label>
+            <select name="meals[]" class="form-control" id="" required>
+               <option value=""></option>
+               @foreach($meals as $meal)
+                  <option value="{{ $meal->id }}">{{ $meal->type }}</option>
+               @endforeach
+            </select>
+         </div>
+         <div class="col-sm-4" id="2">
+            <label for="">Time</label>
+            <input type="time" name="timeMeal[]" class="form-control" required>
+         </div>
+         <div class="col-sm-4" id="3">
+            <label for="">Action</label><br>
+            <a href="#" class="btn btn-danger removeMealsArragement" style="display:inline"><i class="fa fa-times"></i></a>
+         </div>
+      `;
+      $('.addMeals').append(row);
    };
 
+   $('.removeMealsArragement').live('click', function() {
+      $('#1').remove();
+      $('#2').remove();
+      $('#3').remove();
+   });
+
+   //Delete data Meals
+   $('.deleteMealArragement').live('click', function() {
+      if (confirm('Are you sure for deleting?')) {
+         let id = $(this).data("id");
+         $.ajax({
+            type: "GET"
+            , url: "/reservation/reservationGroup/deleteMealArragementGroupReservation/"+id
+            , data: {
+               "id": id
+            },
+
+            success: function(data) {
+               Swal.fire('Erase Data!', 'Data has been deleted', 'success')
+               location.reload(true);
+            }
+         });
+      } else {
+         return false
+      }
+   });
 </script>
 @endpush

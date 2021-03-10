@@ -8,6 +8,7 @@ use App\Http\Requests\RegistrationFormRequest;
 use App\Registration;
 use App\Reservation;
 use App\ReservationCheckInDetail;
+use App\ReservationGroupCheckInDetail;
 use App\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -44,7 +45,8 @@ class RegistrationController extends Controller
      */
     public function store(RegistrationFormRequest $request)
     {   
-        $data = \array_merge($request->except('_token', 'roomNo', 'totalPax', 'roomRate', 'typeOfRegistration', 'walkInOrReservation', 'rooms', 'idReservation', 'amount', 'extraBad', 'rate', 'idRooms'));
+        // \dd($request->all());
+        $data = \array_merge($request->except('_token', 'roomNo', 'totalPax', 'roomRate', 'typeOfRegistration', 'walkInOrReservation', 'rooms', 'idIndividualReservation', 'idGroupReservation', 'amount', 'extraBad', 'rate', 'idRooms', 'meals', 'timeMeal'));
         $registration = Registration::create($data);
 
         $registration_id = $registration->id;
@@ -53,9 +55,11 @@ class RegistrationController extends Controller
             ExtraBad::create($extraBadData);
         }
         
+        // update kamar O (occupation)
         $rooms = Room::find($request->rooms);
         $rooms->toQuery()->update(['code' => 'O']);
 
+        //ROOM ARRAGEMENT
         if (count($request->rooms) > 0) {
             foreach ($request->rooms as $room => $v) {
                 $roomArragement = [
@@ -71,11 +75,36 @@ class RegistrationController extends Controller
         }
 
         // condition registration by reservation
-        if ($request->has('idReservation')) {
+        if ($request->has('idIndividualReservation')) {
             ReservationCheckInDetail::create([
-                'reservation_id' => $request->idReservation,
+                'reservation_id' => $request->idIndividualReservation,
                 'registration_id' => $registration->id,
             ]);
+        } elseif ($request->has('idGroupReservation')) {
+            ReservationGroupCheckInDetail::create([
+                'reservationgroup_id' => $request->idGroupReservation,
+                'registration_id' => $registration->id
+            ]);
+
+            if ($request->has('meals')) {
+                //jika ada tambahan meals/ meals req
+                if (\count($request->meals)) {
+                    //loop request meals
+                    foreach ($request->meals as $meal => $v) {
+                        $arrMealsArragement = [
+                            'reservationgroup_id' => $request->idGroupReservation,
+                            'meal_id' => $request->meals[$meal],
+                            'atTime' => $request->timeMeal[$meal],
+                        ];
+                        DB::table('reservationgroup_meal')->updateOrInsert([
+                            'reservationgroup_id' => $request->idGroupReservation,
+                            'meal_id' => $request->meals[$meal]
+                        ],$arrMealsArragement);
+                    }
+                }
+            }
+        } else {
+            return \abort(500, 'error condition registration by reservation');
         }
 
         \session()->flash('message', 'Registration has been added');
@@ -91,7 +120,11 @@ class RegistrationController extends Controller
     public function show($id)
     {
         $registration = Registration::findOrFail($id);
-        $guestReservation = ReservationCheckInDetail::where('registration_id', $id)->first();
+
+        $guestIndividaulReservation = ReservationCheckInDetail::where('registration_id', $id)->first();
+
+        $guestGroupReservation = ReservationGroupCheckInDetail::where('registration_id', $id)->first();
+
         $checkIn = new Carbon($registration->arrivaleDate);
         $checkOut = $registration->departureDate;
         $difference = ($checkIn->diff($checkOut)->days < -1)
@@ -103,7 +136,8 @@ class RegistrationController extends Controller
             'registration',
             'difference',
             'grandTotal',
-            'guestReservation'
+            'guestIndividaulReservation',
+            'guestGroupReservation'
         ));
     }
 
@@ -115,7 +149,10 @@ class RegistrationController extends Controller
      */
     public function edit($registration)
     {   
-        $guestReservation = ReservationCheckInDetail::where('registration_id', $registration)->first();
+        $guestIndividualReservation = ReservationCheckInDetail::where('registration_id', $registration)->first();
+
+        $guestGroupReservation = ReservationGroupCheckInDetail::where('registration_id', $registration)->first();
+
         $registration = Registration::findOrFail($registration);
         $rooms = Room::get();
         $checkIn = new Carbon($registration->arrivaleDate);
@@ -125,7 +162,7 @@ class RegistrationController extends Controller
             : $checkIn->diffInDays($checkOut);
 
         return \view('frontOffice.reception.edit', \compact(
-            'registration', 'rooms', 'difference', 'guestReservation'
+            'registration', 'rooms', 'difference', 'guestIndividualReservation', 'guestGroupReservation'
         ));
     }
 
@@ -233,10 +270,10 @@ class RegistrationController extends Controller
         $deleteExtraBad->delete();
     }
 
-    public function addExtraBad(Request $request)
+    public function addExtraBed(Request $request)
     {
-        $extraBadData = \array_merge($request->only('registration_id','amount', 'extraBad', 'rate'));
-        ExtraBad::create($extraBadData);
+        $extraBedData = \array_merge($request->only('registration_id','amount', 'extraBad', 'rate'));
+        ExtraBad::create($extraBedData);
         return \redirect()->back();
     }
 }

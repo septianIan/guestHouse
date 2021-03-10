@@ -12,9 +12,4 @@ class IndividualReservationRoom extends Model
     {
         return $this->belongsToMany(Reservation::class);
     }
-
-    public function getTypeOfRoomAttribute($value)
-    {
-        return \ucfirst($value);
-    }
 }

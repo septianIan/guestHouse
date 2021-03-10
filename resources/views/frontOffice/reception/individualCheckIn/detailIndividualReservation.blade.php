@@ -35,7 +35,6 @@
                      Arrivale Date : {{ $reservation->arrivaleDate }}<br>
                      Departure Date : {{ $reservation->departureDate }}<br>
                      Estimate Arrival Check in : {{ $reservation->estimateArrivale }}<br>
-                     Email: info@almasaeedstudio.com
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
@@ -65,7 +64,7 @@
          <form action="{{ route('reception.registration.store') }}" method="post">
             @csrf
 
-            <input type="hidden" name="idReservation" value="{{ $reservation->id }}">
+            <input type="hidden" name="idIndividualReservation" value="{{ $reservation->id }}">
 
             <div class="card card-primary">
                <div class="card-header">
@@ -87,7 +86,7 @@
                         @enderror
 
                         <label for="">Nationality</label>
-                        <input type="text" name="nationality" class="form-control @error('nationality') is-invalid @enderror" placeholder="Nationality..." autocomplete="off" value="{{ old('nationality') }}">
+                        <input type="text" name="nationality" class="form-control @error('nationality') is-invalid @enderror" placeholder="Nationality..." autocomplete="off" value="ID" required>
                         @error('nationality')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -112,7 +111,7 @@
                         @enderror
 
                         <label for="">Passport</label>
-                        <input type="number" name="passport" class="form-control @error('passport') is-invalid @enderror" placeholder="Passport..." autocomplete="off" value="{{ old('passport') }}">
+                        <input type="number" name="passport" class="form-control @error('passport') is-invalid @enderror" placeholder="Passport..." autocomplete="off" value="{{ old('passport') }}" required>
                         @error('passport')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -213,7 +212,7 @@
                <div class="card-body">
                   <div class="row">
                      <div class="col-sm-5">
-                        <select name="termOfPayment" class="form-control" id="test" onchange="showDiv(this)">
+                        <select name="termOfPayment" class="form-control">
                            <option value="{{ $reservation->methodPayment }}">{{ $reservation->methodPayment }}</option>
                            <option value="cash">Cash/Travel cheque</option>
                            <option value="creditCard">Credit card</option>
@@ -350,9 +349,9 @@
                            <tr style="background:lightblue;">
                               <td colspan="2"></td>
                               <td>
-                                 <input type="number" id="form1" name="amount" class="form-control" value="" required>
+                                 <input type="number" id="form1" name="amount" class="form-control" value="1" required>
                               </td>
-                              <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
+                              <td><input type="number" class="form-control" id="form3" name="rate" value="{{ $extraBad->roomRate }}"></td>
                               <td>
                                  <select name="extraBad" id="form2" class="form-control" required>
                                     <option value="extraBad">Extra Bad</option>
@@ -405,41 +404,6 @@
 <!-- Sweet alert -->
 <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script>
-   function getItems() {
-      var items = new Array();
-      var itemRoom = document.getElementsByClassName("roomRate");
-      var stay = document.getElementsByClassName("stay");
-      var totalPerMalam = 0;
-      var total = 0;
-      var roomRate = "";
-
-      for (var i = 0; i < itemRoom.length; i++) {
-         roomRate = "roomRate" + (i);
-         total = total + parseInt(document.getElementById(roomRate).value);
-      }
-
-      if (!isNaN(total)) {
-         document.getElementById('totalRoomRate').innerHTML = "Rp. " + total;
-
-      }
-
-      if (isNaN(total)) {
-         document.getElementById('totalRoomRate').innerHTML = "0";
-      }
-
-      //TOTAL PER MALAM
-      for (let x = 0; x < 2; x++) {
-         stay = "stay" + (x);
-         totalPerMalam = total + parseInt(document.getElementById(stay).value);
-      }
-
-
-      if (!isNaN(totalPerMalam)) {
-         document.getElementById('totalPerMalam').innerHTML = "Rp. " + totalPerMalam;
-         return totalPerMalam;
-      }
-   }
-
    $('.addRow').on('click', function() {
       addRow();
    });

@@ -3,7 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+/**
+ * 
+ * Individual checkin detail
+ */
 class ReservationCheckInDetail extends Model
 {
     protected $table = 'reservation_detail_check_in';

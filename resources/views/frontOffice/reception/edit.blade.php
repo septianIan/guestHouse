@@ -10,7 +10,8 @@
 @section('content')
 <div class="container">
 
-   @if(isset($guestReservation))
+   {{-- Jika checkIn by reservation --}}
+   @if(isset($guestIndividualReservation))
    <div class="row">
       <div class="col-lg-12">
          <div class="invoice p-3 mb-3">
@@ -18,38 +19,100 @@
                <div class="col-12">
                   <h4>
                      <i class="fa fa-info-circle"></i>
-                     &nbsp;Detail Guest Reservation
+                     &nbsp;Detail Guest <b>Individual</b> Reservation
                   </h4>
                </div>
             </div>
             <div class="row invoice-info">
                <div class="col-sm-3 invoice-col">
                   <address>
-                     <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $guestReservation->reservation->guestName }} </font></strong><br>
-                     Address : {{ $guestReservation->reservation->address }}<br>
-                     Contact Person : {{ $guestReservation->reservation->contactPerson }}<br>
-                     Name Person : {{ $guestReservation->reservation->namePerson }}<br>
+                     <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $guestIndividualReservation->reservation->guestName }} </font></strong><br>
+                     Address : {{ $guestIndividualReservation->reservation->address }}<br>
+                     Contact Person : {{ $guestIndividualReservation->reservation->contactPerson }}<br>
+                     Name Person : {{ $guestIndividualReservation->reservation->namePerson }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Date Reservation : </b>{{ $guestReservation->reservation->created_at }}
+                  <b>Date Reservation : </b>{{ $guestIndividualReservation->reservation->created_at }}
                   <address>
-                     Arrivale Date : {{ $guestReservation->reservation->arrivaleDate }}<br>
-                     Departure Date : {{ $guestReservation->reservation->departureDate }}<br>
-                     Estimate Arrival Check in : {{ $guestReservation->reservation->estimateArrivale }}<br>
+                     Arrivale Date : {{ $guestIndividualReservation->reservation->arrivaleDate }}<br>
+                     Departure Date : {{ $guestIndividualReservation->reservation->departureDate }}<br>
+                     Estimate Arrival Check in : {{ $guestIndividualReservation->reservation->estimateArrivale }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
                   <b>Payment</b>
                   <address>
-                     Method Payment : {{ $guestReservation->reservation->methodPayment }}<br>
-                     Deposit : {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }}<br>
+                     Method Payment : {{ $guestIndividualReservation->reservation->methodPayment }}<br>
+                     Deposit : {{ number_format($guestIndividualReservation->reservation->deposit, 0, ',', '.') }}<br>
                   </address>
                </div>
                <div class="col-sm-3 invoice-col">
                   <b>Order room by reservation</b>
                   <address>
-                     @foreach($guestReservation->reservation->individualReservationRooms as $value)
+                     @foreach($guestIndividualReservation->reservation->individualReservationRooms as $value)
+                     <address>
+                        Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
+                        <b>{{ $value->typeOfRoom }}</b>
+                     </address>
+                     @endforeach
+                     Stay : {{ $difference }} night
+                  </address>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   @elseif(isset($guestGroupReservation))
+   <div class="row">
+      <div class="col-lg-12">
+         <div class="invoice p-3 mb-3">
+            <div class="row">
+               <div class="col-12">
+                  <h4>
+                     <i class="fa fa-info-circle"></i>
+                     &nbsp;Detail Guest <b>Group</b> Reservation
+                  </h4>
+               </div>
+            </div>
+            <div class="row invoice-info">
+               <div class="col-sm-3 invoice-col">
+                  <address>
+                     <strong>Group Name :&nbsp;<font style="font-style:italic;">{{ $guestGroupReservation->reservationGroup->groupName }} </font></strong><br>
+                     Address : {{ $guestGroupReservation->reservationGroup->addressPerson }}<br>
+                     Contact Person : {{ $guestGroupReservation->reservationGroup->contactPerson }}
+                  </address>
+               </div>
+               <div class="col-sm-3 invoice-col">
+                  <b>Date Reservation : </b>{{ $guestGroupReservation->reservationGroup->created_at }}
+                  <address>
+                     Arrivale Date : {{ $guestGroupReservation->reservationGroup->arrivaleDate }}<br>
+                     Departure Date : {{ $guestGroupReservation->reservationGroup->departureDate }}<br>
+                     Estimate Arrival Check in : {{ $guestGroupReservation->reservationGroup->estimateArrivale }}<br>
+                  </address>
+               </div>
+               <div class="col-sm-3 invoice-col">
+                  <b>Method Payment :&nbsp; <font style="font-style:italic;">{{ $guestGroupReservation->reservationGroup->methodPayment->methodPayment }}</font></b>
+                  @if($guestGroupReservation->reservationGroup->methodPayment->methodPayment == 'personal')
+                  <p>
+                     Cast deposit : {{ number_format($guestGroupReservation->reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
+                     Credit card : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
+                     Number account : {{ $guestGroupReservation->reservationGroup->methodPayment->value2 }}<br>
+                     Other : {{ $guestGroupReservation->reservationGroup->methodPayment->value3 }}<br>
+                  </p>
+                  @else
+                  <p>
+                     Deposit : {{ number_format($guestGroupReservation->reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
+                     Credit card : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
+                     Travel agent : {{ $guestGroupReservation->reservationGroup->methodPayment->value2 }}<br>
+                     Other : {{ $guestGroupReservation->reservationGroup->methodPayment->value3 }}<br>
+                  </p>
+                  @endif
+               </div>
+               <div class="col-sm-3 invoice-col">
+                  <b>Order room by reservation</b>
+                  <address>
+                     @foreach($guestGroupReservation->reservationGroup->groupReservationRooms as $value)
                      <address>
                         Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
                         <b>{{ $value->typeOfRoom }}</b>
@@ -69,6 +132,7 @@
          <form action="{{ route('reception.registration.update' ,$registration->id) }}" method="post">
             @csrf
             @method('put')
+            {{-- Fisrt name last name --}}
             <div class="card card-primary">
                <div class="card-header">
                   <h3 class="card-title">Edit Registration guest</h3>
@@ -139,7 +203,7 @@
                   @enderror
                </div>
             </div>
-
+            {{--  --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title"></h3>
@@ -203,7 +267,7 @@
                   </div>
                </div>
             </div>
-
+            {{-- term or payment --}}
             <div class="card card-outline card-primary">
                <div class="card-header">
                   <h3 class="card-title">Term of payment</h3>
@@ -230,7 +294,7 @@
                   </div>
                </div>
             </div>
-
+            {{-- Detail Bill --}}
             <div class="row">
                <div class="col-lg-12">
                   <div class="invoice p-3 mb-3">
@@ -290,9 +354,9 @@
                               @if(!empty($registration->extraBad))
                               <tbody>
                                  <tr rowspan="1" style="background:#2ecc71;font-weight:bold;">
-                                    <td colspan="6">Extrabad :</td>
+                                    <td colspan="6">Extrabad ({{ $registration->extraBad->amount }}) :</td>
                                     <td>
-                                       Rp. {{ number_format($registration->extraBad->rate * $difference, 0, ',', '.') }} (+)
+                                       Rp. {{ number_format($registration->extraBad->rate * $registration->extraBad->amount * $difference, 0, ',', '.') }} (+)
                                     </td>
                                  </tr>
                               </tbody>
@@ -350,6 +414,7 @@
                </div>
             </div>
 
+            {{-- Submit --}}
             <div class="card card-success">
                <div class="card-header">
                   <h3 class="card-title">
@@ -372,6 +437,7 @@
             </div>
          </form>
 
+         {{-- Room Arragement --}}
          <div class="card card-outline card-primary">
             <div class="card-header">
                <h3 class="card-title">Rooms Arragement</h3>
@@ -380,12 +446,12 @@
                <table class="table table-bordered table-striped">
                   <thead>
                      <tr>
-                        <td>Room no</td>
-                        <td>Total pax</td>
-                        <td>Room rate</td>
-                        <td>Individual/Group</td>
-                        <td>Walk in/Reservarion</td>
-                        <td>Action</td>
+                        <th>Room no</th>
+                        <th>Total pax</th>
+                        <th>Room rate</th>
+                        <th>Individual/Group</th>
+                        <th>Walk in/Reservarion</th>
+                        <th>Action</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -397,18 +463,65 @@
                         <input type="hidden" name="idRegistration" value="{{ $registration->id }}">
                         <input type="hidden" name="idRoomOld" value="{{ $roomArragement->id }}">
 
-                        <tr>
+                        <tr style="background:lightblue;">
                            <td>
-                              <select name="rooms" id="" class="form-control">
-                                 <option value="{{ $roomArragement->id }}">{{ $roomArragement->numberRoom }}</option>
-                                 <option value=""></option>
-                                 @foreach($rooms as $room)
-                                    <option value="{{ $room->id }}" 
-                                    @if($room->code == 'O')
-                                       disabled
-                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
-                                 @endforeach
-                              </select>
+                              <select name="rooms" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                                    <option value="{{ $roomArragement->id }}">{{ $roomArragement->numberRoom }}</option>
+                                    @foreach($rooms as $room)
+
+                                       @if($room->code == 'O')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:blue;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VR')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:green;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VC')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:#FFA500;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VD')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:red;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                          
+                                       @endif
+
+                                    @endforeach
+                                 </select>
+                                 @error('rooms')
+                                 <div class="invalid-feedback">
+                                    {{ $message }}
+                                 </div>
+                                 @enderror
                            </td>
                            <td><input type="text" value="{{ $roomArragement->pivot->totalPax }}" class="form-control" name="totalPax"></td>
                            <td><input type="number" value="{{ $roomArragement->pivot->roomRate }}" class="form-control" name="roomRate"></td>
@@ -430,7 +543,7 @@
                            </td>
                            <td>
                               <div class="btn-group align-middle py-0">
-                                 {{-- submit new room --}}
+                                 {{-- submit edit room --}}
                                  <button class="btn btn-success"><i class="fa fa-edit"></i></button>
                                  {{-- Delete --}}
                                  <a href="#" class="btn btn-danger deleteRoom" data-id="{{ $roomArragement->pivot->id }}"><i class="fa fa-trash"></i></a>
@@ -439,82 +552,69 @@
                         </tr>
                      </form>
                      @endforeach
-                  </tbody>
-                  <tbody>
-                     @if(!empty($registration->extraBad))
-                     <form action="{{ route('reception.registration.editExtraBad', $registration->id) }}" method="post">
-
-                        <tr style="background:lightblue;">
-                           <td></td>
-                           <td>
-                              <input type="number" id="form1" name="amount" class="form-control" value="{{ $registration->extraBad->amount }}" required>
-                           </td>
-                           <td><input type="number" class="form-control" id="form3" name="rate" value="{{ $registration->extraBad->rate }}"></td>
-                           <td>
-                              <select name="extraBad" id="form2" class="form-control" required>
-                                 <option value="extraBad">Extra Bad</option>
-                              </select>
-                           </td>
-                           <td colspan="2">
-                              <center>
-
-                                 @csrf
-                                 @method('post')
-                                 <div class="btn-group align-middle py-0">
-                                    {{-- submit new room --}}
-                                    <button class="btn btn-success"><i class="fa fa-edit"></i></button>
-                                    {{-- Delete --}}
-                                    <a href="#" class="btn btn-danger deleteExtraBad" data-id="{{ $registration->extraBad->id }}"><i class="fa fa-trash"></i></a>
-                                 </div>
-                              </center>
-                           </td>
-                        </tr>
-                     </form>
-                     @else
-                     <form action="{{ route('reception.registration.addExtraBad') }}" method="post">
-                     @csrf
-                     <tr style="background:lightblue;">
-                        <td></td>
-                        <td>
-                           <input type="number" id="form1" name="amount" class="form-control" value="" required>
-                        </td>
-                        <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
-                        <td>
-                           <select name="extraBad" id="form2" class="form-control" required>
-                              <option value="extraBad">Extra Bad</option>
-                           </select>
-                        </td>
-                        <td colspan="2">
-                           <center>
-                              <input type="hidden" value="{{ $registration->id }}" name="registration_id">
-                              <button class="btn btn-primary" type="submit" id="btnSave"><i class="fa fa-bookmark"></i></button>
-                           </center>
-                        </td>
-                     </tr>
-                     </form>
-                     @endif
-                  </tbody>
-                  <tfoot style="background:#ccc;">
                      <tr>
                         <form action="{{ route('reception.registration.addRoom') }}" method="post">
                            @csrf
                            <input type="hidden" name="idRegistration" value="{{ $registration->id }}">
 
                            <td>
-                              <select name="rooms" id="rooms" class="form-control @error('rooms[]') is-invalid @enderror">
-                                 <option value=""></option>
-                                 @foreach($rooms as $room)
-                                 <option value="{{ $room->id }}" 
-                                    @if($room->code == 'O')
-                                       disabled
-                                    @endif>{{ $room->numberRoom }} || {{ $room->code }}</option>
-                                 @endforeach
-                              </select>
-                              @error('rooms[]')
-                              <div class="invalid-feedback">
-                                 {{ $message }}
-                              </div>
-                              @enderror
+                              <select name="rooms" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                                    <option value=""></option>
+                                    @foreach($rooms as $room)
+
+                                       @if($room->code == 'O')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:blue;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VR')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:green;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VC')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:#FFA500;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                       @elseif($room->code == 'VD')
+                                          <option value="{{ $room->id }}" 
+                                          @if($room->code == 'O')
+                                             disabled
+                                          @elseif($room->code == 'VD')
+                                             disabled
+                                          @endif
+                                          style="color:red;font-weight:bold;">
+                                       
+                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                          
+                                       @endif
+
+                                    @endforeach
+                                 </select>
+                                 @error('rooms[]')
+                                 <div class="invalid-feedback">
+                                    {{ $message }}
+                                 </div>
+                                 @enderror
                            </td>
                            <td>
                               <input type="text" class="form-control @error('totalPax') is-invalid @enderror" id="totalPax" name="totalPax">
@@ -544,10 +644,117 @@
                            </td>
                         </form>
                      </tr>
-                  </tfoot>
+                  </tbody>
+               </table>
+
+               {{-- Extra bed --}}
+               <table class="table table-bordered mt-2">
+                  <thead>
+                     <tr>
+                        <th>Amount</th>
+                        <th>Extra bed</th>
+                        <th>Rate</th>
+                        <th>Action</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {{-- Jika ada extra bed, maka action edit dan hapus --}}
+                     @if(!empty($registration->extraBad))
+                     <form action="{{ route('reception.registration.editExtraBad', $registration->id) }}" method="post">
+
+                        <tr style="background:lightblue;">
+                           <td>
+                              <input type="number" id="form1" name="amount" class="form-control" value="{{ $registration->extraBad->amount }}" required>
+                           </td>
+                           <td><input type="number" class="form-control" id="form3" name="rate" value="{{ $registration->extraBad->rate }}"></td>
+                           <td>
+                              <select name="extraBad" id="form2" class="form-control" required>
+                                 <option value="extraBad">Extra Bed</option>
+                              </select>
+                           </td>
+                           <td>
+                              <center>
+
+                                 @csrf
+                                 @method('post')
+                                 <div class="btn-group align-middle py-0">
+                                    {{-- submit new room --}}
+                                    <button class="btn btn-success"><i class="fa fa-edit"></i></button>
+                                    {{-- Delete --}}
+                                    <a href="#" class="btn btn-danger deleteExtraBad" data-id="{{ $registration->extraBad->id }}"><i class="fa fa-trash"></i></a>
+                                 </div>
+                              </center>
+                           </td>
+                        </tr>
+                     </form>
+                     {{-- Jika tidak ada extra bed, maka ada form add extra bed --}}
+                     @else
+                     <tr style="background:#ccc;">
+                        <form action="{{ route('reception.registration.addExtraBed') }}" method="post">
+                           <td>
+                              <input type="number" id="form1" name="amount" class="form-control" value="" required>
+                           </td>
+                           <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
+                           <td>
+                              <select name="extraBad" id="form2" class="form-control" required>
+                                 <option value="extraBad">Extra Bed</option>
+                              </select>
+                           </td>
+                           <td>
+                              <center>
+                                 @csrf
+                                 @method('post')
+                                 <input type="hidden" name="registration_id" value="{{ $registration->id }}">
+                                 <div class="btn-group align-middle py-0">
+                                    {{-- submit new room --}}
+                                    <button class="btn btn-primary" type="submit" id="btnSave"><i class="fa fa-bookmark"></i></button>
+                                 </div>
+                              </center>
+                           </td>
+                        </form>
+                     </tr>
+                     @endif
+                  </tbody>
                </table>
             </div>
          </div>   
+
+         {{-- Meals for group reservation --}}
+         @if(isset($guestGroupReservation))
+         <div class="col-md-12">
+            <div class="card card-outline card-primary">
+               <div class="card-header">
+                  <h3 class="card-title">
+                  Meal arragement
+                  </h3>
+                  <div class="card-tools">
+                     <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                     </button>
+                  </div>
+               </div>
+               <div class="card-body">
+                  <table class="table table-bordered table-striped">
+                     <thead>
+                        <tr>
+                           <th>Meals</th>
+                           <th>Hour</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        @forelse($guestGroupReservation->reservationGroup->meals as $meal)
+                           <tr>
+                              <td>{{ $meal->type }}</td>
+                              <td>{{ $meal->pivot->atTime }}</td>
+                           </tr>
+                        @empty
+                           
+                        @endforelse
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         @endif
          {{-- BATAS --}}
       </div>
    </div>
@@ -643,16 +850,5 @@
          return false;
       }
    });
-
-   /*function showDiv(select) {
-      let date = `<input type="date" name="expDate" class="form-control" id="remove">`;
-      let removeDate = document.getElementById('remove');
-      if (select.value == "creditCard") {
-         $('.expDate').append(date);
-      } else {
-         removeDate.remove();
-      }
-   };*/
-
 </script>
 @endpush

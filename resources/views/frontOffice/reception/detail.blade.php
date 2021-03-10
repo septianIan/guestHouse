@@ -55,7 +55,7 @@
       </div>
 
       {{-- Detial Reservation guest --}}
-      @if(isset($guestReservation))
+      @if(isset($guestIndividaulReservation))
       <div class="row">
          <div class="col-lg-12">
             <div class="invoice p-3 mb-3">
@@ -63,38 +63,100 @@
                   <div class="col-12">
                      <h4>
                         <i class="fa fa-info-circle"></i>
-                        &nbsp;Detail Guest Reservation
+                        &nbsp;Detail Guest <b>Individual</b> Reservation
                      </h4>
                   </div>
                </div>
                <div class="row invoice-info">
                   <div class="col-sm-3 invoice-col">
                      <address>
-                        <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $guestReservation->reservation->guestName }} </font></strong><br>
-                        Address : {{ $guestReservation->reservation->address }}<br>
-                        Contact Person : {{ $guestReservation->reservation->contactPerson }}<br>
-                        Name Person : {{ $guestReservation->reservation->namePerson }}<br>
+                        <strong>Guest Name :&nbsp;<font style="font-style:italic;">{{ $guestIndividaulReservation->reservation->guestName }} </font></strong><br>
+                        Address : {{ $guestIndividaulReservation->reservation->address }}<br>
+                        Contact Person : {{ $guestIndividaulReservation->reservation->contactPerson }}<br>
+                        Name Person : {{ $guestIndividaulReservation->reservation->namePerson }}<br>
                      </address>
                   </div>
                   <div class="col-sm-3 invoice-col">
-                     <b>Date Reservation : </b>{{ $guestReservation->reservation->created_at }}
+                     <b>Date Reservation : </b>{{ $guestIndividaulReservation->reservation->created_at }}
                      <address>
-                        Arrivale Date : {{ $guestReservation->reservation->arrivaleDate }}<br>
-                        Departure Date : {{ $guestReservation->reservation->departureDate }}<br>
-                        Estimate Arrival Check in : {{ $guestReservation->reservation->estimateArrivale }}<br>
+                        Arrivale Date : {{ $guestIndividaulReservation->reservation->arrivaleDate }}<br>
+                        Departure Date : {{ $guestIndividaulReservation->reservation->departureDate }}<br>
+                        Estimate Arrival Check in : {{ $guestIndividaulReservation->reservation->estimateArrivale }}<br>
                      </address>
                   </div>
                   <div class="col-sm-3 invoice-col">
                      <b>Payment</b>
                      <address>
-                        Method Payment : {{ $guestReservation->reservation->methodPayment }}<br>
-                        Deposit : {{ number_format($guestReservation->reservation->deposit, 0, ',', '.') }}<br>
+                        Method Payment : {{ $guestIndividaulReservation->reservation->methodPayment }}<br>
+                        Deposit : {{ number_format($guestIndividaulReservation->reservation->deposit, 0, ',', '.') }}<br>
                      </address>
                   </div>
                   <div class="col-sm-3 invoice-col">
                      <b>Order room by reservation</b>
                      <address>
-                        @foreach($guestReservation->reservation->individualReservationRooms as $value)
+                        @foreach($guestIndividaulReservation->reservation->individualReservationRooms as $value)
+                        <address>
+                           Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
+                           <b>{{ $value->typeOfRoom }}</b>
+                        </address>
+                        @endforeach
+                        Stay : {{ $difference }} night
+                     </address>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      @elseif(isset($guestGroupReservation))
+      <div class="row">
+         <div class="col-lg-12">
+            <div class="invoice p-3 mb-3">
+               <div class="row">
+                  <div class="col-12">
+                     <h4>
+                        <i class="fa fa-info-circle"></i>
+                        &nbsp;Detail Guest <b>Group</b> Reservation
+                     </h4>
+                  </div>
+               </div>
+               <div class="row invoice-info">
+                  <div class="col-sm-3 invoice-col">
+                     <address>
+                        <strong>Group Name :&nbsp;<font style="font-style:italic;">{{ $guestGroupReservation->reservationGroup->groupName }} </font></strong><br>
+                        Address : {{ $guestGroupReservation->reservationGroup->addressPerson }}<br>
+                        Contact Person : {{ $guestGroupReservation->reservationGroup->contactPerson }}
+                     </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Date Reservation : </b>{{ $guestGroupReservation->reservationGroup->created_at }}
+                     <address>
+                        Arrivale Date : {{ $guestGroupReservation->reservationGroup->arrivaleDate }}<br>
+                        Departure Date : {{ $guestGroupReservation->reservationGroup->departureDate }}<br>
+                        Estimate Arrival Check in : {{ $guestGroupReservation->reservationGroup->estimateArrivale }}<br>
+                     </address>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Method Payment :&nbsp; <font style="font-style:italic;">{{ $guestGroupReservation->reservationGroup->methodPayment->methodPayment }}</font></b>
+                     @if($guestGroupReservation->reservationGroup->methodPayment->methodPayment == 'personal')
+                     <p>
+                        Cast deposit : {{ number_format($guestGroupReservation->reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
+                        Credit card : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
+                        Number account : {{ $guestGroupReservation->reservationGroup->methodPayment->value2 }}<br>
+                        Other : {{ $guestGroupReservation->reservationGroup->methodPayment->value3 }}<br>
+                     </p>
+                     @else
+                     <p>
+                        Deposit : {{ number_format($guestGroupReservation->reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
+                        Credit card : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
+                        Travel agent : {{ $guestGroupReservation->reservationGroup->methodPayment->value2 }}<br>
+                        Other : {{ $guestGroupReservation->reservationGroup->methodPayment->value3 }}<br>
+                     </p>
+                     @endif
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     <b>Order room by reservation</b>
+                     <address>
+                        @foreach($guestGroupReservation->reservationGroup->groupReservationRooms as $value)
                         <address>
                            Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
                            <b>{{ $value->typeOfRoom }}</b>
@@ -168,9 +230,9 @@
                         @if(!empty($registration->extraBad))
                         <tbody>
                            <tr rowspan="1" style="background:#2ecc71;font-weight:bold;">
-                              <td colspan="6">Extrabad :</td>
+                              <td colspan="6">Extrabad ({{ $registration->extraBad->amount }}) :</td>
                               <td>
-                                 Rp. {{ number_format($registration->extraBad->rate * $difference, 0, ',', '.') }} (+)
+                                 Rp. {{ number_format($registration->extraBad->rate * $registration->extraBad->amount * $difference, 0, ',', '.') }} (+)
                               </td>
                            </tr>
                         </tbody>
