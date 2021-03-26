@@ -57,6 +57,7 @@ class CheckInController extends Controller
                 ->where('typeOfRoom', '=', 'extraBad')
                 ->where('reservation_id', '=' ,$id)
                 ->first();
+        
 
         return view('frontOffice.reception.individualCheckIn.detailIndividualReservation', \compact('reservation', 'rooms', 'difference', 'individialReservationRoomWhereNotExtraBad', 'extraBad'));
     }

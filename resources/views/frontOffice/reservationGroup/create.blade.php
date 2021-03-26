@@ -87,6 +87,9 @@
                               <input type="number" id="totalRoomReservedStandart" name="totalRoomReserved[]" class="form-control">
                            </td>
                            <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
+                           </td>
+                           <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">
                                  <option value="standart">STANDARD</option>
                               </select>
@@ -101,6 +104,9 @@
                               <input type="number" id="totalRoomReservedSuperior" name="totalRoomReserved[]" class="form-control">
                            </td>
                            <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
+                           </td>
+                           <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">
                                  <option value="superior">SUPERIOR</option>
                               </select>
@@ -113,6 +119,9 @@
                         <tr>
                            <td>
                               <input type="number" id="totalRoomReservedDeluxe" name="totalRoomReserved[]" class="form-control">
+                           </td>
+                           <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
                            </td>
                            <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMiscellaneousVouchersTable extends Migration
+class CreateMasterBillsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class CreateMiscellaneousVouchersTable extends Migration
      */
     public function up()
     {
-        Schema::create('miscellaneous_vouchers', function (Blueprint $table) {
+        Schema::create('master_bills', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('room_id')->constrained()->cascadeOnDelete();
-            $table->string('date')->nullable();
-            $table->string('descriptions');
-            $table->string('amount');
-            $table->string('approved')->nullable();
+            $table->string('methodPayment')->nullable();
+            $table->string('numberAccount')->nullable();
+            $table->string('expDate')->nullable();
+            $table->string('typeCharge')->nullable();
+            $table->string('chargeTo')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ class CreateMiscellaneousVouchersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('miscellaneous_vouchers');
+        Schema::dropIfExists('master_bills');
     }
 }

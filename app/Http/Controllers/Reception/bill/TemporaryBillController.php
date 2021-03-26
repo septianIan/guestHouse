@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Reception;
+namespace App\Http\Controllers\Reception\bill;
 
 use App\DetailMasterBill;
 use App\GuestBill;
@@ -14,91 +14,55 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class CashierController extends Controller
-{
+class TemporaryBillController extends Controller
+{   
     public $id;
 
-    public function index()
+    public function saveAllBills(Request $request)
     {
-        return view('frontOffice.reception.cashier.index');
-    }
-
-    public function dtGuestCheckIn()
-    {
-        $registration = Registration::where('status', 'checkIn')->latest()->get();
-        return \datatables()->of($registration)
-            ->addColumn('action', function($registration){
-                $btn = '<a href="/reception/guest/checkIn/detail/' . $registration->id . '" class="btn btn-warning"><i class="fa fa-eye"></i></a>';
-                return $btn;
-            })
-            ->addColumn('status', function($registration){
-                if ($registration->status == 'checkIn') {
-                    $data = '<font style="color:blue;font-weight:bold;">'.'Check In'.'</font>';
-                } else {
-                    $data = '<font style="color:red;font-weight:bold;">'.'Not checked in yet'.'</font>';
-                }
-                return $data;
-            })
-            ->addColumn('guestName', function($registration){
-                return $registration->getGuestName();
-            })
-            ->addIndexColumn()
-            ->rawColumns(['action', 'status'])
-            ->toJson();
-    }
-
-    public function detailGuetsCheckIn($id)
-    {
+        $id = $request->id;
         $this->registration($id);
-        $temporaryBills = DB::table('temporary_bills')->where('registration_id', $id)->orderBy('date', 'ASC')->get();
-
-        //all guest bill individual
-        $allIndividualGuestBills = $this->allIndividualGuestBills($id);
-        foreach($allIndividualGuestBills as $v){
-            $billIndividual[] = $v['amount'];
-        }
-
-        // All guest bill group
-        $allGroupGuestBills = $this->allGroupGuestBills($id);
-        foreach($allGroupGuestBills as $v){
-            $billGroup[] = $v['amount'];
-        }
-
-        $amountRefund = '';
-        $totalCash = '';
-        $allBill = '';
         if ($this->guestIndividaulReservation($id)) {
-            $amountRefund = $this->guestIndividaulReservation($id)->reservation->deposit - \array_sum($billIndividual);
-
-            $totalCash = $this->guestIndividaulReservation($id)->reservation->deposit >= \array_sum($billIndividual) ? 'REFUND' : 'REPAYMENT';
-
-            $allBill = \array_sum($billIndividual);
-
+            $individual = $this->allIndividualGuestBills($id);
+            foreach($individual as $allGroupGuestBill){
+                $allIndividualGuestBills = [
+                    'registration_id' => $id,
+                    'date' => $allGroupGuestBill['date'],
+                    'description' => $allGroupGuestBill['description'],
+                    'amount' => $allGroupGuestBill['amount'],
+                    'typeBill' => $allGroupGuestBill['typeBill'],
+                ];
+                DB::table('temporary_bills')->insert($allIndividualGuestBills);
+            }
         } elseif($this->guestGroupReservation($id)){
-
-            $amountRefund = $this->guestGroupReservation($id)->reservationGroup->methodPayment->deposit - \array_sum($billGroup);
-
-            $totalCash = $this->guestGroupReservation($id)->reservationGroup->methodPayment->deposit - \array_sum($billGroup) > \array_sum($billGroup) ? 'REFUND' : 'REPAYMENT';
-
-            $allBill = \array_sum($billGroup);
-        } else {
-            //jika tamu walkIn
-            $allBill = \array_sum($billIndividual);
+            $group = $this->allGroupGuestBills($id);
+            foreach($group as $allGroupGuestBill){
+                $allGroupGuestBills = [
+                    'registration_id' => $id,
+                    'date' => $allGroupGuestBill['date'],
+                    'description' => $allGroupGuestBill['description'],
+                    'amount' => $allGroupGuestBill['amount'],
+                    'typeBill' => $allGroupGuestBill['typeBill'],
+                ];
+                DB::table('temporary_bills')->insert($allGroupGuestBills);
+            }
+        }  else {
+            //jika guest walkIn
+            $individual = $this->allIndividualGuestBills($id);
+            foreach($individual as $allGroupGuestBill){
+                $allIndividualGuestBills = [
+                    'registration_id' => $id,
+                    'date' => $allGroupGuestBill['date'],
+                    'description' => $allGroupGuestBill['description'],
+                    'amount' => $allGroupGuestBill['amount'],
+                    'typeBill' => $allGroupGuestBill['typeBill'],
+                ];
+                DB::table('temporary_bills')->insert($allIndividualGuestBills);
+            }
         }
         
-        return \view('frontOffice.reception.cashier.detail', [
-            'registration' => $this->registration($id),
-            'difference' => $this->difference($id),
-            'totalRoomCash' => $this->totalRoomCash($id),
-            'guestIndividaulReservation' => $this->guestIndividaulReservation($id),
-            'guestGroupReservation' => $this->guestGroupReservation($id),
-            'allIndividualGuestBills' => $temporaryBills,
-            'allGroupGuestBills' => $temporaryBills,
-            'refund' => $amountRefund,
-            'totalCash' => $totalCash,
-            'allBill' => $allBill,
-        ]);
-    }
+        return \response()->json(['sukses' => true]);
+    } 
 
     public function registration($id)
     {
@@ -211,7 +175,6 @@ class CashierController extends Controller
 
         //array ROOM CHARGE
         $dates = $this->carbonDates($id);
-        $dataRoomCharge = [];
         foreach($registration->rooms as $room){
             foreach($dates as $key => $date){
                 $dataRoomCharge[] = [
@@ -241,6 +204,7 @@ class CashierController extends Controller
 
         // jika tamu melebihi tgl check out
         $COtime = [];
+        $carbonDiffCheckOutTime = $this->carbonCheckOutTime($id);
         $carbonDiffInDateCheckOut = $this->carbonDiffInDateCheckOut($id);
         foreach($registration->rooms as $room){
             foreach($carbonDiffInDateCheckOut as $date){
@@ -250,7 +214,7 @@ class CashierController extends Controller
                     'description' => 'Room charge '.$room->roomType,
                     'amount' => $room->price,
                     // 'amount' => $registration->rooms()->sum('roomRate')
-                    'typeBill' => 'Tamu melebihi C/O'
+                    'typeBill' => 'diffDateInCO'
                 ];
             }
         }
@@ -271,11 +235,6 @@ class CashierController extends Controller
         }
 
         return $allGuestBillIndividual;
-    }
-
-    public function masterBill($id)
-    {   
-
     }
 
     public function guestGroupReservation($id)
@@ -303,7 +262,6 @@ class CashierController extends Controller
 
         //array ROOM CHARGE
         $dates = $this->carbonDates($id);
-        $dataRoomCharge = [];
         foreach($registration->rooms as $room){
             foreach($dates as $key => $date){
                 $dataRoomCharge[] = [
@@ -348,6 +306,7 @@ class CashierController extends Controller
 
         // jika tamu melebihi tgl check out
         $COtime = [];
+        $carbonDiffCheckOutTime = $this->carbonCheckOutTime($id);
         $carbonDiffInDateCheckOut = $this->carbonDiffInDateCheckOut($id);
         foreach($registration->rooms as $room){
             foreach($carbonDiffInDateCheckOut as $date){
@@ -357,7 +316,7 @@ class CashierController extends Controller
                     'description' => 'Room charge '.$room->roomType,
                     'amount' => $room->price,
                     // 'amount' => $registration->rooms()->sum('roomRate')
-                    'typeBill' => 'Tamu melebihi C/O'
+                    'typeBill' => 'diffDateInCO'
                 ];
             }
         }
@@ -380,37 +339,18 @@ class CashierController extends Controller
         return $allGroupGuestBills;
     }
 
-    public function detailMasterBill($id)
-    {
-        $registration = $this->registration($id);
-        $allGroupGuestBills = $this->allGroupGuestBills($id);
-        $guestBills = [];
-        $id = [];
-        foreach($registration->masterBills as $masterBill){
-            foreach($masterBill->detailMasterBills as $dtMasterBill){
-                $id[] = $dtMasterBill->id;
-            }
-        }
-        $a = [
-            [
-                "id" => 2,
-                "date" => "2021-03-18",
-                "description" => "Room charge STANDART",
-                "amount" => 200000,
-                "typeBill" => "rooms",
-            ],
-            [
-                "id" => 3,
-                "date" => "2021-03-19",
-                "description" => "Room charge STANDART",
-                "amount" => 200000,
-                "typeBill" => "rooms",
-            ]
-        ];
-        // \dd($a);
-        $fla = \collect($a)->flatten();
+    public function resetAllBill($id)
+    {   
+        $deleteMasterBill = MasterBill::where('registration_id', $id)->get();
+        $deleteMasterBill->each->delete();
+        $deleteTemporaryBills = DB::table('temporary_bills')->where([
+            ['registration_id', $id],
+            ['typeBill', '!=', 'not room']
+        ])->delete();
 
-        $coll = \collect($allGroupGuestBills)->only($fla);
-        \dd($coll);
+        //repeat create all 
+        //return $this->saveAllBills($id);
+
+        return \response()->json(['sukses' => true]);
     }
 }

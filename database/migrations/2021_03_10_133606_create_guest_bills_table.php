@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePaidOutVouchersTable extends Migration
+class CreateGuestBillsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,12 @@ class CreatePaidOutVouchersTable extends Migration
      */
     public function up()
     {
-        Schema::create('paid_out_vouchers', function (Blueprint $table) {
+        Schema::create('guest_bills', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
             $table->foreignId('room_id')->constrained()->cascadeOnDelete();
-            $table->string('date')->nullable();
-            $table->string('discription');
+            $table->date('date');
+            $table->string('description')->nullable();
             $table->string('amount');
-            $table->string('approved')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ class CreatePaidOutVouchersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('paid_out_vouchers');
+        Schema::dropIfExists('guest_bills');
     }
 }

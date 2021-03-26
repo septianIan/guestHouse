@@ -53,7 +53,7 @@ class ReservationGuestController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < 1)
             ? 'today'
             : $checkIn->diffInDays($checkOut);
-        $data = \array_merge($request->except('_token', 'rooms', 'totalRoomReserved', 'roomRate', 'discount'));
+        $data = \array_merge($request->except('_token', 'rooms', 'totalRoomReserved', 'roomRate', 'discount', 'totalPax'));
         $reservation = Reservation::create($data);
 
         //menyimpan pengaturan kamar reservasi
@@ -64,6 +64,7 @@ class ReservationGuestController extends Controller
                     $individualReservationDetail = [
                         'reservation_id' => $reservation->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'totalPax' => $request->totalPax[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room],
                     ];
@@ -122,7 +123,7 @@ class ReservationGuestController extends Controller
     public function update(ReservationFormRequest $request, Reservation $reservation)
     {
         // \dd($request->all());
-        $data = $request->except('_token', 'numberRoom', 'totalRoomReserved', 'rooms', 'idRooms', 'roomRate', 'discount');
+        $data = $request->except('_token', 'numberRoom', 'totalRoomReserved', 'rooms', 'idRooms', 'roomRate', 'discount', 'totalPax');
         $reservation->update($data);
 
         //jika ada tambahan kamar
@@ -133,6 +134,7 @@ class ReservationGuestController extends Controller
                     $individualReservationDetail = [
                         'reservation_id' => $reservation->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'totalPax' => $request->totalPax[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room],
                     ];

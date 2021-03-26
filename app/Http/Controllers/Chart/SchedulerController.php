@@ -251,30 +251,34 @@ class SchedulerController extends Controller
     {
         $dateToday = Carbon::today()->format('Y-m-d');
         
-        $guestIndividualReservations = Reservation::where('arrivaleDate', $dateToday)
+        $guestIndividualReservations = DB::table('reservations')->where('arrivaleDate', '>=', $dateToday)
         ->orderBy('estimateArrivale', 'asc')
         ->get();
 
-        $guestGroupReservation = ReservationGroup::where('arrivaleDate', $dateToday)
+        $guestGroupReservation = DB::table('reservationgroups')->where('arrivaleDate', '>=', $dateToday)
         ->orderBy('estimateArrivale', 'asc')
         ->get();
 
+        $data = [];
         foreach($guestIndividualReservations as $key => $v){
             $data[] = [
                 'guestName' => $v->guestName,
                 'estimateArrivale' => $v->estimateArrivale,
                 'contactPerson' => $v->contactPerson,
+                'arrivaleDate' => $v->arrivaleDate,
                 'departureDate' => $v->departureDate,
                 'address' => $v->address,
             ];
         }
 
+        $dataGroup = [];
         foreach($guestGroupReservation as $key => $v){
             $dataGroup[] = [
                 'guestName' => $v->groupName,
                 'estimateArrivale' => $v->estimateArrivale,
                 'contactPerson' => $v->contactPerson,
                 'departureDate' => $v->departureDate,
+                'arrivaleDate' => $v->arrivaleDate,
                 'address' => $v->addressPerson,
             ];
         }
@@ -283,10 +287,52 @@ class SchedulerController extends Controller
         return \collect($merged)->sortBy('estimateArrivale');
     }
 
-    public function todayArrivalList()
+    public function todayEAList()
+    {   
+        return view('frontOffice.fitur.todayArrivale');
+    }
+
+    public function dtTodayEA()
+    {   
+        $arrivalDate = $this->getArrivaleReservation();
+        return \datatables()->of($arrivalDate)
+        ->addColumn('arrivaleDate', function($arrivalDate){
+            if ($arrivalDate['arrivaleDate'] < Carbon::now()->format('Y-m-d')) {
+                $data = '<font style="color:red;font-weight:bold;">'.$arrivalDate['arrivaleDate'].'</font>';
+            } else {
+                $data = '<font style="font-weight:bold;">'.$arrivalDate['arrivaleDate'].'</font>';
+            }
+            return $data;
+        })
+        ->addIndexColumn()
+        ->rawColumns(['arrivaleDate'])
+        ->toJson();
+    }
+
+    //*DEPARTURE date
+    //?DEPARTURE date
+    //!DEPARTURE date
+
+    public function dtTodayED()
     {
-        return view('frontOffice.fitur.todayArrivale', [
-            'arrivalReservation' => $this->getArrivaleReservation()
-        ]);
+        $departureDate = $this->getArrivaleReservation();
+        return \datatables()->of($departureDate)
+        ->addColumn('departureDate', function($departureDate){
+            if (Carbon::now()->format('Y-m-d') < $departureDate['departureDate']) {
+                $data = '<font style="font-weight:bold;">'.$departureDate['departureDate'].'</font>';
+            } else {
+                $data = '<font style="color:red;font-weight:bold;">'.$departureDate['departureDate'].'</font>';
+            }
+
+            return $data;
+        })
+        ->addIndexColumn()
+        ->rawColumns(['departureDate'])
+        ->toJson();
+    }
+
+    public function todayEDList()
+    {   
+        return view('frontOffice.fitur.todayDeparture');
     }
 }

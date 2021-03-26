@@ -23,20 +23,10 @@
                         <th>Check</th>
                         <th>Date</th>
                         <th>Description</th>
-                        <th>Charges/Debit</th>
-                        <th>Credit</th>
-                        <th>Belance</th>
+                        <th colspan="6">Charges/Debit</th>
                      </tr>
                   </thead>
                   <tbody>
-                     <tr>
-                        <td></td>
-                        <td>{{ $registration->arrivaleDate }}</td>
-                        <td>Cash</td>
-                        <td> - </td>
-                        <td>Rp. {{ number_format($guestIndividaulReservation->reservation->deposit, 0, ',', '.') }}</td>
-                        <td>Rp. {{ number_format($guestIndividaulReservation->reservation->deposit, 0, ',', '.') }}</td>
-                     </tr>
                      @forelse($allIndividualGuestBills as $individualBill)
                         <tr>
                            <td>
@@ -62,89 +52,70 @@
                               @endif
 
                            </td>
-                           <td>
+                           <td colspan="6">
                               Rp. {{ number_format($individualBill->amount, 0, ',', '.') }}
-                           </td>
-                           <td> - </td>
-                           <td>
-                              Rp. {{ number_format($guestIndividaulReservation->reservation->deposit-=$individualBill->amount, 0, ',', '.') }}
                            </td>
                         </tr>
                      @empty
                         <tr>
-                           <td></td>
-                           <td></td>
-                           <td><center><a href="#" class="btn btn-primary" id="saveAllBills" data-id="{{ $registration->id }}"><i class="fa fa-list" aria-hidden="true"></i> Create master bill</a></center></td>
-                           <td></td>
+                           <td colspan="6"><center><a href="#" class="btn btn-primary" id="saveAllBills" data-id="{{ $registration->id }}"><i class="fa fa-list" aria-hidden="true"></i> Create master bill</a></center></td>
                         </tr>
                      @endforelse
-                     <tr style="background:#8A89EB;">
-                        <td></td>
-                        <td>{{ $registration->departureDate }}</td>
-                        <td><b>{{ $totalCash }}</b></td>
-                        <td> - </td>
-                        <td>Rp. {{ number_format($refund, 0, ',', '.') }} </td>
-                        <td>0</td>
-                     </tr>
                      <tr  style="background:#FAD507;">
                         <td> - </td>
                         <td> - </td>
                         <td> Total </td>
-                        <td>Rp. {{ number_format($allBill, 0, ',', '.') }} </td>
-                        <td> - </td>
-                        <td> - </td>
+                        <td colspan="6">Rp. {{ number_format($allBill, 0, ',', '.') }} </td>
                      </tr>
                   </tbody>
-                  <tfoot>
-
-                  </tfoot>
                   <tfoot style="background:#ccc;">
-                     <tr>
-                        <th>Method payemnt</th>
-                        <th>Number account</th>
-                        <th>Exp date</th>
-                        <th>Type charge</th>
-                        <th>Charge to</th>
-                        <th colspan="2">Action</th>
-                     </tr>
-                     <tr>
-                        <td>
-                           <select name="methodPayment" class="form-control" id="">
-                              <option value=""></option>
-                              <option value="cash">Cash</option>
-                              <option value="credit card">Credit card</option>
-                              <option value="debit">debit</option>
-                              <option value="payLetter">Pasca payment</option>
-                           </select>
-                        </td>
-                        <td>
-                           <input type="number" name="numberAccount" class="form-control" placeholder="Number account..." id="">
-                        </td>
-                        <td>
-                           <input type="date" name="expDate" class="form-control" placeholder="Exp date..." id="">
-                        </td>
-                        <td>
-                           <select name="typeCharge" id="typeCharge" class="form-control">
-                              <option value=""></option>
-                              <option value="P/A">P/A</option>
-                              <option value="P/A ALL">P/A ALL</option>
-                           </select>
-                        </td>
-                        <td>
-                           <select name="chargeTo" class="form-control" id="">
-                              <option value=""></option>
-                              @foreach($registration->rooms as $room)
-                                 <option value="{{ $room->numberRoom }}">{{ $room->numberRoom }}</option>
-                              @endforeach
-                           </select>
-                        </td>
-                        <td colspan="2">
-                           <button class="btn btn-warning">Pay</button>
-                        </td>
-                     </tr>
-                  </tfoot>
+                        <tr>
+                           <th>Method payemnt</th>
+                           <th>Number account</th>
+                           <th>Exp date</th>
+                           <th>Type charge</th>
+                           <th>Charge to</th>
+                           <th colspan="2">Action</th>
+                        </tr>
+                        <tr>
+                           <td>
+                              <select name="methodPayment" class="form-control" id="">
+                                 <option value=""></option>
+                                 <option value="cash">Cash</option>
+                                 <option value="credit card">Credit card</option>
+                                 <option value="debit">debit</option>
+                                 <option value="payLetter">Pasca payment</option>
+                              </select>
+                           </td>
+                           <td>
+                              <input type="number" name="numberAccount" class="form-control" placeholder="Number account..." id="">
+                           </td>
+                           <td>
+                              <input type="date" name="expDate" class="form-control" placeholder="Exp date..." id="">
+                           </td>
+                           <td>
+                              <select name="typeCharge" id="typeCharge" class="form-control">
+                                 <option value=""></option>
+                                 <option value="P/A">P/A</option>
+                                 <option value="P/A ALL">P/A ALL</option>
+                              </select>
+                           </td>
+                           <td>
+                              <select name="chargeTo" class="form-control" id="">
+                                 <option value=""></option>
+                                 @foreach($registration->rooms as $room)
+                                    <option value="{{ $room->numberRoom }}">{{ $room->numberRoom }}</option>
+                                 @endforeach
+                              </select>
+                           </td>
+                           <td colspan="2">
+                              <button class="btn btn-warning">Pay</button>
+                           </td>
+                        </tr>
+                     </tfoot>
                </table>
-               <a href="#" class="btn btn-success btn-flat float-right checkOut" data-id="{{ $registration->id }}" id="checkOut">Check Out</a>
+
+               <a href="#" class="btn btn-success btn-flat float-right" data-target="#modal-checkOut" data-toggle="modal">Check Out</a>
             </div>
          </div>
       </div>

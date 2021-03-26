@@ -473,7 +473,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
-
+                     <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>

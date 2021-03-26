@@ -35,7 +35,12 @@ Route::get('/home', 'HomeController@index')->name('home');
  */
 Route::get('date-between', 'Chart\ChartPlanController@betweenDate')->name('chartPlan.dateBetween');
 Route::get('reservation/plan', 'Chart\SchedulerController@reservationPlan')->name('chartPlan.reservationPlan');
-Route::get('chartplan/today/arrivale', 'Chart\SchedulerController@todayArrivalList')->name('chartPlan.todayArrivalList');
+
+Route::get('chartplan/today/expected/arrivale', 'Chart\SchedulerController@todayEAList')->name('chartPlan.todayEAList');
+Route::get('data/today/expected/arrival', 'Chart\SchedulerController@dtTodayEA')->name('data.todayEA');
+
+Route::get('chartplan/today/expected/departure', 'Chart\SchedulerController@todayEDList')->name('chartPlan.todayEDList');
+Route::get('data/today/expected/departure', 'Chart\SchedulerController@dtTodayED')->name('data.todayEDList');
 
 Route::get('data/rooms', 'Chart\SchedulerController@rooms')->name('data.rooms');
 

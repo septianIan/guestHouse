@@ -104,7 +104,7 @@ class RegistrationController extends Controller
                 }
             }
         } else {
-            return \abort(500, 'error condition registration by reservation');
+            //return \abort(500, 'error condition registration by reservation');
         }
 
         \session()->flash('message', 'Registration has been added');
@@ -175,7 +175,7 @@ class RegistrationController extends Controller
      */
     public function update(RegistrationFormRequest $request, Registration $registration)
     {
-        $data = \array_merge($request->only('firstName', 'nationality', 'occupation', 'lastName', 'passport', 'dateBirth', 'homeAddress', 'company', 'arrivaleDate', 'departureDate', 'purpose', 'comingFrom', 'nextDestination', 'termOfPayment', 'numberAccount', 'status'));
+        $data = \array_merge($request->only('firstName', 'nationality', 'occupation', 'lastName', 'passport', 'dateBirth', 'homeAddress', 'company', 'arrivaleDate', 'departureDate', 'purpose', 'comingFrom', 'nextDestination', 'termOfPayment', 'numberAccount', 'clerk', 'status'));
         // \dd($data);
         $registration->update($data);
 

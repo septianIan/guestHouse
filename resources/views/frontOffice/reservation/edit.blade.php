@@ -61,6 +61,7 @@
                         <tr>
                            <td>Media Of Reservation</td>
                            <td>Total Room Reserved</td>
+                           <td>Total Pax</td>
                            <td>Type Of Room</td>
                            <td>Room rate</td>
                            <td>Action</td>
@@ -89,6 +90,9 @@
                               <input type="hidden" name="" id="totalRoomReserved{{ $value->typeOfRoom }}DefaultHidden" value="{{ $value->totalRoomReserved }}">
                            </td>
                            <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control" value={{ $value->totalPax }}>
+                           </td>
+                           <td>
                               <select name="rooms[]" id="typeRoom" class="form-control" required>
                                  <option value="{{ $value->typeOfRoom }}">{{ $value->typeOfRoom }}</option>
                               </select>
@@ -113,6 +117,9 @@
                            </td>
                            <td>
                               <input type="number" id="NewTotalRoomReserved" name="totalRoomReserved[]" class="form-control" value="">
+                           </td>
+                           <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
                            </td>
                            <td>
                               <select name="rooms[]" id="NewTypeRoom" class="form-control">
@@ -294,6 +301,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
+                     <input type="text" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>

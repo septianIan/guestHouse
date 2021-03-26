@@ -59,10 +59,11 @@
                   <table class="table table-bordered table-striped">
                      <thead>
                         <tr>
-                           <td>Media Of Reservation</td>
-                           <td>Total Room Reserved</td>
-                           <td>Type Of Room</td>
-                           <td>Room rate</td>
+                           <th>Media Of Reservation</th>
+                           <th>Total Room Reserved</th>
+                           <th>Total Pax</th>
+                           <th>Type Of Room</th>
+                           <th>Room rate</th>
                         </tr>
                      </thead>
                      <tbody>
@@ -80,6 +81,9 @@
                               <input type="number" id="totalRoomReservedStandart" name="totalRoomReserved[]" class="form-control">
                            </td>
                            <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
+                           </td>
+                           <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">
                                  <option value="standart">STANDARD</option>
                               </select>
@@ -94,6 +98,9 @@
                               <input type="number" id="totalRoomReservedSuperior" name="totalRoomReserved[]" class="form-control">
                            </td>
                            <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
+                           </td>
+                           <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">
                                  <option value="superior">SUPERIOR</option>
                               </select>
@@ -106,6 +113,9 @@
                         <tr>
                            <td>
                               <input type="number" id="totalRoomReservedDeluxe" name="totalRoomReserved[]" class="form-control">
+                           </td>
+                           <td>
+                              <input type="number" id="totalPax" name="totalPax[]" class="form-control">
                            </td>
                            <td>
                               <select name="rooms[]" id="typeRoom" class="form-control">
@@ -287,6 +297,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
+                     <input type="text" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>

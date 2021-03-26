@@ -56,7 +56,7 @@ class ReservationGroupController extends Controller
         $difference = ($checkIn->diff($checkOut)->days < -1)
             ? 'today' : $checkIn->diffInDays($checkOut);
         
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale', 'status'), \compact('dateReservation'));
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'flightNumber', 'estimateArrivale','clerk' , 'status'), \compact('dateReservation'));
         $groupReservation = ReservationGroup::create($data);
 
         //jika ada makanan yang dipesan
@@ -83,6 +83,7 @@ class ReservationGroupController extends Controller
                     $roomSelection = [
                         'reservationgroup_id' => $groupReservation->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'totalPax' => $request->totalPax[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room],
                         'discount' => $request->discount[$room]
@@ -174,7 +175,7 @@ class ReservationGroupController extends Controller
     public function update(ReservationGroupFormRequest $request, ReservationGroup $reservationGroup)
     {
         $dateReservation = Carbon::now()->isoFormat('D-M-Y');
-        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'estimateArrivale', 'specialRequest', 'status'), \compact('dateReservation'));
+        $data = \array_merge($request->only('groupName', 'arrivaleDate', 'departureDate', 'mediaReservation', 'contactPerson', 'addressPerson', 'specialRequest', 'estimateRequest', 'rateRequest', 'atTime', 'estimateArrivale', 'specialRequest','clerk' , 'status'), \compact('dateReservation'));
         // \dd($request->all());
         $reservationGroup->update($data);
 
@@ -185,12 +186,13 @@ class ReservationGroupController extends Controller
                     $arrRoomArragement = [
                         'reservationgroup_id' => $reservationGroup->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
+                        'totalPax' => $request->totalPax[$room],
                         'typeOfRoom' => $request->rooms[$room],
                         'roomRate' => $request->roomRate[$room]
                     ];
                     GroupReservationRoom::updateOrCreate([
-                        ['reservationgroup_id' => $reservationGroup->id],
-                        ['typeOfRoom' => $request->rooms[$room]]
+                        'reservationgroup_id' => $reservationGroup->id,
+                        'typeOfRoom' => $request->rooms[$room]
                     ],$arrRoomArragement);
                 }
             }

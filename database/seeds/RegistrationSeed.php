@@ -18,39 +18,17 @@ class RegistrationSeed extends Seeder
         $date = Carbon::now();
         $data = [
             [
-                'firstName' => 'septian',
-                'lastName' => 'aditama',
+                'firstName' => 'Adam',
+                'lastName' => 'budi',
                 'nationality' => 'ID',
                 'passport' => '123',
                 'occupation' => 'mahasiswa',
                 'dateBirth' => '1998-09-26',
-                'homeAddress' => 'bojongoro jawa timur indonesia',
+                'homeAddress' => 'Lamongan jawa timur indonesia',
                 'company' => 'no',
                 'purpose' => 'batu malang',
-                'arrivaleDate' => '2020-10-17',
-                'departureDate' => '2020-10-20',
-                'comingFrom' => 'surabaya',
-                'nextDestination' => 'tuban',
-                'termOfPayment' => 'creditCard',
-                'numberAccount' => '9823874982',
-                // 'expDate' => '2022-10-20',
-                'status' => 'confirm',
-                'created_at' => $date,            
-                'updated_at' => $date            
-            ],
-
-            [
-                'firstName' => 'ian',
-                'lastName' => 'marmoyo',
-                'nationality' => 'ID',
-                'passport' => '1232323',
-                'occupation' => 'mahasiswa',
-                'dateBirth' => '1988-03-26',
-                'homeAddress' => 'bojongoro jawa timur indonesia',
-                'company' => 'no',
-                'purpose' => 'batu malang',
-                'arrivaleDate' => '2020-10-30',
-                'departureDate' => '2020-11-05',
+                'arrivaleDate' => Carbon::now()->format('Y-m-d'),
+                'departureDate' => Carbon::now()->addDays(2)->format('Y-m-d'),
                 'comingFrom' => 'surabaya',
                 'nextDestination' => 'tuban',
                 'termOfPayment' => 'creditCard',
@@ -67,35 +45,12 @@ class RegistrationSeed extends Seeder
                 'registration_id' => 1,
                 'room_id' => 1,
                 'totalPax' => 2,
-                'roomRate' => 100000,
+                'roomRate' => 200000,
                 'typeOfRegistration' => 'individual',
-                'walkInOrReservation' => 'walkIn',
+                'walkInOrReservation' => 'reservation',
                 'created_at' => $date,
                 'updated_at' => $date
-            ],
-
-            [
-                'registration_id' => 2,
-                'room_id' => 2,
-                'totalPax' => 2,
-                'roomRate' => 100000,
-                'typeOfRegistration' => 'individual',
-                'walkInOrReservation' => 'walkIn',
-                'created_at' => $date,
-                'updated_at' => $date
-            ],
-
-            [
-                'registration_id' => 2,
-                'room_id' => 3,
-                'totalPax' => 2,
-                'roomRate' => 100000,
-                'typeOfRegistration' => 'individual',
-                'walkInOrReservation' => 'walkIn',
-                'created_at' => $date,
-                'updated_at' => $date
-            ],
-            
+            ],            
         ];
 
         Registration::insert($data);

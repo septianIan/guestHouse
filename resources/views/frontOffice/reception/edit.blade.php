@@ -103,7 +103,7 @@
                   @else
                   <p>
                      Deposit : {{ number_format($guestGroupReservation->reservationGroup->methodPayment->deposit, 0, ',', '.') }}<br>
-                     Credit card : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
+                     Guarantee letter : {{ $guestGroupReservation->reservationGroup->methodPayment->value1 }}<br>
                      Travel agent : {{ $guestGroupReservation->reservationGroup->methodPayment->value2 }}<br>
                      Other : {{ $guestGroupReservation->reservationGroup->methodPayment->value3 }}<br>
                   </p>
@@ -423,6 +423,7 @@
                </div>
                <div class="card-body">
                   <div class="col-sm-6 mt-3">
+                     <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Edit</button>
                      <a href="#" class="btn btn-primary checkIn" data-id="{{ $registration->id }}">
                         @if($registration->status == 'checkIn')

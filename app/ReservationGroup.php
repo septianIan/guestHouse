@@ -68,4 +68,21 @@ class ReservationGroup extends Model
             return \false;
         }
     }
+
+    public function getFirstName()
+    {
+        // Split name
+        $splitName = \explode(' ', $this->contactPerson, 2);
+        $firstName = $splitName[0];
+        $lastName = !empty($splitName[1]) ? $splitName[1] : '';
+        return $firstName;
+    }
+
+    public function getLastName()
+    {
+        $splitName = \explode(' ', $this->contactPerson, 2);
+        $firstName = $splitName[0];
+        $lastName = !empty($splitName[1]) ? $splitName[1] : '';
+        return $lastName;
+    }
 }

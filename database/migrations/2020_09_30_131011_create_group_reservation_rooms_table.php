@@ -17,6 +17,7 @@ class CreateGroupReservationRoomsTable extends Migration
             $table->id();
             $table->foreignId('reservationgroup_id')->constrained()->onDelete('cascade');
             $table->string('totalRoomReserved')->nullable();
+            $table->string('totalPax')->nullable();
             $table->string('typeOfRoom')->nullable();
             $table->string('roomRate')->nullable();
             $table->bigInteger('discount')->nullable();

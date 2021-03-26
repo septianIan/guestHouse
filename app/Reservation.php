@@ -37,4 +37,21 @@ class Reservation extends Model
         $this->individualReservationRooms()->delete();
         parent::delete();
     }
+
+    public function getFirstName()
+    {
+        // Split name
+        $splitName = \explode(' ', $this->guestName, 2);
+        $firstName = $splitName[0];
+        $lastName = !empty($splitName[1]) ? $splitName[1] : '';
+        return $firstName;
+    }
+
+    public function getLastName()
+    {
+        $splitName = \explode(' ', $this->guestName, 2);
+        $firstName = $splitName[0];
+        $lastName = !empty($splitName[1]) ? $splitName[1] : '';
+        return $lastName;
+    }
 }

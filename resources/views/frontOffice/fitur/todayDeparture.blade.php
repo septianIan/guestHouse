@@ -1,5 +1,5 @@
 @extends('frontOffice.template.ui')
-@section('title', 'Today Arrival List')
+@section('title', 'Today Departure List')
 @section('breadcumb')
    
 @endsection
@@ -10,7 +10,7 @@
             <div class="card card-primary">
                <div class="card-header">
                   <h2 class="card-title">
-                     Today Expected Arrival today guest
+                     Today Expected Departure today guest
                   </h2>
                </div>
                <div class="card-body">
@@ -60,7 +60,7 @@
          "serverSide" : true,
          "responsive" : true,
          "autoWidth" : true,
-         ajax: '{{ route('data.todayEA') }}',
+         ajax: '{{ route('data.todayEDList') }}',
          columns : [
             {data: 'DT_RowIndex'},
             {data: 'guestName'},

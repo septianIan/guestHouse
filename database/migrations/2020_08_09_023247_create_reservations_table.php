@@ -25,7 +25,9 @@ class CreateReservationsTable extends Migration
             $table->string('contactPerson');
             $table->string('address');
             $table->string('estimateArrivale')->nullable();
+            $table->date('dateReservation')->nullable();
             $table->string('specialRequest')->nullable();
+            $table->string('clerk')->nullable();
             /**
              * Status confirm = tamu sudah reservasi sudah membayar deposit
              * Status tentative = tamu reservasi tapi masih belum pasti check in    namun sudah deposit

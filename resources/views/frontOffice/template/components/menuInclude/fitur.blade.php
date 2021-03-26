@@ -4,19 +4,11 @@
       <a href="#" class="nav-link">
          <i class="nav-icon fa fa-columns"></i>
          <p>
-            Chart Plan
+            Plan room
             <i class="right fas fa-angle-left"></i>
          </p>
       </a>
       <ul class="nav nav-treeview">
-         <li class="nav-item">
-            <a href="{{ route('chartPlan.dateBetween') }}" class="nav-link">
-               <i class="far fa-circle nav-icon"></i>
-               <p>
-                  Between Date
-               </p>
-            </a>
-         </li>
          <li class="nav-item">
             <a href="{{ route('chartPlan.reservationPlan') }}" class="nav-link">
                <i class="far fa-circle nav-icon"></i>
@@ -26,10 +18,34 @@
             </a>
          </li>
          <li class="nav-item">
-            <a href="{{ route('chartPlan.todayArrivalList') }}" class="nav-link">
+            <a href="{{ route('chartPlan.todayEAList') }}" class="nav-link">
+               <i class="far fa-circle nav-icon"></i>
+               <p>
+                  Today EA List
+               </p>
+            </a>
+         </li>
+         <li class="nav-item">
+            <a href="{{ route('chartPlan.todayEDList') }}" class="nav-link">
+               <i class="far fa-circle nav-icon"></i>
+               <p>
+                  Today ED List
+               </p>
+            </a>
+         </li>
+         <li class="nav-item">
+            <a href="" class="nav-link">
                <i class="far fa-circle nav-icon"></i>
                <p>
                   Today Arrival List
+               </p>
+            </a>
+         </li>
+         <li class="nav-item">
+            <a href="" class="nav-link">
+               <i class="far fa-circle nav-icon"></i>
+               <p>
+                  Today Departure List
                </p>
             </a>
          </li>

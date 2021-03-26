@@ -14,73 +14,61 @@ class IndividualReservationSeed extends Seeder
      */
     public function run()
     {
-        $date = Carbon::now();
         $reservation = [
             [
                 'guestName' => 'septian aditama',
-                'arrivaleDate' => '2020-09-20',
-                'departureDate' => '2020-09-25',
+                'arrivaleDate' => Carbon::now()->format('Y-m-d'),
+                'departureDate' => Carbon::now()->addDays(3)->format('Y-m-d'),
                 'mediaReservation' => 'Telephone',
                 'methodPayment' => 'debit',
                 'numberAccount' => '65273471438',
-                'deposit' => '100000',
+                'deposit' => '300000',
                 'contactPerson' => '087535252643',
                 'address' => 'Jl monginsidi no 25 bojoneogoro',
                 'estimateArrivale' => '09:00',
+                'dateReservation' =>Carbon::now()->format('Y-m-d'),
                 'specialRequest' => 'no req',
+                'clerk' => 'Reservation shift 1',
                 'status' => 'confirm',
-                'created_at' => $date,
-                'updated_at' => $date,
+                'created_at' =>Carbon::now()->format('Y-m-d'),
+                'updated_at' =>Carbon::now()->format('Y-m-d'),
                 //'deleted_at' => null
             ],    
             [
-                'guestName' => 'andik ikwanni sowa maulidan',
-                'arrivaleDate' => '2020-09-21',
-                'departureDate' => '2020-09-25',
+                'guestName' => 'ajeng ayu nindia safira',
+                'arrivaleDate' => Carbon::now()->addDays(-2)->format('Y-m-d'),
+                'departureDate' => Carbon::now()->format('Y-m-d'),
                 'mediaReservation' => 'Telephone',
-                'methodPayment' => 'cast',
-                'numberAccount' => 0,
-                'deposit' => '200000',
-                'contactPerson' => '081862426234',
-                'address' => 'Ds bendo kec kapas bojonegoro',
-                'estimateArrivale' => '07:00',
+                'methodPayment' => 'debit',
+                'numberAccount' => '65273471438',
+                'deposit' => '300000',
+                'contactPerson' => '087535252643',
+                'address' => 'Jl patimura no 25 bojoneogoro',
+                'estimateArrivale' => '08:00',
+                'dateReservation' => Carbon::now()->addDays(-2)->format('Y-m-d'),
                 'specialRequest' => 'no req',
+                'clerk' => 'Reservation shift 1',
                 'status' => 'confirm',
-                'created_at' => $date,
-                'updated_at' => $date,
+                'created_at' =>Carbon::now()->format('Y-m-d'),
+                'updated_at' =>Carbon::now()->format('Y-m-d'),
                 //'deleted_at' => null
             ],
-            [
-                'guestName' => 'ajeng ayu nindia safira',
-                'arrivaleDate' => '2020-09-22',
-                'departureDate' => '2020-09-24',
-                'mediaReservation' => 'Telephone',
-                'methodPayment' => 'cast',
-                'numberAccount' => 0,
-                'deposit' => '100000',
-                'contactPerson' => '081935123947',
-                'address' => 'Ds semanding kapas bojonegoro',
-                'estimateArrivale' => '08:00',
-                'specialRequest' => 'no req',
-                'status' => 'confirm',
-                'created_at' => $date,
-                'updated_at' => $date,
-                //'deleted_at' => null
-            ]
         ];
 
         $individualReservationDetail = [
             [
                 'reservation_id' => 1,
                 'totalRoomReserved' => 1,
+                'totalPax' => 2,
                 'typeOfRoom' => 'standart',
-                'roomRate' => 100000,
+                'roomRate' => 200000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],
             [
                 'reservation_id' => 2,
                 'totalRoomReserved' => 1,
+                'totalPax' => 2,
                 'typeOfRoom' => 'superior',
                 'roomRate' => 300000,
                 'created_at' => Carbon::now(),
@@ -89,25 +77,9 @@ class IndividualReservationSeed extends Seeder
             [
                 'reservation_id' => 2,
                 'totalRoomReserved' => 1,
+                'totalPax' => 2,
                 'typeOfRoom' => 'standart',
-                'roomRate' => 100000,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-            [
-                'reservation_id' => 3,
-                'totalRoomReserved' => 3,
-                'typeOfRoom' => 'deluxe',
                 'roomRate' => 200000,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ],
-
-            [
-                'reservation_id' => 3,
-                'totalRoomReserved' => 1,
-                'typeOfRoom' => 'extraBad',
-                'roomRate' => 50000,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ],

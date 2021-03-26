@@ -50,6 +50,7 @@
                   <address>
                      {{ $reservation->status }}
                   </address>
+                  <address>Clerk :{{ $reservation->clerk }}</address>
                </div>
             </div>
          </div>
@@ -69,6 +70,7 @@
                      <thead>
                         <tr>
                            <th>Total Room Reserved</th>
+                           <th>Total pax</th>
                            <th>Type Of Room</th>
                            <th>Room rate</th>
                         </tr>
@@ -77,6 +79,7 @@
                         @foreach($reservation->individualReservationRooms as $value)
                         <tr>
                            <td>{{ $value->totalRoomReserved }}</td>
+                           <td>{{ $value->totalPax }}</td>
                            <td>{{ $value->typeOfRoom }}</td>
                            <td>Rp. {{ number_format($value->roomRate, 0, ',', '.') }}</td>
                         </tr>

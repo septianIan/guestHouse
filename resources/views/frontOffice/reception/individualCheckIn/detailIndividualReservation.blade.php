@@ -78,7 +78,7 @@
                   <div class="row">
                      <div class="col-sm-6">
                         <label for="">First name</label>
-                        <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" placeholder="First name..." autocomplete="off" value="{{ old('firstName') }}">
+                        <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" placeholder="First name..." autocomplete="off" value="{{ $reservation->getFirstName() }}">
                         @error('firstName')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -103,7 +103,7 @@
                      </div>
                      <div class="col-sm-6">
                         <label for="">Last name</label>
-                        <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" placeholder="Last name..." autocomplete="off" value="{{ old('lastName') }}">
+                        <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" placeholder="Last name..." autocomplete="off" value="{{ $reservation->getLastName() }}">
                         @error('lastName')
                         <div class="invalid-feedback">
                            {{ $message }}

@@ -19,10 +19,10 @@ class CreateRegistrationsTable extends Migration
             $table->string('lastName');
             $table->string('nationality');
             $table->string('passport');
-            $table->string('occupation');
-            $table->string('dateBirth');
+            $table->string('occupation')->nullable();
+            $table->string('dateBirth')->nullable();
             $table->string('homeAddress', 191);
-            $table->string('company');
+            $table->string('company')->nullable();
             $table->string('purpose');
             $table->string('arrivaleDate');
             $table->string('departureDate');
@@ -30,6 +30,7 @@ class CreateRegistrationsTable extends Migration
             $table->string('nextDestination');
             $table->string('termOfPayment');
             $table->string('numberAccount');
+            $table->string('clerk')->nullable();
             // $table->string('expDate')->default(0);
             $table->string('status')->default('confirm');
             $table->timestamps();

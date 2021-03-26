@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTelephoneVouchersTable extends Migration
+class CreateTemporaryBillsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,17 @@ class CreateTelephoneVouchersTable extends Migration
      */
     public function up()
     {
-        Schema::create('telephone_vouchers', function (Blueprint $table) {
+        Schema::create('temporary_bills', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
+            $table->date('date');
             $table->string('description');
-            $table->string('charged');
-            $table->timestamps();
+            $table->string('amount');
+            $table->string('typeBill');
+            $table->string('chargeTo')->nullable();
+            $table->string('status')->nullable()->default(0);
+            $table->string('idGuestBill')->nullable();
+            // $table->timestamps();
         });
     }
 
@@ -29,6 +34,6 @@ class CreateTelephoneVouchersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('telephone_vouchers');
+        Schema::dropIfExists('temporary_bills');
     }
 }

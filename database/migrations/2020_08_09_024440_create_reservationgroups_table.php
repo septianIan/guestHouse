@@ -27,6 +27,7 @@ class CreateReservationgroupsTable extends Migration
             $table->string('flightNumber')->nullable();
             $table->string('estimateArrivale');
             $table->string('dateReservation');
+            $table->string('clerk')->nullable();
             $table->string('status')->default('confirm');
             $table->timestamps();
             $table->softDeletes();

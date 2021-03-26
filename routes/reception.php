@@ -47,18 +47,23 @@ Route::get('guest/checkIn', 'CashierController@index')->name('cashier.index');
 Route::get('data/guest/checkIn', 'CashierController@dtGuestCheckIn')->name('data.guestCheckIn');
 Route::get('guest/checkIn/detail/{id}', 'CashierController@detailGuetsCheckIn')->name('cashier.detailGuetsCheckIn');
 
-/**
- * Voucher/Bill telephone
- */
-Route::post('guest/bill/telephone', 'vouchers\TelephoneVoucherController@store')->name('billTelephone.store');
-Route::get('/guest/billtelephonne/edit/{id}', 'vouchers\TelephoneVoucherController@edit')->name('billtelephone.edit');
-Route::post('guest/bill/telephone/update', 'vouchers\TelephoneVoucherController@update')->name('billtelephone.update');
-Route::delete('guest/bill/telephone/delete/{id}', 'vouchers\TelephoneVoucherController@destroy')->name('billtelephone.destroy');
+Route::post('guest/bill', 'bill\GuestBillController@store')->name('guestBill.store');
+//delete postbill
+Route::delete('guest/bill/delete/description/{id}', 'bill\GuestBillController@destroy')->name('guestBill.destroy');
 
-/**
- * Voucher / bill miscella
- */
-Route::post('guest/bill/miscellaneous', 'vouchers\MiscellaneousVoucherController@store')->name('billMiscellaneous.store');
-Route::get('/guest/billMiscellaneous/edit/{id}', 'vouchers\MiscellaneousVoucherController@edit');
-Route::post('guest/bill/miscellaneous/update', 'vouchers\MiscellaneousVoucherController@update')->name('billMicellaneous.update');
-Route::delete('guest/bill/miscellaneous/delete/{id}', 'vouchers\MiscellaneousVoucherController@destroy')->name('billMiscellaneous.destroy');
+//MASTER BILL
+Route::resource('master-bill', 'bill\MasterBillController');
+//delete masterbill
+Route::delete('guest/bill/delete/master-bill/{id}', 'bill\MasterBillController@deleteMasterBill')->name('guestBill.deleteMasterBill');
+//delete masterbill per kamar
+Route::delete('guest/bill/delete/master-bill/per-room/{id}', 'bill\MasterBillController@deleteMasterBillPerRoom');
+
+// Temporary bill
+Route::get('temporary/bill', 'bill\TemporaryBillController@guestBills')->name('temporary.bill');
+Route::post('temporary/create/all-bills', 'bill\TemporaryBillController@saveAllBills')->name('temporary.store');
+
+//RESET ALL BILL
+Route::get('guest/bill/reset/{id}', 'bill\TemporaryBillController@resetAllBill');
+
+//CheckOut
+Route::get('guest/bill/checkout/{id}', 'bill\CheckOutController@checkOut');

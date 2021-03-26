@@ -80,7 +80,7 @@
                   <div class="row">
                      <div class="col-sm-6">
                         <label for="">First name</label>
-                        <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" placeholder="First name..." autocomplete="off" value="{{ old('firstName') }}">
+                        <input type="text" name="firstName" class="form-control @error('firstName') is-invalid @enderror" placeholder="First name..." autocomplete="off" value="{{ $groupReservation->getFirstName() }}">
                         @error('firstName')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -88,7 +88,7 @@
                         @enderror
 
                         <label for="">Nationality</label>
-                        <input type="text" name="nationality" class="form-control @error('nationality') is-invalid @enderror" placeholder="Nationality..." autocomplete="off" value="{{ old('nationality') }}">
+                        <input type="text" name="nationality" class="form-control @error('nationality') is-invalid @enderror" placeholder="Nationality..." autocomplete="off" value="ID">
                         @error('nationality')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -105,7 +105,7 @@
                      </div>
                      <div class="col-sm-6">
                         <label for="">Last name</label>
-                        <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" placeholder="Last name..." autocomplete="off" value="{{ old('lastName') }}">
+                        <input type="text" name="lastName" class="form-control @error('lastName') is-invalid @enderror" placeholder="Last name..." autocomplete="off" value="{{ $groupReservation->getLastName() }}">
                         @error('lastName')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -214,17 +214,10 @@
                <div class="card-body">
                   <div class="row">
                      <div class="col-sm-5">
-                        <select name="termOfPayment" class="form-control">
-                           <option value=""></option>
-                           <option value="cash">Cash/Travel cheque</option>
-                           <option value="creditCard">Credit card</option>
-                           <option value="debit">Debit card</option>
-                           <option value="companyAccount">Company account</option>
-                           <option value="travelAccount">Travel account</option>
-                        </select>
+                        <input type="text" class="form-control" name="termOfPayment" value="{{ $groupReservation->methodPayment->methodPayment }}" readonly>
                      </div>
                      <div class="col-sm-4">
-                        <input type="number" class="form-control" value="0" name="numberAccount">
+                        <input type="number" class="form-control" value="{{ $groupReservation->methodPayment->value2 }}" name="numberAccount" readonly>
                      </div>
                      <div class="col-sm-3 expDate">
                         

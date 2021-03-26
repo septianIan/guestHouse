@@ -28,7 +28,6 @@ class RegistrationFormRequest extends FormRequest
             'lastName' => 'required',
             'nationality' => 'required',
             'passport' => 'required',
-            'occupation' => 'required',
             'dateBirth' => 'required',
             'homeAddress' => 'required',
             'company' => 'required',
