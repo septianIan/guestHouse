@@ -141,4 +141,10 @@ class MasterBillController extends Controller
         $masterBill->delete();
         return \response()->json(['sukses' => true]);
     }
+
+    public function printVoucher($id)
+    {
+        $masterBill = MasterBill::find($id);
+        return view('frontOffice.reception.cashier.guestBill.voucherBill.voucherBill', \compact('masterBill'));
+    }
 }

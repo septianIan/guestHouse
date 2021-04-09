@@ -30,7 +30,7 @@ class groupReservationSeed extends Seeder
                 'estimateArrivale' => '08:00',
                 'dateReservation' => Carbon::now()->format('Y-m-d'),
                 'clerk' => 'Reservation shift 1',
-                'status' => 'confirm',
+                'status' => 'checkIn',
                 'created_at' => Carbon::now()->format('Y-m-d'),
                 'updated_at' => Carbon::now()->format('Y-m-d'),
                 'deleted_at' => null
@@ -41,6 +41,7 @@ class groupReservationSeed extends Seeder
             [
                 'reservationgroup_id' => 1,
                 'totalRoomReserved' => 1,
+                'totalPax' => 2,
                 'typeOfRoom' => 'superior',
                 'roomRate' => 300000,
                 'created_at' => Carbon::now(),
@@ -49,6 +50,7 @@ class groupReservationSeed extends Seeder
             [
                 'reservationgroup_id' => 1,
                 'totalRoomReserved' => 1,
+                'totalPax' => 2,
                 'typeOfRoom' => 'deluxe',
                 'roomRate' => 400000,
                 'created_at' => Carbon::now(),

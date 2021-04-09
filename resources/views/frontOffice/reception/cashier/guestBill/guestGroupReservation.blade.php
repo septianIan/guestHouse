@@ -61,6 +61,8 @@
                                  <font>{{ $groupBill->description }} <i class="fas fa-utensils"></i></font>
                               @elseif($groupBill->typeBill == 'diffDateInCO')
                                  <font style="color:red;">{{ $groupBill->description }}</font>
+                              @elseif($groupBill->typeBill == 'roomSurcharge')
+                                 <font>{{ $groupBill->description }} <i class="fa fa-check"></i></font>
                               @else
                                  {{ $groupBill->description }} @if($groupBill->status == 0)<a href="#" class="btn btn-danger btn-xs deletePostCash" data-id="{{ $groupBill->idGuestBill }}"><i class="fa fa-trash" aria-hidden="true"></i></a>@endif
                               @endif
@@ -149,7 +151,7 @@
                      </tr>
                   </tfoot>
                </table>
-               <a href="#" class="btn btn-success btn-flat float-right checkOut" data-id="{{ $registration->id }}" id="checkOut">Check Out</a>   
+               <a href="#" class="btn btn-success btn-flat float-right checkOut" data-id="{{ $registration->id }}" id="checkOut">Check Out</a>  
             </div>
          </div>
       </div>
@@ -177,7 +179,7 @@
                      Charge to : {{ $masterBill->chargeTo }} <br>
                   </p>
                </div>
-               <button class="btn btn-primary btn-flat btn-sm float-right mb-2"><i class="fa fa-print" aria-hidden="true"></i> Print</button>
+               <a href="{{ route('reception.masterBill.voucher', $masterBill->id) }}" class="btn btn-primary btn-flat float-right mb-2" target="_blank"><i class="fa fa-print"></i> Print</a>
                <table class="table table-bordered table-striped" style="font-size:14px;">
                   <thead>
                      <tr>

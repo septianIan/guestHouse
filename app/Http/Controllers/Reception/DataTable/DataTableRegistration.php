@@ -22,6 +22,8 @@ class DataTableRegistration extends Controller
             ->addColumn('status', function(Registration $registration){
                 if ($registration->status == 'checkIn') {
                     $data = '<font style="color:blue;font-weight:bold;">'.'Check In'.'</font>';
+                } elseif($registration->status == 'checkOut'){
+                    $data = '<font style="color:green;font-weight:bold;">'.'Check Out'.'</font>';
                 } else {
                     $data = '<font style="color:red;font-weight:bold;">'.'Not checked in yet'.'</font>';
                 }

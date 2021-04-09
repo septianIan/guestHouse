@@ -110,15 +110,9 @@
                   @endif
                </div>
                <div class="col-sm-3 invoice-col">
-                  <b>Order room by reservation</b>
+                  <b>Special Request</b>
                   <address>
-                     @foreach($guestGroupReservation->reservationGroup->groupReservationRooms as $value)
-                     <address>
-                        Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
-                        <b>{{ $value->typeOfRoom }}</b>
-                     </address>
-                     @endforeach
-                     Stay : {{ $difference }} night
+                     {{ $guestGroupReservation->reservationGroup->specialRequest }}
                   </address>
                </div>
             </div>
@@ -422,17 +416,19 @@
                   </h3>
                </div>
                <div class="card-body">
-                  <div class="col-sm-6 mt-3">
-                     <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
-                     <button class="btn btn-success" type="submit">Edit</button>
-                     <a href="#" class="btn btn-primary checkIn" data-id="{{ $registration->id }}">
-                        @if($registration->status == 'checkIn')
-                           <i class="fa fa-check" aria-hidden="true"></i> Guest has chacked in
-                        @else
-                           Check In
-                        @endif
-                     </a>
-                     <b></b>
+                  <div class="row">
+                     <div class="col-sm-6 mt-3">
+                        <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
+                        <button class="btn btn-success" type="submit">Edit</button>
+                        <a href="#" class="btn btn-primary checkIn" data-id="{{ $registration->id }}">
+                           @if($registration->status == 'checkIn')
+                              <i class="fa fa-check" aria-hidden="true"></i> Guest has chacked in
+                           @else
+                              Check In
+                           @endif
+                        </a>
+                        <b></b>
+                     </div>
                   </div>
                </div>
             </div>
@@ -466,7 +462,7 @@
 
                         <tr style="background:lightblue;">
                            <td>
-                              <select name="rooms" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                              <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
                                     <option value="{{ $roomArragement->id }}">{{ $roomArragement->numberRoom }}</option>
                                     @foreach($rooms as $room)
 
@@ -559,7 +555,7 @@
                            <input type="hidden" name="idRegistration" value="{{ $registration->id }}">
 
                            <td>
-                              <select name="rooms" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                              <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror" required>
                                     <option value=""></option>
                                     @foreach($rooms as $room)
 
@@ -618,7 +614,7 @@
                                  @enderror
                            </td>
                            <td>
-                              <input type="text" class="form-control @error('totalPax') is-invalid @enderror" id="totalPax" name="totalPax">
+                              <input type="text" class="form-control @error('totalPax') is-invalid @enderror" id="totalPax" name="totalPax" required>
                               @error('totalPax')
                               <div class="invalid-feedback">
                                  {{ $message }}
@@ -784,23 +780,52 @@
          title: 'Would you like to keep a check in?',
          showDenyButton: true,
          showCancelButton: true,
-         confirmButtonText: `Save`,
-         denyButtonText: `Don't save`,
+         confirmButtonText: `Check in`,
+         denyButtonText: `Cencel`,
       }).then((result) => {
          if (result.value) {
             $.ajax({
                type: "GET",
-                  url: "/reception/checkIn/" + id,
-                  data: {
-                  "id": id
+               url: "/reception/check/early/arrival/" + id,
+               data: {
+               "id": id
                },
 
                success: function(data) {
                   if (data.success === true) {
-                     Swal.fire('Info! ', data.message, 'info')
-                  } else if (data.success === false) {
+                     //jike check in setelah jam 14:00, maka check in langsung
                      Swal.fire('Saved!', data.message, 'success')
                      location = '/reception/registration';
+                  } else if (data.success === false) {
+                     //jika check in sebelum jam 14:00, validasi apakah yakin check in sebelum jam 14:00
+                     Swal.fire({
+                        title: 'Are you sure For check in ?',
+                        text: data.message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, check in!'
+                     }).then((result) => {
+                        if(result.value){
+                           $.ajax({
+                                 type: "GET",
+                                 url: "/reception/checkIn/" + id,
+                                 data: {
+                                 "id": id
+                              },
+
+                              success: function(data){
+                                 if(data.success === true){
+                                    Swal.fire('Saved!', data.message, 'info')
+                                 } else if(data.success === false){
+                                    Swal.fire('Saved!', data.message, 'success')
+                                    location = '/reception/registration';
+                                 }
+                              }
+                           });
+                        }
+                     });
                   }
                }
             })
@@ -851,5 +876,12 @@
          return false;
       }
    });
+
+   // ALERT MESSAGE
+   var msg = '{{Session::get('alert')}}';
+   var exist = '{{Session::has('alert')}}';
+   if(exist){
+      alert(msg);
+   }
 </script>
 @endpush

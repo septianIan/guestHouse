@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Reception;
 
+use App\CheckIn;
 use App\ExtraBad;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationFormRequest;
@@ -13,6 +14,8 @@ use App\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\CheckOut;
+use App\RoomSurcharge;
 
 class RegistrationController extends Controller
 {
@@ -45,7 +48,7 @@ class RegistrationController extends Controller
      */
     public function store(RegistrationFormRequest $request)
     {   
-        // \dd($request->all());
+        //\dd($request->all());
         $data = \array_merge($request->except('_token', 'roomNo', 'totalPax', 'roomRate', 'typeOfRegistration', 'walkInOrReservation', 'rooms', 'idIndividualReservation', 'idGroupReservation', 'amount', 'extraBad', 'rate', 'idRooms', 'meals', 'timeMeal'));
         $registration = Registration::create($data);
 
@@ -106,7 +109,6 @@ class RegistrationController extends Controller
         } else {
             //return \abort(500, 'error condition registration by reservation');
         }
-
         \session()->flash('message', 'Registration has been added');
         return \redirect()->route('reception.registration.edit', $registration->id);
     }
@@ -119,28 +121,20 @@ class RegistrationController extends Controller
      */
     public function show($id)
     {
-        $registration = Registration::findOrFail($id);
-
-        $guestIndividaulReservation = ReservationCheckInDetail::where('registration_id', $id)->first();
-
-        $guestGroupReservation = ReservationGroupCheckInDetail::where('registration_id', $id)->first();
-
-        $checkIn = new Carbon($registration->arrivaleDate);
-        $checkOut = $registration->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < -1)
-            ? 'today'
-            : $checkIn->diffInDays($checkOut);
-        $grandTotal = $registration->rooms()->sum('roomRate') * $difference;
-
-        return \view('frontOffice.reception.detail', \compact(
-            'registration',
-            'difference',
-            'grandTotal',
-            'guestIndividaulReservation',
-            'guestGroupReservation'
-        ));
+        $this->registration($id);
+        
+        return \view('frontOffice.reception.detail', [
+            'registration' => $this->registration($id),
+            'grandTotal' => $this->grandTotalRoomOnly($id),
+            'registrationCheckOut' => $this->dataCheckOut($id),
+            'difference' => $this->difference($id),
+            'guestIndividaulReservation' => $this->guestIndividaulReservation($id),
+            'guestGroupReservation' => $this->guestGroupReservation($id),
+            'roomSurCharges' => $this->roomSurCharges($id),
+            'dataCheckIn' => CheckIn::where('registration_id', $id)->first(),
+            'dataCheckOut' => CheckOut::where('registration_id', $id)->first()
+        ]);
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -194,7 +188,7 @@ class RegistrationController extends Controller
     public function destroy($id)
     {
         $check = Registration::where('id', $id)->first();
-        if ($check->status == 'checkIn') {
+        if ($check->status == 'checkIn' || $check->status == 'checkOut') {
             $success = true;
             $message = 'Guest has checked in, data cannot be deleted';
         } else {
@@ -219,9 +213,15 @@ class RegistrationController extends Controller
 
     public function editRoom(Request $request, $id)
     {
+        //cek room
+        $cekKamar = \collect($this->cekRoom($request))->toArray()['original'];
+        if ($cekKamar['success']) {
+            return \redirect()->back()->with('alert', $cekKamar['message']);
+        }
         //Update room old
         $oldRoom = Room::find($request->idRoomOld);
         $oldRoom->update(['code' => 'VR']);
+
         DB::table('registration_room')->where('id', $id)
             ->update([
                 'registration_id' => $request->idRegistration,
@@ -239,6 +239,11 @@ class RegistrationController extends Controller
 
     public function addRoom(Request $request)
     {
+        $cekKamar = \collect($this->cekRoom($request))->toArray()['original'];
+        if ($cekKamar['success']) {
+            return \redirect()->back()->with('alert', $cekKamar['message']);
+        }
+        
         DB::table('registration_room')->insert([
             'registration_id' => $request->idRegistration,
             'room_id' => $request->rooms,
@@ -275,5 +280,224 @@ class RegistrationController extends Controller
         $extraBedData = \array_merge($request->only('registration_id','amount', 'extraBad', 'rate'));
         ExtraBad::create($extraBedData);
         return \redirect()->back();
+    }
+
+    public function registration($id)
+    {
+        $registration = Registration::findOrFail($id);
+        return $registration;
+    }
+
+    public function grandTotalRoomOnly($id)
+    {   
+        $registration = $this->registration($id);
+        $checkIn = new Carbon($registration->arrivaleDate);
+        $checkOut = $registration->departureDate;
+        $difference = ($checkIn->diff($checkOut)->days < -1)
+            ? 'today'
+            : $checkIn->diffInDays($checkOut);
+        $grandTotalRoomOnly = $registration->rooms()->sum('roomRate') * $difference;
+
+        return $grandTotalRoomOnly;
+    }
+
+    public function dataCheckOut($id)
+    {   
+        $registrationCheckOut = CheckOut::where('registration_id', $id)->first();
+        return $registrationCheckOut;
+    }
+
+    public function guestIndividaulReservation($id)
+    {   
+        $guestIndividaulReservation = '';
+        $guestIndividaulReservation = ReservationCheckInDetail::where('registration_id', $this->registration($id)->id)
+        ->first();
+        return $guestIndividaulReservation;
+    }
+
+    public function guestGroupReservation($id)
+    {
+        $guestGroupReservation = ReservationGroupCheckInDetail::where('registration_id', $this->registration($id)->id)
+        ->first();      
+        return $guestGroupReservation;
+    }
+
+    public function roomSurCharges($id)
+    {
+        $roomSurCharges = [];
+        $roomSurCharges = RoomSurcharge::where([
+            ['registration_id', '=', $this->registration($id)->id],
+            ['typeSurCharge', '=', 'early C/I']
+        ])->get();
+
+        return $roomSurCharges;
+    }
+
+    public function difference($id)
+    {   
+        $registration = $this->registration($id);
+        $checkIn = new Carbon($registration->arrivaleDate);
+        $checkOut = $registration->departureDate;
+        $difference = ($checkIn->diff($checkOut)->days < -1)
+            ? 'today'
+            : $checkIn->diffInDays($checkOut);
+
+        return $difference;
+    }
+
+    public function cekRoom(Request $request)
+    {   
+        // return \response()->json($this->checkRoomStandart($request));
+        if($this->checkDuplicateRooms($request)){
+            $success = true;
+            $message = 'There are duplicate rooms';
+        }else if ($this->checkRoomStandart($request) == \true) {
+            $success = true;
+            $message = 'The room STANDART booked exceeds the available rooms';
+        } elseif($this->checkRoomSuperior($request) == \true) {
+            $success = true;
+            $message = 'The room SUPERIOR booked exceeds the available rooms';
+        } elseif($this->checkRoomDeluxe($request) == \true){
+            $success = true;
+            $message = 'The room DELUXE booked exceeds the available rooms';
+        } else {
+            $success = \false;
+            $message = 'sip';
+        }
+        return \response()->json([
+            'success' => $success,
+            'message' => $message
+        ]);
+    }
+    
+    public function checkRoomStandart(Request $request)
+    {   
+        //cek kamar
+        $countRoom = Room::whereIn('id', $request->rooms)->pluck('roomType');
+        
+        //jumlah room yang di booking individu
+        $individuReservedStandart = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'standart'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        //jumlah room yang di booking group
+        $groupReservationStandart = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'standart'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+        
+        //rumus semua kamar booking
+        $totalRoomReservedStandart = $individuReservedStandart + $groupReservationStandart;
+
+        //cek kamar VR
+        $roomStandartVR = Room::where([
+            ['roomType', '=', 'standart'],
+            ['code' ,'=', 'VR']
+        ])->get();
+
+        $countRequestStandart = \collect($countRoom)->filter(function($countRequestStandart){
+            return $countRequestStandart == "STANDART";
+        });
+
+        $totalRoomStandart = count($roomStandartVR) - $totalRoomReservedStandart;
+
+        // jika request lebih besar dari rumus (jumlah room VR - total room yang di booking)
+        if ($countRequestStandart->count() > $totalRoomStandart) {
+            $success = true;
+            $message = 'The room STANDART booked exceeds the available rooms';
+        } else {
+            $success = \false;
+        }
+
+        return $success;
+    }
+
+    public function checkRoomSuperior(Request $request)
+    {   
+        //cek kamar
+        $countRoom = Room::whereIn('id', $request->rooms)->pluck('roomType');
+
+        //jumlah room yang di booking individu
+        $individuReservedSuperior = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'superior'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        //jumlah room yang di booking group
+        $groupReservationSuperior = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'superior'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+        
+        $totalRoomReserveSuperior = $individuReservedSuperior + $groupReservationSuperior;
+
+        $roomSuperiorVR = Room::where([
+            ['roomType', '=', 'superior'],
+            ['code' ,'=', 'VR']
+        ])->get();
+
+        $countRequestRoomSuperior = \collect($countRoom)->filter(function($countRequestRoomSuperior){
+            return $countRequestRoomSuperior == "SUPERIOR";
+        });
+
+        $totalRoomSuperior = \count($roomSuperiorVR) - $totalRoomReserveSuperior;
+
+        // jika request lebih besar dari rumus (jumlah room VR - total room yang di booking)
+        if ($countRequestRoomSuperior->count() > $totalRoomSuperior) {
+            $success = true;
+            $message = 'The room SUPERIOR booked exceeds the available rooms';
+        } else {
+            $success = \false;
+        }
+
+        return $success;
+    }
+
+    public function checkRoomDeluxe(Request $request)
+    {   
+        //cek kamar
+        $countRoom = Room::whereIn('id', $request->rooms)->pluck('roomType');
+
+        //jumlah room yang di booking individu
+        $individuReservedDeluxe = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'deluxe'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        //jumlah room yang di booking group
+        $groupReservationDeluxe = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'deluxe'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+        
+        $totalRoomReservedDeluxe = $individuReservedDeluxe + $groupReservationDeluxe;
+
+        $roomDeluxeVR = Room::where([
+            ['roomType', '=', 'deluxe'],
+            ['code' ,'=', 'VR']
+        ])->get();
+
+        $countRequestRoomDeluxe = \collect($countRoom)->filter(function($countRequestRoomDeluxe){
+            return $countRequestRoomDeluxe == "DELUXE";
+        });
+
+        $totalRoomDeluxe = \count($roomDeluxeVR) - $totalRoomReservedDeluxe;
+
+        // jika request lebih besar dari rumus (jumlah room VR - total room yang di booking)
+        if ($countRequestRoomDeluxe->count() > $totalRoomDeluxe) {
+            $success = true;
+            $message = 'The room DELUXE booked exceeds the available rooms';
+        } else {
+            $success = \false;
+        }
+
+        return $success;
+    }
+
+    public function checkDuplicateRooms(Request $request)
+    {   
+        $cek = (\count($request->rooms) !== \count(\array_unique($request->rooms))) ? true : \false;
+        return $cek;
     }
 }

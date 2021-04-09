@@ -13,9 +13,6 @@
                <div class="card-header p-0 pt-1">
                   <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
                      <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" href="#allRoomsStatus" role="tab" aria-controls="allRoomsStatus" aria-selected="true">All room status</a>
-                     </li>
-                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" href="#allRoomStatusStandart" role="tab" aria-controls="allRoomStatusStandart" aria-selected="false">All room status standart</a>
                      </li>
                      <li class="nav-item">
@@ -29,46 +26,8 @@
                {{-- Body --}}
                <div class="card-body">
                   <div class="tab-content" id="custom-tabs-one-tabContent">
-                     <div class="tab-pane fade show active" id="allRoomsStatus" role="tabpanel">
-                        <div class="row">
-                           @foreach($rooms as $room)
-                              <div class="col-lg-3">
-                                 <div class="card card-default" 
-                                 @if($room->code == 'O')
-                                    style="background:#0000FF;color:white;"
-                                 @elseif($room->code == 'VR')
-                                    style="background:#008000;color:white;"
-                                 @elseif($room->code == 'VD')
-                                    style="background:#FF0000;color:white;"
-                                 @elseif($room->code == 'VC')
-                                    style="background:#FFA500;color:white;"
-                                 @endif>
-                                    <div class="card-header">
-                                       <h3 class="card-title">
-                                          {{ $room->roomType }} 
-                                       </h3>
-                                       <h3 class="card-title float-right">
-                                          <b>{{ $room->numberRoom }}</b> 
-                                       </h3>
-                                    </div>
-                                    <div class="card-body">
-                                       @if($room->code == 'O')
-                                          <font style="font-weight:bold;">{{ $room->code }}</font>(Occupied)
-                                       @elseif($room->code == 'VR')
-                                          <font style="font-weight:bold;">{{ $room->code }}</font>(Vacant ready)
-                                       @elseif($room->code == 'VD')
-                                          <font style="font-weight:bold;">{{ $room->code }}</font>(Vacant dirty)
-                                       @elseif($room->code == 'VC')
-                                          <font style="font-weight:bold;">{{ $room->code }}</font>(Vacant clean)
-                                       @endif
-                                    </div>
-                                 </div>
-                              </div>
-                           @endforeach 
-                        </div>
-                     </div>
                      {{-- Standart rooms --}}
-                     <div class="tab-pane fade" id="allRoomStatusStandart" role="tabpanel">
+                     <div class="tab-pane show active" id="allRoomStatusStandart" role="tabpanel">
                         <div class="row">
                            <div class="col-lg-12">
                               <div class="card card-outline card-primary">

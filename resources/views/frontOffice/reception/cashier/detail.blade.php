@@ -595,22 +595,57 @@
          imageHeight: 200,
          imageAlt: 'Custom image',
          }).then((result) => {
+            if (result.value) {
+               $.ajax({
+                  type: "GET",
+                  url: "/reception/check/early/departure/" + id,
+                  data: {
+                  "id": id
+                  },
+                  success: function(data) {
+                     if (data.success === true) {
+                        SwalCheckOut(data, id);
+                     } else if (data.success === false) {
+                        SwalCheckOut(data, id);
+                     }
+                  }
+               })
+            }
+         })
+      });
+
+      function SwalCheckOut(data, id){
+         Swal.fire({
+            title: 'Are you sure For check out ?',
+            text: data.message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, check out!'
+         }).then((result) => {
             if(result.value){
                $.ajax({
                   type: "GET",
-                  url: "/reception/guest/bill/checkout/"+id,
+                  url: "/reception/guest/bill/checkout/"+id, //function check out
                   dataType: 'json',
                   success: function(data) {
-                     if(data.success === true){
+                     if(data.status === 1){
+                        //jika master bill belum di buat
                         Swal.fire('Info!', data.message, 'info')
-                     }else if(data.success === false){
+                     } else if(data.status === 2){
+                        Swal.fire('Info!', data.message, 'info')
+                     } else if(data.status === 3){
+                        //check out berhasil
                         Swal.fire('Check Out!', 'Guest has been check out', 'success')
-                        location = '/reception/guest/checkIn';
+                        location = '/reception/registration/'+id;
+                     } else {
+                        console.log(false)
                      }
                   }
                });
             }
-         })
-      });
+         });
+      }
    </script>
 @endpush

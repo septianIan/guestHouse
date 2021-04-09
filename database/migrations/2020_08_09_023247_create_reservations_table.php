@@ -36,7 +36,7 @@ class CreateReservationsTable extends Migration
              */
             $table->string('status')->default('confirm');
             $table->timestamps();
-            // $table->softDeletes();
+            $table->softDeletes();
         });
     }
 

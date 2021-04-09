@@ -9,6 +9,7 @@ use App\MasterBill;
 use App\Registration;
 use App\ReservationCheckInDetail;
 use App\ReservationGroupCheckInDetail;
+use App\RoomSurcharge;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -178,11 +179,10 @@ class TemporaryBillController extends Controller
         foreach($registration->rooms as $room){
             foreach($dates as $key => $date){
                 $dataRoomCharge[] = [
-                    'id' => $room->id,
                     'date' => $date,
                     'description' => 'Room charge '.$room->roomType,
-                    'amount' => $room->price,
-                    // 'amount' => $registration->rooms()->sum('roomRate')
+                    'amount' => $room->pivot->roomRate,
+                    // 'amount' => $registration->rooms()->sum('roomRate'),
                     'typeBill' => 'rooms'
                 ];
             }
@@ -212,14 +212,46 @@ class TemporaryBillController extends Controller
                     'id' => $room->id,
                     'date' => $date,
                     'description' => 'Room charge '.$room->roomType,
-                    'amount' => $room->price,
+                    'amount' => $room->pivot->roomRate,
+                    // 'amount' => $room->price,
                     // 'amount' => $registration->rooms()->sum('roomRate')
                     'typeBill' => 'diffDateInCO'
                 ];
             }
         }
 
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime);
+        //Room Surcharge early Check In
+        $roomSurchargesEarlyCheckIn = [];
+        foreach($this->roomSurchargesEarlyCheckIn($id) as $roomSurcharge){
+            $roomSurchargesEarlyCheckIn[] = [
+                'id' => $roomSurcharge->id,
+                'date' => $roomSurcharge->registration->checkIn->date->format('Y-m-d'),
+                'description' => 'Room surcharge early check in '.$roomSurcharge->typeRoom,
+                'amount' => $roomSurcharge->roomSurCharge,
+                'typeBill' => 'roomSurcharge',
+            ];
+        }
+
+        //Room surcharge early check Out
+        $roomSurchargesEarlyCheckOut = [];
+        $jamSekarang = Carbon::now()->toTimeString();
+        $jamDuaBelasSiang = Carbon::now()->format('12:00');
+        if ($jamSekarang > $jamDuaBelasSiang) {
+            $dates = $this->carbonDates($id);
+            foreach($registration->rooms as $room){
+                foreach($dates as $key => $date){
+                    $roomSurchargesEarlyCheckOut[] = [
+                        'date' => $date,
+                        'description' => 'Room surcharge early check out '.$room->roomType,
+                        'amount' => $room->pivot->roomRate/2,
+                        'typeBill' => 'roomSurcharge'
+                    ];
+                }
+            }
+        }
+
+        //!BATAS
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
         $collect = collect($merged)->sortBy('date');
 
         $allGuestBillIndividual = [];
@@ -267,7 +299,7 @@ class TemporaryBillController extends Controller
                 $dataRoomCharge[] = [
                     'date' => $date,
                     'description' => 'Room charge '.$room->roomType,
-                    'amount' => $room->price,
+                    'amount' => $room->pivot->roomRate,
                     // 'amount' => $registration->rooms()->sum('roomRate'),
                     'typeBill' => 'rooms'
                 ];
@@ -321,7 +353,38 @@ class TemporaryBillController extends Controller
             }
         }
 
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataMeals, $dataExtraBed, $COtime);
+        //Room Surcharge early Check In
+        $roomSurchargesEarlyCheckIn = [];
+        foreach($this->roomSurchargesEarlyCheckIn($id) as $roomSurcharge){
+            $roomSurchargesEarlyCheckIn[] = [
+                'id' => $roomSurcharge->id,
+                'date' => $roomSurcharge->registration->checkIn->date->format('Y-m-d'),
+                'description' => 'Room surcharge early check in '.$roomSurcharge->typeRoom,
+                'amount' => $roomSurcharge->roomSurCharge,
+                'typeBill' => 'roomSurcharge',
+            ];
+        }
+
+        //Room surcharge early check Out
+        $roomSurchargesEarlyCheckOut = [];
+        $jamSekarang = Carbon::now()->toTimeString();
+        $jamDuaBelasSiang = Carbon::now()->format('12:00');
+        if ($jamSekarang > $jamDuaBelasSiang) {
+            $dates = $this->carbonDates($id);
+            foreach($registration->rooms as $room){
+                foreach($dates as $key => $date){
+                    $roomSurchargesEarlyCheckOut[] = [
+                        'date' => $date,
+                        'description' => 'Room surcharge early check out '.$room->roomType,
+                        'amount' => $room->pivot->roomRate/2,
+                        'typeBill' => 'roomSurcharge'
+                    ];
+                }
+            }
+        }
+
+        //!BATAS
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataMeals, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
         $collect = collect($merged)->sortBy('date');
 
         $allGroupGuestBills = [];
@@ -348,9 +411,17 @@ class TemporaryBillController extends Controller
             ['typeBill', '!=', 'not room']
         ])->delete();
 
-        //repeat create all 
-        //return $this->saveAllBills($id);
-
         return \response()->json(['sukses' => true]);
+    }
+
+    public function roomSurchargesEarlyCheckIn($id)
+    {
+        $roomSurCharges = [];
+        $roomSurCharges = RoomSurcharge::where([
+            ['registration_id', '=', $this->registration($id)->id],
+            ['typeSurCharge', '=', 'early C/I']
+        ])->get();
+
+        return $roomSurCharges;
     }
 }

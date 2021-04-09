@@ -16,13 +16,14 @@ class CreateRegistrationRoomTable extends Migration
         Schema::create('registration_room', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('room_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('room_id')->nullable()->default('0')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
 
             $table->string('totalPax');
             $table->string('roomRate');
             $table->string('typeOfRegistration');
             $table->string('walkInOrReservation');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

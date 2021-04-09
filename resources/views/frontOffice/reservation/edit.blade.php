@@ -32,15 +32,15 @@
                   </div>
                   @enderror
 
-                  <label for="">Change Arrivale Date</label>
-                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror" autocomplete="off" value="{{ $reservation->arrivaleDate }}">
+                  <label for="">Arrivale Date</label>
+                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror arrivaleDate" autocomplete="off" value="{{ $reservation->arrivaleDate }}">
                   @error('arrivaleDate')
                   <div class="invalid-feedback">
                      {{ $message }}
                   </div>
                   @enderror
 
-                  <label for="">Change Departure Date</label>
+                  <label for="">Departure Date</label>
                   <input type="date" name="departureDate" class="form-control @error('departureDate') is-invalid @enderror" placeholder="Departure Date..." autocomplete="off" value="{{ $reservation->departureDate }}">
                   @error('departureDate')
                   <div class="invalid-feedback">
@@ -301,7 +301,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
-                     <input type="text" name="clerk" value="{{ auth()->user()->name }}">
+                     <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>
@@ -394,6 +394,15 @@
          let totalRoomReservedStandart = $(this).val();
          let totalRoomReservedStandartDefaultHidden = $('#totalRoomReservedstandartDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedStandart').val('');
+            $("#totalRoomReservedStandart").removeClass('is-valid');
+            $("#totalRoomReservedStandart").addClass('is-invalid');
+            $("#totalRoomReservedStandart").css("background","#FFF");
+            return;
+         }
          // jika jumlah kamar yang di pesan kurang dari kamar default
          if(totalRoomReservedStandart < totalRoomReservedStandartDefaultHidden){
             //jika jumlah kamar yang dipesan kurang dari nool
@@ -411,7 +420,8 @@
                data: {
                   "_token": "{{ csrf_token() }}",
                   "totalRoomReserved": totalRoomReservedStandart,
-                  "typeRoom": typeRoom 
+                  "typeRoom": typeRoom,
+                  "arrivalDate": arrivalDate 
                },
                beforeSend: function(){
                   $("#totalRoomReservedstandart").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
@@ -441,6 +451,15 @@
          let totalRoomReservedSuperior = $(this).val();
          let totalRoomReservedsuperiorDefaultHidden = $('#totalRoomReservedsuperiorDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedSuperior').val('');
+            $("#totalRoomReservedSuperior").removeClass('is-valid');
+            $("#totalRoomReservedSuperior").addClass('is-invalid');
+            $("#totalRoomReservedSuperior").css("background","#FFF");
+            return;
+         }
          if(totalRoomReservedSuperior < totalRoomReservedsuperiorDefaultHidden){
             if(totalRoomReservedSuperior <= 0){
                alert('The total rooms booked cannot be below zero');
@@ -456,7 +475,8 @@
                data: {
                   "_token": "{{ csrf_token() }}",
                   "totalRoomReserved": totalRoomReservedSuperior,
-                  "typeRoom": typeRoom 
+                  "typeRoom": typeRoom,
+                  "arrivalDate": arrivalDate
                },
                beforeSend: function(){
                   $("#totalRoomReservedSuperior").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
@@ -486,6 +506,15 @@
          let totalRoomReservedDeluxe = $(this).val();
          let totalRoomReservedDeluxeDefaultHidden = $('#totalRoomReserveddeluxeDefaultHidden').val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedDeluxe').val('');
+            $("#totalRoomReservedDeluxe").removeClass('is-valid');
+            $("#totalRoomReservedDeluxe").addClass('is-invalid');
+            $("#totalRoomReservedDeluxe").css("background","#FFF");
+            return;
+         }
          if(totalRoomReservedDeluxe < totalRoomReservedDeluxeDefaultHidden){
             if(totalRoomReservedDeluxe <= 0){
                alert('The total rooms booked cannot be below zero');

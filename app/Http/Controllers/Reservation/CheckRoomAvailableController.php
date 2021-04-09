@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Reservation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReservationFormRequest;
 use App\IndividualReservationRoom;
+use App\Registration;
 use App\Reservation;
 use App\Room;
 use Carbon\Carbon;
@@ -35,8 +36,22 @@ class CheckRoomAvailableController extends Controller
             ['code' ,'=', 'VR']
         ])->get();
 
+        //* cek tamu yang akan check out
+        foreach($this->registration($request) as $regis){
+            foreach($regis->rooms as $room){
+                // $countRoom[] = $room->id;
+                $countRoom[] = $room->roomType;
+            }
+        }
+
+        $countRoomStandart = \collect($countRoom)->filter(function($countRoomStandart){
+            return $countRoomStandart == "STANDART";
+        });
+
+        $total = $countRoomStandart->count() + (\count($roomStandartVR) - $totalRoomReservedStandart);
+
         // jika request lebih besar dari rumus (jumlah room VR - total room yang di booking)
-        if ($request->totalRoomReserved > \count($roomStandartVR) - $totalRoomReservedStandart) {
+        if ($request->totalRoomReserved > $total) {
             $success = true;
             $message = 'The room STANDART booked exceeds the available rooms';
         } else {
@@ -69,7 +84,20 @@ class CheckRoomAvailableController extends Controller
 
         $totalRoomReservedSuperior = $individuReservedSuperior + $groupReservationSuperior;
 
-        if ($request->totalRoomReserved > \count($roomSuperiorVR) - $totalRoomReservedSuperior) {
+        //* cek tamu yang akan check out
+        foreach($this->registration($request) as $regis){
+            foreach($regis->rooms as $room){
+                $countRoom[] = $room->roomType;
+            }
+        }
+
+        $countRoomSuperior = \collect($countRoom)->filter(function($countRoomSuperior){
+            return $countRoomSuperior == "SUPERIOR";
+        });
+
+        $total = $countRoomSuperior->count() + (\count($roomSuperiorVR) - $totalRoomReservedSuperior);
+
+        if ($request->totalRoomReserved > $total) {
             $success = true;
             $message = 'The room SUPERIOR booked exceeds the available rooms';
         } else {
@@ -102,7 +130,21 @@ class CheckRoomAvailableController extends Controller
 
         $totalRoomReservedDeluxe = $individuReservedDeluxe + $groupReservationDeluxe;
 
-        if ($request->totalRoomReserved > count($roomDeluxeVR) - $totalRoomReservedDeluxe) {
+         //* cek tamu yang akan check out
+        foreach($this->registration($request) as $regis){
+            foreach($regis->rooms as $room){
+                $countRoom[] = $room->id;
+            }
+        }
+
+        $countRoomDeluxe = \collect($countRoom)->filter(function($countRoomDeluxe){
+            return $countRoomDeluxe == "DELUXE";
+        });
+
+        $total = $countRoomDeluxe->count() + (count($roomDeluxeVR) - $totalRoomReservedDeluxe);
+
+
+        if ($request->totalRoomReserved > $total) {
             $success = true;
             $message = 'The room DELUXE booked exceeds the available rooms';
         } else {
@@ -117,7 +159,7 @@ class CheckRoomAvailableController extends Controller
     }
 
     public function checkAvailableRoom(Request $request)
-    {
+    {   
         //STANDART
         $individuReservedStandart = DB::table('individual_reservation_rooms')->where([
             ['typeOfRoom', '=', 'standart'],
@@ -174,13 +216,8 @@ class CheckRoomAvailableController extends Controller
 
         if($request->typeRoom == 'standart'){
 
-            if ($request->totalRoomReserved > \count($roomStandartVR) - $totalRoomReservedStandart) {
-                $success = true;
-                $message = 'The room STANDART booked exceeds the available rooms';
-            } else {
-                $success = \false;
-                $message = $request->totalRoomReserved.' Rooms standart available';
-            }
+            $this->checkRoomStandart($request);
+            
         } elseif($request->typeRoom == 'superior'){
 
             if ($request->totalRoomReserved > \count($roomSuperiorVR) - $totalRoomReservedSuperior) {
@@ -211,5 +248,13 @@ class CheckRoomAvailableController extends Controller
             'success' => $success,
             'message' => $message,
         ]);
+    }
+
+    public function registration($request)
+    {   
+        $guestRegistration = Registration::whereDate('departureDate', '<=', $request->arrivalDate)
+        ->where('status', 'checkIn')->get();
+
+        return $guestRegistration;
     }
 }

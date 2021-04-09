@@ -49,4 +49,9 @@ class Registration extends Model
     {
         return $this->hasOne(CheckOut::class);
     }
+
+    public function roomSurcharge()
+    {
+        return $this->hasOne(RoomSurcharge::class);
+    }
 }

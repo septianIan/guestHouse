@@ -47,6 +47,8 @@
                                  <font>{{ $individualBill->description }} <i class="fas fa-utensils"></i></font>
                               @elseif($individualBill->typeBill == 'diffDateInCO')
                                  <font style="color:red;">{{ $individualBill->description }} <i class="fa fa-check"></i></font>
+                              @elseif($individualBill->typeBill == 'roomSurcharge')
+                                 <font>{{ $individualBill->description }} <i class="fa fa-check"></i></font>
                               @else
                                  {{ $individualBill->description }} @if($individualBill->status == 0)<a href="#" class="btn btn-danger btn-xs deletePostCash" data-id="{{ $individualBill->idGuestBill }}"><i class="fa fa-trash" aria-hidden="true"></i></a>@endif
                               @endif
@@ -79,7 +81,7 @@
                         </tr>
                         <tr>
                            <td>
-                              <select name="methodPayment" class="form-control" id="">
+                              <select name="methodPayment" class="form-control" id="" required>
                                  <option value=""></option>
                                  <option value="cash">Cash</option>
                                  <option value="credit card">Credit card</option>
@@ -115,7 +117,7 @@
                      </tfoot>
                </table>
 
-               <a href="#" class="btn btn-success btn-flat float-right" data-target="#modal-checkOut" data-toggle="modal">Check Out</a>
+               <a href="#" class="btn btn-success btn-flat float-right checkOut" data-id="{{ $registration->id }}" id="checkOut">Check Out</a>
             </div>
          </div>
       </div>
@@ -131,6 +133,7 @@
       <div class="card card-success">
          <div class="card-header">
             <h3 class="card-title">Master bill</h3>
+            <a href="#" class="btn btn-flat btn-danger btn-sm float-right deleteAllMasterBill" data-id="{{ $masterBill->id }}"><i class="fa fa-window-close" aria-hidden="true"></i></a>
          </div>
          <div class="card-body">
             <div class="col-sm-6 invoice-col">
@@ -142,7 +145,7 @@
                   Charge to : {{ $masterBill->chargeTo }} <br>
                </p>
             </div>
-            <button class="btn btn-primary btn-flat float-right mb-2"><i class="fa fa-print" aria-hidden="true"></i> Print</button>
+            <a href="{{ route('reception.masterBill.voucher', $masterBill->id) }}" class="btn btn-primary btn-flat float-right mb-2" target="_blank"><i class="fa fa-print"></i> Print</a>
             <table class="table table-bordered table-striped">
                <thead>
                   <tr>

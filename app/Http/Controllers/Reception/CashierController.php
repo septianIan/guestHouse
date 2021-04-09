@@ -9,6 +9,7 @@ use App\MasterBill;
 use App\Registration;
 use App\ReservationCheckInDetail;
 use App\ReservationGroupCheckInDetail;
+use App\RoomSurcharge;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -255,7 +256,38 @@ class CashierController extends Controller
             }
         }
 
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime);
+        //Room Surcharge early Check In
+        $roomSurchargesEarlyCheckIn = [];
+        foreach($this->roomSurchargesEarlyCheckIn($id) as $roomSurcharge){
+            $roomSurchargesEarlyCheckIn[] = [
+                'id' => $roomSurcharge->id,
+                'date' => $roomSurcharge->registration->checkIn->date->format('Y-m-d'),
+                'description' => 'Room surcharge early check in '.$room->roomType,
+                'amount' => $roomSurcharge->roomSurCharge,
+                'typeBill' => 'roomSurcharge',
+            ];
+        }
+
+        //Room surcharge early check Out
+        $roomSurchargesEarlyCheckOut = [];
+        $jamSekarang = Carbon::now()->toTimeString();
+        $jamDuaBelasSiang = Carbon::now()->format('12:00');
+        if ($jamSekarang > $jamDuaBelasSiang) {
+            $dates = $this->carbonDates($id);
+            foreach($registration->rooms as $room){
+                foreach($dates as $key => $date){
+                    $roomSurchargesEarlyCheckOut[] = [
+                        'date' => $date,
+                        'description' => 'Room surcharge early check out '.$room->roomType,
+                        'amount' => $room->pivot->roomRate/2,
+                        'typeBill' => 'roomSurcharge'
+                    ];
+                }
+            }
+        }
+
+        //!BATAS
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
         $collect = collect($merged)->sortBy('date');
 
         $allGuestBillIndividual = [];
@@ -361,8 +393,40 @@ class CashierController extends Controller
                 ];
             }
         }
+        
+        
+        //Room Surcharge early Check In
+        $roomSurchargesEarlyCheckIn = [];
+        foreach($this->roomSurchargesEarlyCheckIn($id) as $roomSurcharge){
+            $roomSurchargesEarlyCheckIn[] = [
+                'id' => $roomSurcharge->id,
+                'date' => $roomSurcharge->registration->checkIn->date->format('Y-m-d'),
+                'description' => 'Room surcharge early check in '.$room->roomType,
+                'amount' => $roomSurcharge->roomSurCharge,
+                'typeBill' => 'roomSurcharge',
+            ];
+        }
 
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataMeals, $dataExtraBed, $COtime);
+        //Room surcharge early check Out
+        $roomSurchargesEarlyCheckOut = [];
+        $jamSekarang = Carbon::now()->toTimeString();
+        $jamDuaBelasSiang = Carbon::now()->format('12:00');
+        if ($jamSekarang > $jamDuaBelasSiang) {
+            $dates = $this->carbonDates($id);
+            foreach($registration->rooms as $room){
+                foreach($dates as $key => $date){
+                    $roomSurchargesEarlyCheckOut[] = [
+                        'date' => $date,
+                        'description' => 'Room surcharge early check out '.$room->roomType,
+                        'amount' => $room->pivot->roomRate/2,
+                        'typeBill' => 'roomSurcharge'
+                    ];
+                }
+            }
+        }
+
+        //!BATAS
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataMeals, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
         $collect = collect($merged)->sortBy('date');
 
         $allGroupGuestBills = [];
@@ -380,37 +444,14 @@ class CashierController extends Controller
         return $allGroupGuestBills;
     }
 
-    public function detailMasterBill($id)
+    public function roomSurchargesEarlyCheckIn($id)
     {
-        $registration = $this->registration($id);
-        $allGroupGuestBills = $this->allGroupGuestBills($id);
-        $guestBills = [];
-        $id = [];
-        foreach($registration->masterBills as $masterBill){
-            foreach($masterBill->detailMasterBills as $dtMasterBill){
-                $id[] = $dtMasterBill->id;
-            }
-        }
-        $a = [
-            [
-                "id" => 2,
-                "date" => "2021-03-18",
-                "description" => "Room charge STANDART",
-                "amount" => 200000,
-                "typeBill" => "rooms",
-            ],
-            [
-                "id" => 3,
-                "date" => "2021-03-19",
-                "description" => "Room charge STANDART",
-                "amount" => 200000,
-                "typeBill" => "rooms",
-            ]
-        ];
-        // \dd($a);
-        $fla = \collect($a)->flatten();
+        $roomSurCharges = [];
+        $roomSurCharges = RoomSurcharge::where([
+            ['registration_id', '=', $this->registration($id)->id],
+            ['typeSurCharge', '=', 'early C/I']
+        ])->get();
 
-        $coll = \collect($allGroupGuestBills)->only($fla);
-        \dd($coll);
+        return $roomSurCharges;
     }
 }

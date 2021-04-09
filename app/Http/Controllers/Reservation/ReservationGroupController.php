@@ -48,6 +48,7 @@ class ReservationGroupController extends Controller
      */
     public function store(ReservationGroupFormRequest $request)
     {
+        // \dd($request->all());
         $rooms = Room::find($request->rooms);
         $dateReservation = Carbon::now()->isoFormat('D-M-Y');
 
@@ -253,7 +254,7 @@ class ReservationGroupController extends Controller
      */
     public function destroy(ReservationGroup $reservationGroup)
     {
-        if ($reservationGroup->status == 'checkIn') {
+        if ($reservationGroup->status == 'checkIn' || $reservationGroup->status == 'checkOut') {
             $success = true;
             $message = 'Guest has chacked in, data cannot be deleted';
         } else {

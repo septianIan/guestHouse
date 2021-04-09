@@ -23,19 +23,19 @@ class RoomSeeder extends Seeder
                 'roomType' => 'standart',
                 'numberRoom' => '102',
                 'price' => '200000',
-                'code' => 'O'
+                'code' => 'VR'
             ],
             [
                 'roomType' => 'standart',
                 'numberRoom' => '103',
                 'price' => '200000',
-                'code' => 'O'
+                'code' => 'VR'
             ],
             [
                 'roomType' => 'standart',
                 'numberRoom' => '104',
                 'price' => '200000',
-                'code' => 'VR'
+                'code' => 'O'
             ],  
             [
                 'roomType' => 'standart',
@@ -48,19 +48,19 @@ class RoomSeeder extends Seeder
                 'roomType' => 'superior',
                 'numberRoom' => '106',
                 'price' => '300000',
-                'code' => 'VR'
+                'code' => 'O'
             ],
             [
                 'roomType' => 'superior',
                 'numberRoom' => '107',
                 'price' => '300000',
-                'code' => 'VR'
+                'code' => 'O'
             ],
             [
                 'roomType' => 'superior',
                 'numberRoom' => '108',
                 'price' => '300000',
-                'code' => 'VC'
+                'code' => 'VD'
             ],
             [
                 'roomType' => 'superior',
@@ -72,7 +72,7 @@ class RoomSeeder extends Seeder
                 'roomType' => 'superior',
                 'numberRoom' => '110',
                 'price' => '300000',
-                'code' => 'VC'
+                'code' => 'VR'
             ],
             //Deluxe
             [
@@ -85,7 +85,7 @@ class RoomSeeder extends Seeder
                 'roomType' => 'deluxe',
                 'numberRoom' => '112',
                 'price' => '400000',
-                'code' => 'VD'
+                'code' => 'VR'
             ],
             [
                 'roomType' => 'deluxe',
@@ -97,13 +97,13 @@ class RoomSeeder extends Seeder
                 'roomType' => 'deluxe',
                 'numberRoom' => '114',
                 'price' => '400000',
-                'code' => 'VD'
+                'code' => 'VR'
             ],
             [
                 'roomType' => 'deluxe',
                 'numberRoom' => '115',
                 'price' => '400000',
-                'code' => 'VR'
+                'code' => 'O'
             ],
         ];
         Room::insert($rooms);

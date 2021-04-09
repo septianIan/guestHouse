@@ -28,6 +28,8 @@ Route::get('data/reservation', 'CheckInController@dataTableIndividualReservation
 Route::get('detailIndividualCheckIn/{id}', 'CheckInController@detailIndividualReservation')->name('data.detailReservation');
 //BATAS
 
+//check erly arrivale
+Route::get('/check/early/arrival/{id}', 'CheckInController@checkEarlyArrivale');
 //route check in
 Route::get('/checkIn/{id}', 'CheckInController@checkIn')->name('checkIn.checkInStore');
 
@@ -62,8 +64,18 @@ Route::delete('guest/bill/delete/master-bill/per-room/{id}', 'bill\MasterBillCon
 Route::get('temporary/bill', 'bill\TemporaryBillController@guestBills')->name('temporary.bill');
 Route::post('temporary/create/all-bills', 'bill\TemporaryBillController@saveAllBills')->name('temporary.store');
 
-//RESET ALL BILL
+//!RESET ALL BILL
 Route::get('guest/bill/reset/{id}', 'bill\TemporaryBillController@resetAllBill');
 
-//CheckOut
+//!check early departure
+ROute::get('check/early/departure/{id}', 'bill\CheckOutController@checkEarlyDeparture');
+//!CheckOut
 Route::get('guest/bill/checkout/{id}', 'bill\CheckOutController@checkOut');
+Route::get('guest/bill/checkout/detail/{id}', 'bill\CheckOutController@checkOutDetail')->name('checkOut.detail');
+
+// *print voucher bill
+Route::get('bill/voucher/guest/{id}', 'bill\MasterBillController@printVoucher')->name('masterBill.voucher');
+
+//!
+Route::post('check/registration/room/reserved', 'RegistrationController@cekRoom')->name('checkAvailableRoom.totalRoomReserved');
+Route::post('check/room/reserved', 'CheckInController@cekRoom')->name('checkAvailableRoom.roomReserved');

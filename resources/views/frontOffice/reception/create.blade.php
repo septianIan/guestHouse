@@ -104,7 +104,7 @@
                         @enderror
 
                         <label for="">Arrivale date</label>
-                        <input type="date" class="form-control @error('arrivaleDate') is-invalid @enderror" name="arrivaleDate" placeholder="Arrivale date..." value="{{ old('arrivaleDate') }}" autocomplete="off">
+                        <input type="date" class="form-control @error('arrivaleDate') is-invalid @enderror arrivaleDate" name="arrivaleDate" placeholder="Arrivale date..." value="{{ old('arrivaleDate') }}" autocomplete="off">
                         @error('arrivaleDate')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -173,7 +173,7 @@
                         @enderror
                      </div>
                      <div class="col-sm-4">
-                        <input type="number" class="form-control @error('numberAccount') is-invalid @enderror" name="numberAccount">
+                        <input type="number" class="form-control @error('numberAccount') is-invalid @enderror" name="numberAccount" required>
                         @error('numberAccount')
                         <div class="invalid-feedback">
                            {{ $message }}
@@ -205,7 +205,7 @@
                      <tbody>
                         <tr>
                            <td>
-                              <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                              <select name="rooms[]" id="roomArragement" class="rooms form-control @error('rooms[]') is-invalid @enderror">
                                     <option value=""></option>
                                     @foreach($rooms as $room)
 
@@ -295,7 +295,7 @@
                   </table>
                </div>
             </div>
-
+            {{-- Submit --}}
             <div class="card card-success">
                <div class="card-header">
                   <h3 class="card-title">
@@ -305,7 +305,8 @@
                <div class="card-body">
                   <div class="col-sm-6 mt-3">
                      <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
-                     <button class="btn btn-success" type="submit">Submit</button>
+                     <button class="btn btn-success submit" style="display:none;" id="submit" type="submit">Submit</button>
+                     <a href="#" class="btn btn-warning btn-flat" id="cekRoom">cek</a>
                   </div>
                </div>
             </div>
@@ -319,12 +320,19 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+
+<!--- Sweet alert -->
+<link rel="stylesheet" href="{{ asset('assets/plugins/sweetalert2-theme/bootstrap-4.min.css') }}">
 @endpush
 
 @push('scripts')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
+
+<!-- Sweet alert -->
+<script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+
 <script>
    $(function() {
       $('.multiSelect').select2({
@@ -343,7 +351,10 @@
             <td>
                <input type="number" id="form1" name="amount" class="form-control" value="" required>
             </td>
-            <td><input type="number" class="form-control" id="form3" name="rate" value=""></td>
+            <td>
+               <input type="number" class="form-control" id="form3" name="rate" value="">
+               <input type="hidden" name="totalPax[]" value="0" style="width:100px;" class="form-control" id="">
+            </td>
             <td>
                <select name="extraBad" id="form2" class="form-control" required>
                   <option value="extraBad">Extra Bad</option>
@@ -368,7 +379,7 @@
       let tr = `
          <tr>
             <td>
-               <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+               <select name="rooms[]" id="roomArragement" class="rooms form-control @error('rooms[]') is-invalid @enderror">
                   <option value=""></option>
                   @foreach($rooms as $room)
 
@@ -474,5 +485,47 @@
       }
    };
 
+   $(document).ready(function(){
+      $('#cekRoom').live('click', function(){
+         var rooms=[];
+         $('select[name="rooms[]"] option:selected').each(function(){
+            rooms.push($(this).val());
+         }); 
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedStandart').val('');
+            $("#totalRoomReservedStandart").removeClass('is-valid');
+            $("#totalRoomReservedStandart").addClass('is-invalid');
+            $("#totalRoomReservedStandart").css("background","#FFF");
+            return;
+         }
+         //
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reception.checkAvailableRoom.totalRoomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "rooms": rooms,
+               "arrivalDate": arrivalDate 
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  Swal.fire({
+                     icon: 'error',
+                     title: 'Oops...',
+                     text: data.message
+                  })
+                  document.getElementById("submit").style.visibility = 'hidden';
+               }else if(data.success === false) {
+                  alert(data.message);
+                  document.getElementById("submit").style.visibility = 'visible';
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {}
+         });
+      }); 
+   });
 </script>
 @endpush

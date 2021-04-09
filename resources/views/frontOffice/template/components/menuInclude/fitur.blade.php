@@ -1,5 +1,4 @@
-<li class="nav-header">Other Menu</li>
-
+   {{-- plan room --}}
    <li class="nav-item has-treeview">
       <a href="#" class="nav-link">
          <i class="nav-icon fa fa-columns"></i>
@@ -10,10 +9,10 @@
       </a>
       <ul class="nav nav-treeview">
          <li class="nav-item">
-            <a href="{{ route('chartPlan.reservationPlan') }}" class="nav-link">
+            <a href="{{ route('chartPlan.roomArragement') }}" class="nav-link">
                <i class="far fa-circle nav-icon"></i>
                <p>
-                  Reservation Plan
+                  Available Rooms
                </p>
             </a>
          </li>
@@ -52,6 +51,17 @@
       </ul>
    </li>
 
+   {{-- rooms status --}}
+   <li class="nav-item">
+      <a href="{{ route('rooms.status') }}" class="nav-link">
+         <i class="nav-icon fas fa-info"></i>
+         <p>
+            Rooms Status
+         </p>
+      </a>
+   </li>
+
+   {{-- Reserved reservation --}}
    <li class="nav-item has-treeview">
       <a href="#" class="nav-link">
          <i class="nav-icon fas fa-check-square"></i>
@@ -80,6 +90,7 @@
       </ul>
    </li>
 
+   {{-- cencelled reservation --}}
    <li class="nav-item has-treeview">
       <a href="#" class="nav-link">
          <i class="nav-icon fas fa-user-times"></i>
@@ -106,12 +117,22 @@
       </ul>
    </li>
 
+   {{-- calendar --}}
    <li class="nav-item">
-      <a href="pages/calendar.html" class="nav-link">
+      <a href="{{ route('schedulerCalendar.reservation') }}" class="nav-link">
          <i class="nav-icon fas fa-calendar-alt"></i>
          <p>
             Calendar
-            <span class="badge badge-info right">2</span>
+         </p>
+      </a>
+   </li>
+
+   {{-- calendar --}}
+   <li class="nav-item">
+      <a href="{{ route('cashierSummaryCalendar.reservation') }}" class="nav-link">
+         <i class="nav-icon fas fa-calendar-alt"></i>
+         <p>
+            Cashier Summary
          </p>
       </a>
    </li>

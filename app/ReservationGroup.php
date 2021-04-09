@@ -85,4 +85,13 @@ class ReservationGroup extends Model
         $lastName = !empty($splitName[1]) ? $splitName[1] : '';
         return $lastName;
     }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($groupReservation){
+            $groupReservation->update(['status' => 0]);
+            $groupReservation->groupReservationRooms()->delete();
+        });
+    }
 }

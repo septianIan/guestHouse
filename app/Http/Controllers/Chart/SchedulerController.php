@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Chart;
 
+use App\CheckOut;
 use App\Http\Controllers\Controller;
 use App\IndividualReservationRoom;
+use App\MasterBill;
+use App\MethodPayment;
+use App\Registration;
 use App\Reservation;
 use App\ReservationGroup;
 use App\Room;
@@ -13,6 +17,10 @@ use Illuminate\Support\Facades\DB;
 
 class SchedulerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -167,7 +175,71 @@ class SchedulerController extends Controller
         return $roomDeluxeO;
     }
 
-    public function reservationPlan()
+    public function individuReservedStandart()
+    {
+        $individuReservedStandart = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'standart'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        return $individuReservedStandart;
+    }
+
+    public function groupReservationStandart()
+    {
+        $groupReservationStandart = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'standart'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        return $groupReservationStandart;
+    }
+
+    public function individuReservedSuperior()
+    {
+        $individuReservedSuperior = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'superior'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+        return $individuReservedSuperior;
+    }
+
+    public function groupReservationSuperior()
+    {
+        $groupReservationSuperior = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'superior'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        return $groupReservationSuperior;
+    }
+
+    public function individuReservedDeluxe()
+    {
+        $individuReservedDeluxe = DB::table('individual_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'deluxe'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        return $individuReservedDeluxe;
+    }
+
+    public function groupReservationDeluxe()
+    {
+        $groupReservationDeluxe = DB::table('group_reservation_rooms')->where([
+            ['typeOfRoom', '=', 'deluxe'],
+            ['status', '=', 1]
+        ])->sum('totalRoomReserved');
+
+        return $groupReservationDeluxe;
+    }
+
+    /**
+     * Status = 0 tamu sudah checkOut atau sudah selesai
+     * Status = 1 tamu booking
+     * Status = 2 tamu sudah checkIn
+     */
+    public function roomArragement()
     {   
         //all rooms
         $rooms = $this->getRoomAll();
@@ -177,15 +249,8 @@ class SchedulerController extends Controller
         $roomStandartVD = $this->getRoomStandartVD();
         $roomStandartVC = $this->getRoomStandartVC();
         $roomStandartO = $this->getRoomStandartO();
-        $individuReservedStandart = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'standart'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-        $groupReservationStandart = DB::table('group_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'standart'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved'); 
-        $totalBookingRoomReservedStandart = $individuReservedStandart + $groupReservationStandart;
+        
+        $totalBookingRoomReservedStandart = $this->individuReservedStandart() + $this->groupReservationStandart();
         
         //superior
         $roomSuperior = $this->getRoomSuperior();
@@ -193,15 +258,7 @@ class SchedulerController extends Controller
         $roomSuperiorVD = $this->getRoomSuperiorVD();
         $roomSuperiorVC = $this->getRoomSuperiorVC();
         $roomSuperiorO = $this->getRoomSuperiorO();
-        $individuReservedSuperior = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'superior'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-        $groupReservationSuperior = DB::table('group_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'superior'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-        $totalRoomReservedSuperior = $individuReservedSuperior + $groupReservationSuperior;
+        $totalRoomReservedSuperior = $this->individuReservedSuperior() + $this->groupReservationSuperior();
 
         //deluxe
         $roomDeluxe = $this->getRoomDeluxe();
@@ -209,18 +266,7 @@ class SchedulerController extends Controller
         $roomDeluxeVD = $this->getRoomDeluxeVD();
         $roomDeluxeVC = $this->getRoomDeluxeVC();
         $roomDeluxeO = $this->getRoomDeluxeO();
-
-        $individuReservedDeluxe = DB::table('individual_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'deluxe'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $groupReservationDeluxe = DB::table('group_reservation_rooms')->where([
-            ['typeOfRoom', '=', 'deluxe'],
-            ['status', '=', 1]
-        ])->sum('totalRoomReserved');
-
-        $totalRoomReservedDeluxe = $individuReservedDeluxe + $groupReservationDeluxe;
+        $totalRoomReservedDeluxe = $this->individuReservedDeluxe() + $this->groupReservationDeluxe();
 
         return view('frontOffice.fitur.reservationPlanIndex', \compact('rooms', 
             //
@@ -251,12 +297,10 @@ class SchedulerController extends Controller
     {
         $dateToday = Carbon::today()->format('Y-m-d');
         
-        $guestIndividualReservations = DB::table('reservations')->where('arrivaleDate', '>=', $dateToday)
-        ->orderBy('estimateArrivale', 'asc')
+        $guestIndividualReservations = DB::table('reservations')->orderBy('estimateArrivale', 'asc')
         ->get();
 
-        $guestGroupReservation = DB::table('reservationgroups')->where('arrivaleDate', '>=', $dateToday)
-        ->orderBy('estimateArrivale', 'asc')
+        $guestGroupReservation = DB::table('reservationgroups')->orderBy('estimateArrivale', 'asc')
         ->get();
 
         $data = [];
@@ -334,5 +378,207 @@ class SchedulerController extends Controller
     public function todayEDList()
     {   
         return view('frontOffice.fitur.todayDeparture');
+    }
+
+    public function schedulerCalendar()
+    {   
+        return view('frontOffice.fitur.calendar');
+    }
+
+    public function cashierSummaryCalendar()
+    {   
+        return view('frontOffice.fitur.cashierSummary');
+    }
+
+    public function cekRoom($date)
+    {   
+        // if ($this->registration($date)->isEmpty()) {
+        //     return \abort(404);
+        // }
+        // cari tamu yang akan check out di tanggal $date status nya check in,
+        $totalBookingRoomReservedStandart = $this->individuReservedStandart() + $this->groupReservationStandart();
+        $standartRoomAvailable = count($this->getRoomStandartVR())-$totalBookingRoomReservedStandart;
+
+        $totalRoomReservedSuperior = $this->individuReservedSuperior() + $this->groupReservationSuperior();
+        $superiorRoomAvaileble = count($this->getRoomSuperiorVR())-$totalRoomReservedSuperior;
+
+        $totalRoomReservedDeluxe = $this->individuReservedDeluxe() + $this->groupReservationDeluxe();
+        $deluxeRoomAvaileble = count($this->getRoomDeluxeVR())- $totalRoomReservedDeluxe;
+        
+        $countRoom = [];
+        foreach($this->registration($date) as $regis){
+            foreach($regis->rooms as $room){
+                $countRoom[] = $room->id;
+            }
+        }
+        return view('frontOffice.fitur.detailCalendar.checkRoom', [
+            'registration' => $this->registration($date),
+            'roomAvailble' =>  \count($countRoom) + $standartRoomAvailable + $superiorRoomAvaileble + $deluxeRoomAvaileble,
+            'standartRoomAvailable' => $standartRoomAvailable,
+            'superiorRoomAvaileble' => $superiorRoomAvaileble,
+            'deluxeRoomAvaileble' => $deluxeRoomAvaileble,
+            'dateSelected' => $date,
+            'standartRoom' => $this->getRoomStandartVR(),
+            'superiorRoom' => $this->getRoomSuperiorVR(),
+            'deluxeRoom' => $this->getRoomDeluxeVR(),
+        ]);
+    }
+
+    public function registration($date)
+    {   
+        $guestRegistration = Registration::whereDate('departureDate', '<=', $date)
+        ->where('status', 'checkIn')->get();
+
+        return $guestRegistration;
+    }
+
+    public function cashierSummry($date)
+    {
+        /**
+         * Ambil semua pemasukan pada tanggal ini,
+         * 1. pemasukan deposit tamu indiviudal dan group
+         * 2. pemasukan tamu check out
+         * 3. semua metode pembayaran
+         */
+
+        $depositReservationIndividu = $this->getIndividualReservations($date);
+        $depostiGroupReservation = $this->getGroupReservations($date);
+        $getCheckOutPayment = $this->getCheckOutPayment($date);
+        $getOnlyTrasherd = $this->getOnlyTrasherd($date);
+
+        $deposit1 = [];
+        foreach($depositReservationIndividu as $depositIndividu){
+            $deposit1[] = [
+                'methodPayment' => $depositIndividu->methodPayment,
+                'income' => $depositIndividu->deposit
+            ]; 
+        }
+
+        $deposit2 = [];
+        foreach($depostiGroupReservation as $depositGroup){
+            $deposit2[] = [
+                'methodPayment' => $depositGroup->methodPayment,
+                'income' => $depositGroup->deposit
+            ]; 
+        }
+
+        $masterBIll = [];
+        foreach($getCheckOutPayment as $mBill){
+            $masterBIll[] = [
+                'methodPayment' => $mBill->methodPayment,
+                'income' => $mBill->detailMasterBills()->sum('charge')
+            ];
+        }
+
+        $merge = \array_merge($deposit1, $deposit2, $masterBIll, $getOnlyTrasherd);
+        $total = [];
+        foreach($merge as $v){
+            $total[] = $v['income'];
+        }
+        
+        return view('frontOffice.fitur.detailCalendar.FoCashierSummary', [
+            'date' => $date,
+            'income' => $merge,
+            'total' => \array_sum($total)
+        ]);
+
+    }
+
+    public function getIndividualReservations($date)
+    {   
+        //ambil dari tgl reservasi
+        $depositReservationIndividu = Reservation::where([
+            ['arrivaleDate', '=', $date],
+            ['clerk', '=', auth()->user()->name]
+        ])->get();
+        return $depositReservationIndividu;
+    }
+
+    public function getGroupReservations($date)
+    {
+        // ambil deposti yang metode pembayaran personal
+        // 'reservationgroup_id' => $groupReservation->id,
+        // 'methodPayment' => $request->methodPayment,
+        // 'deposit' => $request->deposit,
+        // 'value1' => $request->creditCard,
+        // 'value2' => $request->numberAccount,
+        // 'value3' => $requestOther,
+        // 'status' => 0
+        $groupReservation = ReservationGroup::where([
+            ['arrivaleDate', $date],
+            ['clerk', '=', auth()->user()->name]
+        ])->get();
+
+        $idGroup = [];
+        foreach($groupReservation as $id){
+            $idGroup[] = $id->id;
+        }
+
+        $depositGroupReservation = [];
+        $depositGroupReservation = MethodPayment::where([
+            ['reservationgroup_id', '=', $idGroup],
+            ['methodPayment', '=', 'company']
+        ])->get();
+
+        return $depositGroupReservation;
+    }
+
+    public function getCheckOutPayment($date)
+    {
+        $checkOut = CheckOut::where([
+            ['date', '=', $date]
+        ])->get();
+
+        $registrationId = [];
+        foreach($checkOut as $co){
+            $registrationId[] = $co->registration_id;
+        }
+
+        $masterBill = MasterBill::whereIn('registration_id', $registrationId)->get();
+        
+        return $masterBill;
+    }
+
+    public function getOnlyTrasherd($date)
+    {
+        $reser = Reservation::onlyTrashed()->where([
+            ['arrivaleDate', $date],
+            ['clerk', '=', auth()->user()->name]
+        ])->get();
+
+        $reserGroup = ReservationGroup::onlyTrashed()->where([
+            ['arrivaleDate', $date],
+            ['clerk', '=', auth()->user()->name]
+        ])->get();
+
+        $idGroup = [];
+        foreach($reserGroup as $id){
+            $idGroup[] = $id->id;
+        }
+
+        $depositGroupReservation = [];
+        $depositGroupReservation = MethodPayment::where([
+            ['reservationgroup_id', '=', $idGroup],
+            ['methodPayment', '=', 'company']
+        ])->get();
+
+        $indiOnlyTrahed = [];
+        foreach($depositGroupReservation as $depositGroup){
+            $indiOnlyTrahed[] = [
+                'methodPayment' => $depositGroup->methodPayment,
+                'income' => $depositGroup->deposit
+            ]; 
+        }
+
+        $groupOnlyTrahed = [];
+        foreach($reser as $depositIndividu){
+            $groupOnlyTrahed[] = [
+                'methodPayment' => $depositIndividu->methodPayment,
+                'income' => $depositIndividu->deposit
+            ]; 
+        }
+
+        $merge = \array_merge($indiOnlyTrahed, $groupOnlyTrahed);
+        return $merge;
     }
 }

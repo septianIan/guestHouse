@@ -24,10 +24,11 @@ class CreateIndividualReservationRoomsTable extends Migration
             $table->integer('status')->default(1);
             /**
              * Status = 0 tamu sudah checkOut atau sudah selesai
-             * Status = 1 tamu bookong
+             * Status = 1 tamu booking
              * Status = 2 tamu sudah checkIn
              */
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

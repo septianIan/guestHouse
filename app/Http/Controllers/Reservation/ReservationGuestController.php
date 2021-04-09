@@ -47,20 +47,16 @@ class ReservationGuestController extends Controller
     //ReservationFormRequest
     public function store(ReservationFormRequest $request)
     {
-        //code mengambil selisih antara checkin dan checkout
-        $checkIn = new Carbon($request->arrivaleDate);
-        $checkOut = $request->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < 1)
-            ? 'today'
-            : $checkIn->diffInDays($checkOut);
+        // \dd($request->all());
         $data = \array_merge($request->except('_token', 'rooms', 'totalRoomReserved', 'roomRate', 'discount', 'totalPax'));
         $reservation = Reservation::create($data);
+
 
         //menyimpan pengaturan kamar reservasi
         if (\count($request->rooms) > 0) {
             foreach ($request->rooms as $room => $v) {
                 //jika req room ada dan req totalRoomReserved ada, maka true
-                if ($request->totalRoomReserved[$room]  != ''&& $request->rooms[$room] != '') {
+                if ($request->totalRoomReserved[$room]  != '' && $request->rooms[$room] != '') {
                     $individualReservationDetail = [
                         'reservation_id' => $reservation->id,
                         'totalRoomReserved' => $request->totalRoomReserved[$room],
@@ -162,7 +158,6 @@ class ReservationGuestController extends Controller
             $success = true;
             $message = 'Guest has chacked in, data cannot be deleted';
         } else {
-            $reservation->update(['status' => 0]);
             $reservation->delete();
 
             $success = false;

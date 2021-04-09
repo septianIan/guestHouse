@@ -21,7 +21,7 @@
                      </h3>
                   </div>
                </div>
-               <div class="row invoice-info">
+               <div class="row invoice-info" style="font-size:14px;">
                   <div class="col-sm-3 invoice-col">
                      <p>
                         Name guest : {{ $registration->getGuestName() }}<br>
@@ -31,7 +31,7 @@
                         Date birth : {{ $registration->dateBirth }}
                      </p>
                   </div>
-                  <div class="col-sm-4 invoice-col">
+                  <div class="col-sm-3 invoice-col">
                      <p>
                         Home address : {{ $registration->homeAddress }}<br>
                         Company : {{ $registration->company }}<br>
@@ -48,6 +48,29 @@
                         Number account : {{ $registration->numberAccount }}<br>
                         Exp date : {{ $registration->expDate }}
                      </p>
+                  </div>
+                  <div class="col-sm-3 invoice-col">
+                     @if($registration->status == 'checkIn')
+                        <div class="alert alert-info alert-dismissible">
+                           <h5><i class="icon fas fa-check"></i>Check In!</h5>
+                           <p>
+                              On : {{ $dataCheckIn->date }} <br>
+                              Hour : {{ $dataCheckIn->time }}
+                           </p>
+                        </div>  
+                     @elseif($registration->status == 'checkOut')
+                        <div class="alert alert-success alert-dismissible">
+                           <h5><i class="icon fas fa-check"></i>Check Out!</h5>
+                           <p>
+                              On : {{ $dataCheckOut->date }} <br>
+                              Hour : {{ $dataCheckOut->time }}
+                           </p>
+                        </div>
+                     @else
+                        <div class="alert alert-warning alert-dismissible">
+                           <h5><i class="icon fas fa-check"></i>{{ $registration->status }}!</h5>
+                        </div>
+                     @endif
                   </div>
                </div>
             </div>
@@ -154,15 +177,9 @@
                      @endif
                   </div>
                   <div class="col-sm-3 invoice-col">
-                     <b>Order room by reservation</b>
+                     <b>Special Request</b>
                      <address>
-                        @foreach($guestGroupReservation->reservationGroup->groupReservationRooms as $value)
-                        <address>
-                           Total room reserved : {{ $value->totalRoomReserved }}&nbsp;
-                           <b>{{ $value->typeOfRoom }}</b>
-                        </address>
-                        @endforeach
-                        Stay : {{ $difference }} night
+                        {{ $guestGroupReservation->reservationGroup->specialRequest }}
                      </address>
                   </div>
                </div>
@@ -288,6 +305,103 @@
                </div>
             </div>
          </div>
+      </div>
+
+      {{-- GUEST bILL --}}
+      <div class="row">
+         {{-- Room surcharge --}}
+         @if($roomSurCharges->isNotEmpty())
+            <div class="col-sm-6">
+            <div class="invoice p-3 mb-3">
+               <div class="row">
+                  <div class="col-12">
+                     <h4>
+                        <i class="fa fa-info-circle"></i>
+                        &nbsp;Room surcharge
+                     </h4>
+                  </div>
+               </div>
+               <div class="row invoice-info">
+                  <div class="col-sm-6 invoice-col" style="font-size:14px;">
+                     <p>
+                        Name guest : {{ $registration->getGuestName() }}<br>
+                        Nationality : {{ $registration->nationality }}<br>
+                        Passport : {{ $registration->passport }}<br>
+                        Occupation : {{ $registration->occupation }}<br>
+                        Date birth : {{ $registration->dateBirth }} <br>
+                        Check in time : {{ $registration->checkIn->time }}
+                     </p>
+                  </div>
+                  <table class="table table-bordered table-striped" style="font-size:14px;">
+                     <thead>
+                        <tr>
+                           <th>Type room</th>
+                           <th>Room surcharge</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        @foreach($roomSurCharges as $roomSurCharge)
+                           <tr>
+                              <td>{{ $roomSurCharge->typeRoom }}</td>
+                              <td>Rp. {{ number_format($roomSurCharge->roomSurCharge, 0, ',', '.') }}</td>
+                           </tr>
+                        @endforeach
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         @endif
+         {{-- master bill --}}
+         @if($registration->status == 'checkOut')
+         @foreach($registrationCheckOut->registration->masterBills as $masterBill)
+         <div class="col-sm-6">
+            <div class="card card-success">
+               <div class="card-header">
+                  <h3 class="card-title">Master bill</h3>
+               </div>
+               <div class="card-body">
+                  <div class="col-sm-6 invoice-col">
+                     <p>
+                        Method Payment : {{ $masterBill->methodPayment }} <br>
+                        Number account : {{ $masterBill->numberAccount }} <br>
+                        Exp date : {{ $masterBill->expDate }} <br>
+                        Type charge : {{ $masterBill->typeCharge }} <br>
+                        Charge to : {{ $masterBill->chargeTo }} <br>
+                     </p>
+                  </div>
+                  <a href="{{ route('reception.masterBill.voucher', $masterBill->id) }}" class="btn btn-primary btn-flat float-right mb-2" target="_blank"><i class="fa fa-print"></i> Print</a>
+                  <table class="table table-bordered table-striped">
+                     <thead>
+                        <tr>
+                           <th>No</th>
+                           <th>Date</th>
+                           <th>Description</th>
+                           <th>Charge</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        @foreach($masterBill->detailMasterBills as $detailMasterBill)
+                           <tr>
+                              <td>{{ $loop->iteration }}</td>
+                              <td>{{ $detailMasterBill->date }}</td>
+                              <td>
+                                 {{ $detailMasterBill->description }}
+                              </td>
+                              <td>Rp. {{ number_format($detailMasterBill->charge, 0, ',', '.') }}</td>
+                           </tr>
+                        @endforeach
+                           <tr>
+                              <td colspan="3"><center><b>Total</b></center></td>
+                              <td>Rp. {{ number_format($masterBill->detailMasterBills->sum('charge'), 0, ',', '.') }}</td>
+                           </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         @endforeach
+         @endif
       </div>
    </div>
 @endsection

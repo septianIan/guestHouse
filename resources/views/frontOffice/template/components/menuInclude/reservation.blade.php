@@ -1,5 +1,3 @@
-   <li class="nav-header">Menu reservation</li>
-
    <li class="nav-item">
       <a href="{{ route('reservation.reservation.index') }}" class="nav-link">
          <i class="nav-icon fas fa-user-plus"></i>

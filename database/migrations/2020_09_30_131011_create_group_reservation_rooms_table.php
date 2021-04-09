@@ -28,6 +28,7 @@ class CreateGroupReservationRoomsTable extends Migration
              * Status = 2 tamu sudah checkIn
              */
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

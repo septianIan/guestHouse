@@ -34,6 +34,7 @@ class CreateRegistrationsTable extends Migration
             // $table->string('expDate')->default(0);
             $table->string('status')->default('confirm');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
-    //use SoftDeletes;
+    use SoftDeletes;
     
     protected $guarded = [];
 
@@ -53,5 +53,14 @@ class Reservation extends Model
         $firstName = $splitName[0];
         $lastName = !empty($splitName[1]) ? $splitName[1] : '';
         return $lastName;
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($reservation){
+            $reservation->update(['status' => '0']);
+            $reservation->individualReservationRooms()->delete();
+        });
     }
 }

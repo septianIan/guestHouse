@@ -32,7 +32,7 @@
                   @enderror
 
                   <label for="">Arrivale Date</label>
-                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror" autocomplete="off" value="{{ old('arrivaleDate') }}" required>
+                  <input type="date" name="arrivaleDate" class="form-control @error('arrivaleDate') is-invalid @enderror arrivaleDate" autocomplete="off" value="{{ old('arrivaleDate') }}" required>
                   @error('arrivaleDate')
                   <div class="invalid-feedback">
                      {{ $message }}
@@ -150,6 +150,7 @@
                               <input type="number" class="form-control" name="roomRate[]" value="">
 
                               <input type="hidden" name="discount[]" style="width:100px;" class="form-control" id="">
+                              <input type="hidden" name="totalPax[]" value="0" style="width:100px;" class="form-control" id="">
                            </td>
                            <td colspan="2">
                               <center>
@@ -297,7 +298,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6 mt-3">
-                     <input type="text" name="clerk" value="{{ auth()->user()->name }}">
+                     <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
                      <button class="btn btn-success" type="submit">Submit</button>
                   </div>
                </div>
@@ -362,13 +363,23 @@
       $('#totalRoomReservedStandart').change(function(){
          let totalRoomReservedStandart = $(this).val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedStandart').val('');
+            $("#totalRoomReservedStandart").removeClass('is-valid');
+            $("#totalRoomReservedStandart").addClass('is-invalid');
+            $("#totalRoomReservedStandart").css("background","#FFF");
+            return;
+         }
          $.ajax({
             type: "POST",
             url: "{{ route('reservation.checkAvailableRoomStandart.totalRoomReserved') }}",
             data: {
                "_token": "{{ csrf_token() }}",
                "totalRoomReserved": totalRoomReservedStandart,
-               "typeRoom": typeRoom 
+               "typeRoom": typeRoom,
+               "arrivalDate": arrivalDate 
             },
             beforeSend: function(){
                $("#totalRoomReservedStandart").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
@@ -396,13 +407,23 @@
       $('#totalRoomReservedSuperior').change(function(){
          let totalRoomReservedSuperior = $(this).val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedSuperior').val('');
+            $("#totalRoomReservedSuperior").removeClass('is-valid');
+            $("#totalRoomReservedSuperior").addClass('is-invalid');
+            $("#totalRoomReservedSuperior").css("background","#FFF");
+            return;
+         }
          $.ajax({
             type: "POST",
             url: "{{ route('reservation.checkAvailableRoomSuperior.totalRoomReserved') }}",
             data: {
                "_token": "{{ csrf_token() }}",
                "totalRoomReserved": totalRoomReservedSuperior,
-               "typeRoom": typeRoom 
+               "typeRoom": typeRoom,
+               "arrivalDate": arrivalDate
             },
             beforeSend: function(){
                $("#totalRoomReservedSuperior").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");
@@ -427,17 +448,26 @@
       });
 
       //DELUXE
-
       $('#totalRoomReservedDeluxe').change(function(){
          let totalRoomReservedDeluxe = $(this).val();
          let typeRoom = $("#typeRoom option:selected").val();
+         let arrivalDate = $(".arrivaleDate").val();
+         if(arrivalDate == ''){
+            alert('Date check in has been null');
+            $('#totalRoomReservedDeluxe').val('');
+            $("#totalRoomReservedDeluxe").removeClass('is-valid');
+            $("#totalRoomReservedDeluxe").addClass('is-invalid');
+            $("#totalRoomReservedDeluxe").css("background","#FFF");
+            return;
+         }
          $.ajax({
             type: "POST",
             url: "{{ route('reservation.checkAvailableRoomDeluxe.totalRoomReserved') }}",
             data: {
                "_token": "{{ csrf_token() }}",
                "totalRoomReserved": totalRoomReservedDeluxe,
-               "typeRoom": typeRoom 
+               "typeRoom": typeRoom,
+               "arrivalDate": arrivalDate
             },
             beforeSend: function(){
                $("#totalRoomReservedDeluxe").css("background","#FFF url({{ asset('assets/gif/loading3.gif') }}) no-repeat 60px");

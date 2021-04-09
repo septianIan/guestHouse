@@ -1,6 +1,4 @@
-<li class="nav-header">Menu registration</li>
-
-   <li class="nav-item">
+<li class="nav-item">
       <a href="{{ route('reception.registration.index') }}" class="nav-link">
          <i class="nav-icon fas fa-user-plus"></i>
          <p>
@@ -38,7 +36,6 @@
    </li>
 
    {{-- Check Out --}}
-   <li class="nav-header">Menu cashier</li>
    <li class="nav-item">
       <a href="{{ route('reception.cashier.index') }}" class="nav-link">
          <i class="nav-icon fas fa fa-outdent"></i>

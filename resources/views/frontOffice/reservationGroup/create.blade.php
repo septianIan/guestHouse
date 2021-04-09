@@ -68,6 +68,7 @@
                         <tr>
                            <td>Media Of Reservation</td>
                            <td>Total Room Reserved</td>
+                           <td>Total Pax</td>
                            <td>Type Of Room</td>
                            <td>Room rate</td>
                         </tr>
@@ -153,7 +154,10 @@
                                  <option value="extraBad">Extra Bad</option>
                               </select>
                            </td>
-                           <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+                           <td>
+                              <input type="number" class="form-control" id="form3" name="roomRate[]" value="">
+                              <input type="hidden" name="totalPax[]" value="0" style="width:100px;" class="form-control" id="">
+                           </td>
                            <td colspan="2">
                               <center>
                                  <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>
@@ -313,8 +317,8 @@
                   </div>
                   <div class="row">
                      <div class="col-sm-6">
-                        <label for="">Rate</label>
-                        <input type="number" name="rateRequest" class="form-control" value="{{ old('rateRequest') }}">
+                        {{-- <label for="">Rate</label> --}}
+                        <input type="hidden" name="rateRequest" class="form-control" value="{{ old('rateRequest') }}">
                      </div>
                      <div class="col-sm-6">
                         <label for="">Flight number / Other</label>
@@ -457,7 +461,10 @@
                   <option value="extraBad">Extra Bad</option>
                </select>
             </td>
-            <td><input type="number" class="form-control" id="form3" name="roomRate[]" value=""></td>
+            <td>
+               <input type="number" class="form-control" id="form3" name="roomRate[]" value="">
+               <input type="hidden" name="totalPax[]" value="0" style="width:100px;" class="form-control" id="">
+            </td>
             <td colspan="2">
                <center>
                   <a href="#" class="btn btn-danger removeExtraBad"><i class="fa fa-times"></i></a>

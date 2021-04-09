@@ -17,6 +17,7 @@ class CreateCheckInsTable extends Migration
             $table->id();
             $table->foreignId('registration_id')->constrained()->cascadeOnDelete();
             $table->string('date');
+            $table->string('time');
             $table->string('status')->default('checkIn');
             $table->timestamps();
         });

@@ -244,7 +244,6 @@
                            <td>Room rate</td>
                            <td>Individual/Group</td>
                            <td>Walk in/Reservarion</td>
-                           <td>Action</td>
                         </tr>
                      </thead>
                      <tbody>
@@ -255,73 +254,177 @@
                               <td>{{ $no++ }}</td>
                               <td>{{ $value->typeOfRoom }}</td>
                               <td>
-                                 <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+                                 <select name="rooms[]" id="roomArragement" class="form-control @error('rooms') is-invalid @enderror" required>
                                     <option value=""></option>
-                                    @foreach($rooms as $room)
+                                    @if($value->typeOfRoom == 'standart')
+                                       @foreach($standart as $room)
 
-                                       @if($room->code == 'O')
-                                          <option value="{{ $room->id }}" 
                                           @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:blue;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VR')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:green;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VC')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:#FFA500;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
-
-                                       @elseif($room->code == 'VD')
-                                          <option value="{{ $room->id }}" 
-                                          @if($room->code == 'O')
-                                             disabled
-                                          @elseif($room->code == 'VD')
-                                             disabled
-                                          @endif
-                                          style="color:red;font-weight:bold;">
-                                       
-                                          {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:blue;font-weight:bold;">
                                           
-                                       @endif
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
 
-                                    @endforeach
+                                          @elseif($room->code == 'VR')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:green;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VC')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:#FFA500;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VD')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:red;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                             
+                                          @endif
+
+                                       @endforeach
+                                    @elseif($value->typeOfRoom == 'superior')
+                                       @foreach($superior as $room)
+
+                                          @if($room->code == 'O')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:blue;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VR')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:green;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VC')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:#FFA500;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VD')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:red;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                             
+                                          @endif
+
+                                       @endforeach
+                                    @elseif($value->typeOfRoom == 'deluxe')
+                                       @foreach($deluxe as $room)
+
+                                          @if($room->code == 'O')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:blue;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VR')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:green;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VC')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:#FFA500;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+
+                                          @elseif($room->code == 'VD')
+                                             <option value="{{ $room->id }}" 
+                                             @if($room->code == 'O')
+                                                disabled
+                                             @elseif($room->code == 'VD')
+                                                disabled
+                                             @endif
+                                             style="color:red;font-weight:bold;">
+                                          
+                                             {{ $room->numberRoom }} | {{ $room->code }}</option>
+                                             
+                                          @endif
+
+                                       @endforeach
+                                    @else
+                                       <option value="">Null</option>
+                                    @endif
                                  </select>
-                                 @error('rooms[]')
-                                 <div class="invalid-feedback">
-                                    {{ $message }}
-                                 </div>
+                                 @error('rooms')
+                                    <div class="invalid-feedback">
+                                       {{ $message }}
+                                    </div>
                                  @enderror
                               </td>
                               <td>
-                                 <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]">
+                                 <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]" value="{{ $value->totalPax }}">
                                  @error('totalPax')
                                  <div class="invalid-feedback">
                                     {{ $message }}
                                  </div>
                                  @enderror
                               </td>
-                              <td><input type="number" class="form-control" name="roomRate[]"></td>
+                              <td><input type="number" class="form-control" value="{{ $value->roomRate }}" name="roomRate[]"></td>
                               <td>
                                  <select name="typeOfRegistration[]" id="" class="form-control">
                                     <option value="group">Group</option>
@@ -335,7 +438,6 @@
                                     <option value="reservation">Reservation</option>
                                  </select>
                               </td>
-                              <td><a href="#" class="btn btn-danger remove"><i class="fa fa-times"></i></a></td>
                            </tr>
                         @endfor
                         @endforeach
@@ -440,7 +542,8 @@
                </div>
                <div class="card-body">
                   <div class="col-sm-6 mt-3">
-                     <button class="btn btn-success" type="submit">Submit</button>
+                     <button class="btn btn-success submit" style="visibility: hidden;" id="submit" type="submit">Submit</button>
+                     <a href="#" class="btn btn-warning btn-flat" id="cekRoom">cek</a>
                   </div>
                </div>
             </div>
@@ -474,11 +577,11 @@
 
    function addRow() {
       let tr = `
-         <tr style="background:#ccc;">
+         <tr>
             <td></td>
             <td></td>
             <td>
-               <select name="rooms[]" id="" class="form-control @error('rooms[]') is-invalid @enderror">
+               <select name="rooms[]" id="rooms" class="form-control @error('rooms') is-invalid @enderror">
                   <option value=""></option>
                   @foreach($rooms as $room)
 
@@ -530,21 +633,23 @@
 
                   @endforeach
                </select>
-               @error('rooms[]')
-               <div class="invalid-feedback">
-                  {{ $message }}
-               </div>
-               @enderror
             </td>
             <td>
-               <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]">
+               <input type="number" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]" value="">
                @error('totalPax')
                <div class="invalid-feedback">
                   {{ $message }}
                </div>
                @enderror
             </td>
-            <td><input type="number" class="form-control" name="roomRate[]"></td>
+            <td>
+               <input type="number" class="form-control @error('roomRate') is-invalid @enderror" value="" name="roomRate[]">
+               @error('roomRate')
+               <div class="invalid-feedback">
+                  {{ $message }}
+               </div>
+               @enderror
+            </td>
             <td>
                <select name="typeOfRegistration[]" id="" class="form-control">
                   <option value=""></option>
@@ -654,6 +759,52 @@
       } else {
          return false
       }
+   });
+
+   // roomReserved
+   $(document).ready(function(){
+      $('#cekRoom').live('click', function(){
+         // retrive select option array with element id
+         let roomReserved = [];
+         $('select[name="rooms[]"] option:selected').each(function(){
+            roomReserved.push($(this).val());
+         }); 
+         let roomArragement = roomReserved.filter(item => item);
+
+         // tambahan kamar baru
+         let addRoom =[];
+         $('#rooms option:selected').each(function(){
+            addRoom.push($(this).val());
+         });
+         let rooms = addRoom.filter(item => item);
+         let arrivalDate = $(".arrivaleDate").val();
+
+         $.ajax({
+            type: "POST",
+            url: "{{ route('reception.checkAvailableRoom.roomReserved') }}",
+            data: {
+               "_token": "{{ csrf_token() }}",
+               "roomArragement": roomArragement,
+               "rooms": rooms,
+               "arrivalDate": arrivalDate,
+            },
+            dataType: 'json',
+            success: function(data){
+               if(data.success === true){
+                  Swal.fire({
+                     icon: 'error',
+                     title: 'Oops...',
+                     text: data.message
+                  })
+                  document.getElementById("submit").style.visibility = 'hidden';
+               }else if(data.success === false) {
+                  alert(data.message);
+                  document.getElementById("submit").style.visibility = 'visible';
+               }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {}
+         });
+      });
    });
 </script>
 @endpush
