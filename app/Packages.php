@@ -4,20 +4,19 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Packages extends Model
 {
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-
     protected $fillable = [
         'name', 'price'
     ];
 
-    public function orderrdetails()
+    public function drycleaning_details()
     {
-    	return $this->belongsTo(OrderrDetail::class);
+    	return $this->belongsTo(DrycleaningDetails::class);
     }
 }

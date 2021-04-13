@@ -225,14 +225,14 @@ class RegistrationController extends Controller
         DB::table('registration_room')->where('id', $id)
             ->update([
                 'registration_id' => $request->idRegistration,
-                'room_id' => $request->rooms,
+                'room_id' => \implode($request->rooms),
                 'totalPax' => $request->totalPax,
                 'roomRate' => $request->roomRate,
                 'typeOfRegistration' => $request->typeOfRegistration,
                 'walkInOrReservation' => $request->walkInOrReservation
             ]);
         //Update room new
-        $room = Room::find($request->rooms);
+        $room = Room::find(\implode($request->rooms));
         $room->update(['code' => 'O']);
         return \redirect()->back();
     }
@@ -252,7 +252,7 @@ class RegistrationController extends Controller
             'typeOfRegistration' => $request->typeOfRegistration,
             'walkInOrReservation' => $request->walkInOrReservation,
         ]);
-        $rooms = Room::find($request->rooms);
+        $rooms = Room::find(\implode($request->rooms));
         $rooms->update(['code' => 'O']);
         return \redirect()->back();
     }

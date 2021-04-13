@@ -3,7 +3,9 @@
 use App\Orderr;
 use App\OrderrDetail;
 use App\Product;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MinibarSeed extends Seeder
 {
@@ -17,32 +19,40 @@ class MinibarSeed extends Seeder
         //create product
         $product = [
             [
-                'name' => 'roti bakar',
-                'price' => 30000,
+                'name' => 'Coca cola',
+                'price' => 20000,
             ],
             [
-                'name' => 'Nasi goreng sea food',
-                'price' => 50000,
+                'name' => 'Ice latte',
+                'price' => 20000,
             ],
             [
-                'name' => 'Steak',
-                'price' => 75000,
+                'name' => 'Green milk',
+                'price' => 15000,
             ]
         ];
-        Product::insert($product);
+        DB::table('products')->insert($product);
         
         //create order
         $orderr = [
             [
-                'name' => 'septian aditama',
+                'name' => 'adam',
                 'room_id' => 1,
                 'department' => 'House keeping',
                 'total' => 30000,
-                'date' => 2021-03-06,
-                'created_at' => '2021-06-05 12:46:52'
+                'date' => Carbon::now()->addDays(1)->format('Y-m-d'),
+                'created_at' => Carbon::today()
+            ],
+            [
+                'name' => 'Ajeng ayu',
+                'room_id' => 4,
+                'department' => 'House keeping',
+                'total' => 30000,
+                'date' => Carbon::now()->addDays(-1)->format('Y-m-d'),
+                'created_at' => Carbon::today()
             ]
         ];
-        Orderr::insert($orderr);
+        DB::table('orderrs')->insert($orderr);
 
         //order details
         $orderDetail = [
@@ -59,8 +69,15 @@ class MinibarSeed extends Seeder
                 'quantity' => 2,
                 'unitprice' => 1,
                 'amount' => 100000
+            ],
+            [
+                'orderr_id' => 2,
+                'product_id' => 2,
+                'quantity' => 2,
+                'unitprice' => 1,
+                'amount' => 200000
             ]
         ];
-        OrderrDetail::insert($orderDetail);
+        DB::table('orderr_details')->insert($orderDetail);
     }
 }

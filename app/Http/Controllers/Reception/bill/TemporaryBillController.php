@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Reception\bill;
 
 use App\DetailMasterBill;
+use App\Drycleanings;
 use App\GuestBill;
 use App\Http\Controllers\Controller;
 use App\MasterBill;
+use App\Orderr;
 use App\Registration;
 use App\ReservationCheckInDetail;
 use App\ReservationGroupCheckInDetail;
@@ -15,10 +17,28 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/*
+|--------------------------------------------------------------------------
+|   Controller ini untuk pembuatan/penyimpanan sementara semua bill tamu
+|--------------------------------------------------------------------------
+|   semua bill meliputi
+|   bill laundry, bill minibar
+|   bill room, extrabed, early check in, earlt check out, melebihi batas check out,
+*/
+
 class TemporaryBillController extends Controller
 {   
     public $id;
 
+    public function registration($id)
+    {
+        $registration = Registration::findOrFail($id);
+        return $registration;
+    }
+
+    //!
+    //! saveAllBill
+    //!
     public function saveAllBills(Request $request)
     {
         $id = $request->id;
@@ -65,12 +85,9 @@ class TemporaryBillController extends Controller
         return \response()->json(['sukses' => true]);
     } 
 
-    public function registration($id)
-    {
-        $registration = Registration::findOrFail($id);
-        return $registration;
-    }
-
+    //!
+    //! INDIVIDAUL
+    //!
     public function guestIndividaulReservation($id)
     {   
         $registration = $this->registration($id);
@@ -80,88 +97,10 @@ class TemporaryBillController extends Controller
         return $guestIndividaulReservation;
     }
 
-    public function totalRoomCash($id)
-    {   
-        $registration = $this->registration($id);
-        $checkIn = new Carbon($registration->arrivaleDate);
-        $checkOut = $registration->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < -1)
-            ? 'today'
-            : $checkIn->diffInDays($checkOut);
-        $totalRoomCash = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad['rate'] * $difference);
-
-        return $totalRoomCash;
-    }
-
-    public function difference($id)
-    {   
-        $registration = $this->registration($id);
-        $checkIn = new Carbon($registration->arrivaleDate);
-        $checkOut = $registration->departureDate;
-        $difference = ($checkIn->diff($checkOut)->days < -1)
-            ? 'today'
-            : $checkIn->diffInDays($checkOut);
-
-        return $difference;
-    }
-
-    public function guestBill($id)
-    {
-        $registration = $this->registration($id);
-        $guestBills = [];
-        foreach($registration->rooms as $room){
-            $rooms[] = $room->id;
-            $guestBills = GuestBill::whereBetween('date', [
-                $registration->arrivaleDate, $registration->departureDate
-            ])->whereIn('room_id', $rooms)->get();
-        }
-
-        return $guestBills;
-    }
-
-    public function carbonDates($id)
-    {
-        $registration = $this->registration($id);
-        $start = Carbon::parse($registration->arrivaleDate)->addDay(); //11-03-2021 maju 1 tanggal
-        $end = Carbon::parse($registration->departureDate); //14-03-2021 ->subDay(); mundur 1 tanggal
-        $dateRange = CarbonPeriod::create($start, $end);
-        $dates = [];
-        foreach($dateRange as $date) {
-            $dates[] = $date->format('Y-m-d');
-        }
-
-        return $dates;
-    }
-
-    public function carbonCheckOutTime($id) //jika tamu melebihi tgl C/O
-    {
-        $registration = $this->registration($id);
-        $toDay = new Carbon(); //toDay
-        $checkOut = $registration->departureDate;
-        $difference = ($toDay->diff($checkOut)->days < -1)
-            ? 'today'
-            : $toDay->diffInDays($checkOut);
-        return $difference;
-    }
-
-    public function carbonDiffInDateCheckOut($id) //selisi dari tgl C/O - sekarang
-    {
-        $registration = $this->registration($id);
-        $checkOut = Carbon::parse($registration->departureDate)->addDay();
-        $toDay = Carbon::now()->format('Y-m-d');
-        $dateRange = CarbonPeriod::create($checkOut, $toDay);
-        $dates = [];
-        foreach($dateRange as $date) {
-            $dates[] = $date->format('Y-m-d');
-        }
-        
-        return $dates;
-    }
-
     public function allIndividualGuestBills($id)
     {   
         $registration = $this->registration($id);
-        //array guestbill
+        //* array GUEST BILL
         $guestBills = $this->guestBill($id);
         $dataGuestBill = [];
         foreach($guestBills as $key => $guestBill){
@@ -174,7 +113,7 @@ class TemporaryBillController extends Controller
             ];
         }
 
-        //array ROOM CHARGE
+        //* array ROOM CHARGE
         $dates = $this->carbonDates($id);
         foreach($registration->rooms as $room){
             foreach($dates as $key => $date){
@@ -188,7 +127,7 @@ class TemporaryBillController extends Controller
             }
         }
 
-        //array extraBed
+        //* array EXTRABED
         $dataExtraBed = [];
         if ($registration->extraBad != '') {
             foreach($dates as $key => $date){
@@ -202,7 +141,7 @@ class TemporaryBillController extends Controller
             }
         }
 
-        // jika tamu melebihi tgl check out
+        //* jika tamu melebihi tgl check out
         $COtime = [];
         $carbonDiffCheckOutTime = $this->carbonCheckOutTime($id);
         $carbonDiffInDateCheckOut = $this->carbonDiffInDateCheckOut($id);
@@ -220,7 +159,7 @@ class TemporaryBillController extends Controller
             }
         }
 
-        //Room Surcharge early Check In
+        //*Room Surcharge early Check In
         $roomSurchargesEarlyCheckIn = [];
         foreach($this->roomSurchargesEarlyCheckIn($id) as $roomSurcharge){
             $roomSurchargesEarlyCheckIn[] = [
@@ -232,7 +171,7 @@ class TemporaryBillController extends Controller
             ];
         }
 
-        //Room surcharge early check Out
+        //*Room surcharge early check Out
         $roomSurchargesEarlyCheckOut = [];
         $jamSekarang = Carbon::now()->toTimeString();
         $jamDuaBelasSiang = Carbon::now()->format('12:00');
@@ -250,8 +189,36 @@ class TemporaryBillController extends Controller
             }
         }
 
+        //* array MINIBAR/ORDERR
+        $miniBarBills = [];
+        foreach($this->getMiniBarBills($id) as $miniBarBill){
+            foreach($miniBarBill->orderrdetails as $detail){
+                $miniBarBills[] = [
+                    'id' => $detail->id,
+                    'date' => $miniBarBill->date,
+                    'description' => "Minibar order $detail->quantity x " .$detail->product->name,
+                    'amount' => $detail->quantity * $detail->product->price,
+                    'typeBill' => 'minibar'
+                ];
+            }
+        }
+        
+        //* array LAUNDRY
+        $laundryBiils = [];
+        foreach($this->getLaundryBills($id) as $laundry){
+            foreach($laundry->drycleaning_details as $detail){
+                $laundryBiils[] = [
+                    'id' => $detail->id,
+                    'date' => $laundry->date,
+                    'description' => "Laundry $detail->quantity x " .$detail->package->name,
+                    'amount' => $detail->quantity * $detail->package->price,
+                    'typeBill' => 'laundry'
+                ];
+            }
+        }
+
         //!BATAS
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut, $miniBarBills, $laundryBiils);
         $collect = collect($merged)->sortBy('date');
 
         $allGuestBillIndividual = [];
@@ -268,6 +235,10 @@ class TemporaryBillController extends Controller
 
         return $allGuestBillIndividual;
     }
+
+    //!
+    //! GROUP
+    //!
 
     public function guestGroupReservation($id)
     {
@@ -383,8 +354,36 @@ class TemporaryBillController extends Controller
             }
         }
 
+        //* array MINIBAR/ORDERR
+        $miniBarBills = [];
+        foreach($this->getMiniBarBills($id) as $miniBarBill){
+            foreach($miniBarBill->orderrdetails as $detail){
+                $miniBarBills[] = [
+                    'id' => $detail->id,
+                    'date' => $miniBarBill->date,
+                    'description' => "Minibar order $detail->quantity x " .$detail->product->name,
+                    'amount' => $detail->quantity * $detail->product->price,
+                    'typeBill' => 'minibar'
+                ];
+            }
+        }
+
+        //* array LAUNDRY
+        $laundryBiils = [];
+        foreach($this->getLaundryBills($id) as $laundry){
+            foreach($laundry->drycleaning_details as $detail){
+                $laundryBiils[] = [
+                    'id' => $detail->id,
+                    'date' => $laundry->date,
+                    'description' => "Laundry $detail->quantity x " .$detail->package->name,
+                    'amount' => $detail->quantity * $detail->package->price,
+                    'typeBill' => 'laundry'
+                ];
+            }
+        }
+
         //!BATAS
-        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataMeals, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut);
+        $merged = \array_merge($dataGuestBill, $dataRoomCharge, $dataExtraBed, $COtime, $roomSurchargesEarlyCheckIn, $roomSurchargesEarlyCheckOut, $miniBarBills, $laundryBiils);
         $collect = collect($merged)->sortBy('date');
 
         $allGroupGuestBills = [];
@@ -400,6 +399,115 @@ class TemporaryBillController extends Controller
         }
 
         return $allGroupGuestBills;
+    }
+
+    //!
+    //! OTHER FUNCTION
+    //!
+    public function totalRoomCash($id)
+    {   
+        $registration = $this->registration($id);
+        $checkIn = new Carbon($registration->arrivaleDate);
+        $checkOut = $registration->departureDate;
+        $difference = ($checkIn->diff($checkOut)->days < -1)
+            ? 'today'
+            : $checkIn->diffInDays($checkOut);
+        $totalRoomCash = ($registration->rooms()->sum('roomRate') * $difference) + ($registration->extraBad['rate'] * $difference);
+
+        return $totalRoomCash;
+    }
+
+    public function getMiniBarBills($id)
+    {
+        $registration = $this->registration($id);
+        $minibar = [];
+        foreach($registration->rooms as $room){
+            $rooms[] = $room->id;
+            $minibar = Orderr::whereBetween('date', [
+                $registration->arrivaleDate, $registration->departureDate
+            ])->whereIn('room_id', $rooms)->get();
+        }
+
+        return $minibar;
+    }
+
+    public function getLaundryBills($id)
+    {
+        $registration = $this->registration($id);
+        $laundry = [];
+        foreach($registration->rooms as $room){
+            $rooms[] = $room->id;
+            $laundry = Drycleanings::whereBetween('date', [
+                $registration->arrivaleDate, $registration->departureDate
+            ])->whereIn('room_id', $rooms)->get();
+        }
+
+        return $laundry;
+    }
+
+    public function difference($id)
+    {   
+        $registration = $this->registration($id);
+        $checkIn = new Carbon($registration->arrivaleDate);
+        $checkOut = $registration->departureDate;
+        $difference = ($checkIn->diff($checkOut)->days < -1)
+            ? 'today'
+            : $checkIn->diffInDays($checkOut);
+
+        return $difference;
+    }
+
+    public function guestBill($id)
+    {
+        $registration = $this->registration($id);
+        $guestBills = [];
+        foreach($registration->rooms as $room){
+            $rooms[] = $room->id;
+            $guestBills = GuestBill::whereBetween('date', [
+                $registration->arrivaleDate, $registration->departureDate
+            ])->whereIn('room_id', $rooms)->get();
+        }
+
+        return $guestBills;
+    }
+
+    public function carbonDates($id)
+    {
+        $registration = $this->registration($id);
+        $start = Carbon::parse($registration->arrivaleDate)->addDay(); //11-03-2021 maju 1 tanggal
+        $end = Carbon::parse($registration->departureDate); //14-03-2021 ->subDay(); mundur 1 tanggal
+        $dateRange = CarbonPeriod::create($start, $end);
+        $dates = [];
+        foreach($dateRange as $date) {
+            $dates[] = $date->format('Y-m-d');
+        }
+
+        return $dates;
+    }
+
+    public function carbonCheckOutTime($id) //jika tamu melebihi tgl C/O
+    {
+        $registration = $this->registration($id);
+        $toDay = new Carbon(); //toDay
+        $checkOut = $registration->departureDate;
+        $difference = ($toDay->diff($checkOut)->days < -1)
+            ? 'today'
+            : $toDay->diffInDays($checkOut);
+        return $difference;
+    }
+
+    public function carbonDiffInDateCheckOut($id) //selisi dari tgl C/O - sekarang
+    {
+        $registration = $this->registration($id);
+        $checkOut = Carbon::parse($registration->departureDate)->addDay();
+        $toDay = Carbon::now()->format('Y-m-d');
+        $dateRange = CarbonPeriod::create($checkOut, $toDay);
+        $dates = [];
+        foreach($dateRange as $date) {
+            $dates[] = $date->format('Y-m-d');
+        }
+        
+        return $dates;
     }
 
     public function resetAllBill($id)

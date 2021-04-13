@@ -487,6 +487,7 @@ class SchedulerController extends Controller
     public function getIndividualReservations($date)
     {   
         //ambil dari tgl reservasi
+        $depositReservationIndividu = [];
         $depositReservationIndividu = Reservation::where([
             ['arrivaleDate', '=', $date],
             ['clerk', '=', auth()->user()->name]
@@ -504,6 +505,7 @@ class SchedulerController extends Controller
         // 'value2' => $request->numberAccount,
         // 'value3' => $requestOther,
         // 'status' => 0
+        $groupReservation = [];
         $groupReservation = ReservationGroup::where([
             ['arrivaleDate', $date],
             ['clerk', '=', auth()->user()->name]
@@ -524,7 +526,8 @@ class SchedulerController extends Controller
     }
 
     public function getCheckOutPayment($date)
-    {
+    {   
+        $checkOut = [];
         $checkOut = CheckOut::where([
             ['date', '=', $date]
         ])->get();

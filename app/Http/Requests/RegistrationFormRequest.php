@@ -24,13 +24,6 @@ class RegistrationFormRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            "rooms"    => [
-                'required',
-            ],
-            "totalPax"    => [
-                'required',
-                
-            ],
             'firstName' => 'required',
             'lastName' => 'required',
             'nationality' => 'required',

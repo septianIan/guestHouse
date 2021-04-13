@@ -59,6 +59,10 @@
                                  <font style="color:red;">{{ $individualBill->description }} <i class="fa fa-check"></i></font>
                               @elseif($individualBill->typeBill == 'roomSurcharge')
                                  <font>{{ $individualBill->description }} <i class="fa fa-check"></i></font>
+                              @elseif($individualBill->typeBill == 'minibar')
+                                 <font>{{ $individualBill->description }}</font>
+                              @elseif($individualBill->typeBill == 'laundry')
+                                 <font>{{ $individualBill->description }}</font>
                               @else
                                  {{ $individualBill->description }} @if($individualBill->status == 0)<a href="#" class="btn btn-danger btn-xs deletePostCash" data-id="{{ $individualBill->idGuestBill }}"><i class="fa fa-trash" aria-hidden="true"></i></a>@endif
                               @endif

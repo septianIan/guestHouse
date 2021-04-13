@@ -3,6 +3,7 @@
 use App\DrycleaningDetails;
 use App\Drycleanings;
 use App\Packages;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class LaundrySeed extends Seeder
@@ -32,29 +33,56 @@ class LaundrySeed extends Seeder
                 'price' => 20000,
             ]
         ];
-        Packages::insert($dataPackage);
+        DB::table('packages')->insert($dataPackage);
 
         $drycleanings = [
             [
-                'name' => 'septian aditama',
+                'name' => 'Adam',
                 'room_id' => 1,
                 'total' => 35000,
-                'date' => '2021-03-05'
+                'date' => Carbon::now()->addDays(1)->format('Y-m-d')
+            ],
+            [
+                'name' => 'ajeng ayu nindia safira',
+                'room_id' => 7,
+                'total' => 50000,
+                'date' => Carbon::now()->addDays(-1)->format('Y-m-d')
             ]
         ];
         Drycleanings::insert($drycleanings);
 
         $drycleaningDetail = [
             [
-                'drycleaning_id' => 1,
+                'drycleanings_id' => 1,
                 'package_id' => 1,
                 'quantity' => 1,
                 'unitprice' => 1,
                 'amount' => 25000,
             ],
             [
-                'drycleaning_id' => 1,
+                'drycleanings_id' => 1,
                 'package_id' => 1,
+                'quantity' => 1,
+                'unitprice' => 1,
+                'amount' => 10000,
+            ],
+            [
+                'drycleanings_id' => 2,
+                'package_id' => 1,
+                'quantity' => 1,
+                'unitprice' => 1,
+                'amount' => 25000,
+            ],
+            [
+                'drycleanings_id' => 2,
+                'package_id' => 2,
+                'quantity' => 1,
+                'unitprice' => 1,
+                'amount' => 15000,
+            ],
+            [
+                'drycleanings_id' => 2,
+                'package_id' => 3,
                 'quantity' => 1,
                 'unitprice' => 1,
                 'amount' => 10000,

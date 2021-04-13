@@ -7,6 +7,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/*
+|--------------------------------------------------------------------------
+|   Controller ini untuk masterbill tamu 
+|--------------------------------------------------------------------------
+|   master bill meliputi
+|   minibar, laundry, telephone voucher, miscellaneous, coffe shop, room reservice
+*/
+
 class GuestBillController extends Controller
 {
     /**
@@ -39,6 +47,7 @@ class GuestBillController extends Controller
     {
         $temporaryBills = DB::table('temporary_bills')->where('registration_id', $request->registration_id)
             ->first();
+        // jika temporary bill belum dibuat, maka belum bisa post bill tamu
         if ($request->description > 0 && !empty($temporaryBills)) {
             foreach($request->description as $key => $v){
                 $data = [

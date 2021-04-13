@@ -205,7 +205,7 @@
                      <tbody>
                         <tr>
                            <td>
-                              <select name="rooms[]" id="roomArragement" class="rooms form-control @error('rooms[]') is-invalid @enderror">
+                              <select name="rooms[]" id="roomArragement" class="rooms form-control @error('rooms[]') is-invalid @enderror" required>
                                     <option value=""></option>
                                     @foreach($rooms as $room)
 
@@ -264,7 +264,7 @@
                                  @enderror
                            </td>
                            <td>
-                              <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]">
+                              <input type="text" class="form-control @error('totalPax') is-invalid @enderror" name="totalPax[]" required>
                               @error('totalPax')
                               <div class="invalid-feedback">
                                  {{ $message }}
@@ -273,7 +273,7 @@
                            </td>
                            <td><input type="number" class="form-control" name="roomRate[]"></td>
                            <td>
-                              <select name="typeOfRegistration[]" id="" class="form-control">
+                              <select name="typeOfRegistration[]" id="" class="form-control" required>
                                  <option value=""></option>
                                  <option value="individual">Individual</option>
                                  <option value="group">Group</option>
@@ -305,7 +305,7 @@
                <div class="card-body">
                   <div class="col-sm-6 mt-3">
                      <input type="hidden" name="clerk" value="{{ auth()->user()->name }}">
-                     <button class="btn btn-success submit" style="display:none;" id="submit" type="submit">Submit</button>
+                     <button class="btn btn-success submit" style="visibility: hidden;" id="submit" type="submit">Submit</button>
                      <a href="#" class="btn btn-warning btn-flat" id="cekRoom">cek</a>
                   </div>
                </div>

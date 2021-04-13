@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(IndividualReservationSeed::class);
         $this->call(groupReservationSeed::class);
         $this->call(RegistrationSeed::class);
-        // $this->call(MinibarSeed::class);
-        // $this->call(LaundrySeed::class);
+        $this->call(MinibarSeed::class);
+        $this->call(LaundrySeed::class);
     }
 }
